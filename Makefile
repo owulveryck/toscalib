@@ -1,11 +1,12 @@
-
 GOPATH=$(HOME)/GOPROJECTS
 GO=go
 
 gotosca:  *.go
 	$(GO) build
 
-all: gotosca
+all: test gotosca
 
+test:
+	$(GO) test
 clean:
 	rm tosca
