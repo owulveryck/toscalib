@@ -66,7 +66,8 @@ topology_template:
       value: { get_attribute : [ my_server, private_address ] }
 `
 
-type topologyTemplateStruct struct {
+//go:generate stringer -type=TopologyTemplateStruct
+type TopologyTemplateStruct struct {
 	ToscaDefinitionsVersion string `yaml:"tosca_definitions_version"`
 	Description             string `yaml:"description"`
 	TopologyTemplate        struct {
@@ -90,7 +91,7 @@ type topologyTemplateStruct struct {
 }
 
 func main() {
-	t := topologyTemplateStruct{}
+	t := TopologyTemplateStruct{}
 
 	err := yaml.Unmarshal([]byte(data), &t)
 	if err != nil {
