@@ -1,5 +1,9 @@
 package gotosca
 
+const (
+	PropertyFunctions []string = []string{"get_input", "get_property", "get_attribute"} // B 4.1
+)
+
 // TopologyStructure as defined in
 //http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
 type TopologyTemplateStruct struct {
