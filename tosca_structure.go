@@ -1,11 +1,13 @@
 package gotosca
 
 // TopologyStructure as defined in
-//http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html#_Toc419746110
+//http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
 type TopologyTemplateStruct struct {
-	ToscaDefinitionsVersion string `yaml:"tosca_definitions_version"`
+	ToscaDefinitionsVersion string `yaml:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
 	Description             string `yaml:"description"`
-	TopologyTemplate        struct {
+	DlsDefinitions          struct {
+	} `yaml:"dsl_definitions"` // 15 Using YAML Macros to simplify templates
+	TopologyTemplate struct {
 		Inputs map[string]struct {
 			Type        string      `yaml:"type"`
 			Description string      `yaml:"description"`
