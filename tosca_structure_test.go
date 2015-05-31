@@ -6,6 +6,7 @@ import (
 	"log"
 )
 
+//Test data
 var data = `
 tosca_definitions_version: tosca_simple_yaml_1_0_0
 
