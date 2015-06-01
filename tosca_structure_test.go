@@ -3,7 +3,7 @@ package gotosca
 import (
 	"fmt"
 	"gopkg.in/yaml.v2"
-	"log"
+	"testing"
 )
 
 //Test data
@@ -67,74 +67,36 @@ topology_template:
       value: { get_attribute : [ my_server, private_address ] }
 `
 
-func ExampleTopologyTemplateStruct() {
-	t := TopologyTemplateStruct{}
+// Test the Mashalling and Unmarshalling
+func TestToscaStructureMashallAndUnmarshal(t *testing.T) {
+	topology := TopologyTemplateStruct{}
 
-	err := yaml.Unmarshal([]byte(data), &t)
+	err := yaml.Unmarshal([]byte(data), &topology)
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		t.Errorf("error: %v", err)
 	}
-	//fmt.Printf("--- Result of the marshal:\n%v\n\n", t)
+	t.Logf("--- Result of the marshal:\n%v\n\n", topology)
 
-	d, err := yaml.Marshal(&t)
+	d, err := yaml.Marshal(&topology)
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		t.Errorf("error: %v", err)
 	}
-	fmt.Printf("%s\n\n", string(d))
-	//tosca_definitions_version: tosca_simple_yaml_1_0_0
-	//description: Template for deploying a single server with predefined properties.
-	//topology_template:
-	//  inputs:
-	//    cpus:
-	//      type: integer
-	//      description: Number of CPUs for the server.
-	//      constraints:
-	//      - valid_values:
-	//        - 1
-	//        - 2
-	//        - 4
-	//        - 8
-	//  node_templates:
-	//    my_server:
-	//      type: tosca.nodes.Compute
-	//      capabilities:
-	//        host:
-	//          properties:
-	//            disk_size: 10 GB
-	//            mem_size: 4 MB
-	//            num_cpus: "1"
-	//        os:
-	//          properties:
-	//            architecture: x86_64
-	//            distribution: rhel
-	//            type: linux
-	//            version: "6.5"
-	//    my_server2:
-	//      type: tosca.nodes.Compute
-	//      capabilities:
-	//        host:
-	//          properties:
-	//            disk_size: 10 GB
-	//            mem_size: 4 MB
-	//            num_cpus: "1"
-	//        os:
-	//          properties:
-	//            architecture: x86_64
-	//            distribution: rhel
-	//            type: linux
-	//            version: "6.5"
-	//    mysql:
-	//      type: tosca.nodes.DBMS.MySQL
-	//      properties:
-	//        port:
-	//          get_input: my_mysql_port
-	//        root_password:
-	//          get_input: my_mysql_rootpw
-	//  outputs:
-	//    server_ip:
-	//      value:
-	//        get_attribute:
-	//        - my_server
-	//        - private_address
-	//      description: The private IP address of the provisioned server.
+	t.Logf("%s\n\n", string(d))
+}
+
+// Different tests to access the structure
+func TestToscaStructure(t *testing.T) {
+	topology := TopologyTemplateStruct{}
+
+	err := yaml.Unmarshal([]byte(data), &topology)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	t.Logf("--- Result of the marshal:\n%v\n\n", topology)
+
+	d, err := yaml.Marshal(&topology)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	t.Logf("%s\n\n", string(d))
 }
