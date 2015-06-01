@@ -19,6 +19,10 @@ topology_template:
       description: Number of CPUs for the server.
       constraints:
          - valid_values: [ 1, 2, 4, 8 ]
+    myinput:
+      type: integer
+      constraints:
+         - valid_values: [ 1, 2, 4, 8 ]
   node_templates:
     my_server:
       type: tosca.nodes.Compute
@@ -92,11 +96,11 @@ func TestToscaStructure(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
-	t.Logf("--- Result of the marshal:\n%v\n\n", topology)
 
-	d, err := yaml.Marshal(&topology)
-	if err != nil {
-		t.Errorf("error: %v", err)
+	// Play with the structure
+	for key, value := range topology.TopologyTemplate.Inputs {
+		fmt.Printf("Input: %v\n", key)
+		fmt.Printf("\tType: %v\n", value.Type)
+		fmt.Printf("\tDescription: %v\n", value.Description)
 	}
-	t.Logf("%s\n\n", string(d))
 }
