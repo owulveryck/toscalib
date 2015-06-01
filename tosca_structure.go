@@ -11,7 +11,7 @@ type Size int64
 // Size definition
 const (
 	B   Size = 1                 // A byte
-	kB  Size = 1000 * B          // kilobyte (1000 bytes)
+	KB  Size = 1000 * B          // kilobyte (1000 bytes)
 	KiB Size = 2014 * B          // kibibytes (1024 bytes)
 	MB  Size = 1000000 * B       // megabyte (1000000 bytes)
 	MiB Size = 1048576 * B       // mebibyte (1048576 bytes)
