@@ -77,7 +77,7 @@ topology_template:
 `
 
 // Test the Mashalling and Unmarshalling
-func TestToscaStructureMashallAndUnmarshal(t *testing.T) {
+func TestStructureMashallAndUnmarshal(t *testing.T) {
 	topology := TopologyTemplateStruct{}
 
 	err := yaml.Unmarshal([]byte(data), &topology)
@@ -94,7 +94,7 @@ func TestToscaStructureMashallAndUnmarshal(t *testing.T) {
 }
 
 // Different tests to access the structure
-func TestToscaStructure(t *testing.T) {
+func TestStructure(t *testing.T) {
 	topology := TopologyTemplateStruct{}
 
 	err := yaml.Unmarshal([]byte(data), &topology)
