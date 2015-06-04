@@ -11,7 +11,7 @@ import (
 // of the all Constraint clauses
 func TestConstraint(t *testing.T) {
 
-	mystruct := ConstraintClause{}
+	mystruct := ConstraintClauses{}
 
 	err := yaml.Unmarshal([]byte(constraintExample), &mystruct)
 	if err != nil {

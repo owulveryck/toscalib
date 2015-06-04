@@ -50,22 +50,22 @@ const (
 
 /****************** Consstraint *************************/
 // A.5.2 Constraint clause
-type ConstraintClause map[string]interface{}
+type ConstraintClauses map[string]interface{}
 
 // Tihs function evaluate the Parameter an returns trus if equal
-func (this *ConstraintClause) Equal(interface{}) bool          { return true }
-func (this *ConstraintClause) GreaterThan(interface{}) bool    { return true }
-func (this *ConstraintClause) GreaterOrEqual(interface{}) bool { return true }
-func (this *ConstraintClause) LessThan(interface{}) bool       { return true }
-func (this *ConstraintClause) LessOrEqual(interface{}) bool    { return true }
-func (this *ConstraintClause) InRange(interface{}) bool        { return true }
-func (this *ConstraintClause) ValidValues(interface{}) bool    { return true }
-func (this *ConstraintClause) Length(interface{}) bool         { return true }
-func (this *ConstraintClause) MinLength(interface{}) bool      { return true }
-func (this *ConstraintClause) MaxLength(interface{}) bool      { return true }
-func (this *ConstraintClause) Pattern(interface{}) bool        { return true }
+func (this *ConstraintClauses) Equal(interface{}) bool          { return true }
+func (this *ConstraintClauses) GreaterThan(interface{}) bool    { return true }
+func (this *ConstraintClauses) GreaterOrEqual(interface{}) bool { return true }
+func (this *ConstraintClauses) LessThan(interface{}) bool       { return true }
+func (this *ConstraintClauses) LessOrEqual(interface{}) bool    { return true }
+func (this *ConstraintClauses) InRange(interface{}) bool        { return true }
+func (this *ConstraintClauses) ValidValues(interface{}) bool    { return true }
+func (this *ConstraintClauses) Length(interface{}) bool         { return true }
+func (this *ConstraintClauses) MinLength(interface{}) bool      { return true }
+func (this *ConstraintClauses) MaxLength(interface{}) bool      { return true }
+func (this *ConstraintClauses) Pattern(interface{}) bool        { return true }
 
-func (this *ConstraintClause) UnmarshalYAML() {}
+func (this *ConstraintClauses) UnmarshalYAML() {}
 
 /*
 {
@@ -94,22 +94,22 @@ func (this *ConstraintClause) UnmarshalYAML() {}
 // get_property function within TOSCA Service Templates
 // TODO Implement a GetProperty function with a return type *PropertyDefinition
 type PropertyDefinition struct {
-	Type        string             `yaml:"type"`                  // The required data type for the property
-	Description string             `yaml:"description,omitempty"` // The optional description for the property.
-	Required    bool               `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
-	Default     interface{}        `yaml:"default"`
-	Status      Status             `yaml:"status"`
-	Constraints []ConstraintClause `yaml:"constraints"`
-	EntrySchema string             `yaml:"entry_schema"`
+	Type        string           `yaml:"type"`                  // The required data type for the property
+	Description string           `yaml:"description,omitempty"` // The optional description for the property.
+	Required    bool             `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
+	Default     interface{}      `yaml:"default"`
+	Status      Status           `yaml:"status"`
+	Constraints ConstraintClauses `yaml:"constraints,inline,omitempty"`
+	EntrySchema string           `yaml:"entry_schema"`
 }
 
 // Type input corresponds to  `yaml:"inputs,omitempty"`
 type Input struct {
-	Type             string             `yaml:"type"`
-	Description      string             `yaml:"description,omitempty"` // Not required
-	Constraints      []ConstraintClause `yaml:"constraints,omitempty"`
-	ValidSourceTypes interface{}        `yaml:"valid_source_types,omitempty"`
-	Occurrences      interface{}        `yaml:"occurrences,omitempty"`
+	Type             string           `yaml:"type"`
+	Description      string           `yaml:"description,omitempty"` // Not required
+	Constraints      ConstraintClauses `yaml:"constraints,omitempty,inline"`
+	ValidSourceTypes interface{}      `yaml:"valid_source_types,omitempty"`
+	Occurrences      interface{}      `yaml:"occurrences,omitempty"`
 }
 
 type Output struct {
