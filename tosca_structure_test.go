@@ -2,6 +2,7 @@ package toscalib
 
 import (
 	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"log"
 	"reflect"
 	"testing"
@@ -61,15 +62,34 @@ func TestTopology(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
-	log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
 	t.Logf("--- Result of the marshal:\n%v\n\n", mystruct)
 
 	d, err := yaml.Marshal(&mystruct)
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
+	t.Logf("%s\n\n", string(d))
+}
+
+func TestExample(t *testing.T) {
+	mystruct := TopologyTemplateStruct{}
+	file, err := ioutil.ReadFile("examples/tosca_single_instance_wordpress.yaml")
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	err = yaml.Unmarshal(file, &mystruct)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
+	t.Logf("--- Result of the marshal:\n%v\n\n", mystruct)
+	d, err := yaml.Marshal(&mystruct)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
 	log.Printf("%s\n\n", string(d))
 	t.Logf("%s\n\n", string(d))
+
 }
 
 // Different tests to access the structure
