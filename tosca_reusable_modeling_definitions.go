@@ -76,6 +76,9 @@ type InterfaceDefinition interface{}
 // TODO: Appendix 5.5
 type ArtifactDefinition interface{}
 
+// TODO: I'm defining temporaly PropDef because it is needed in the NodeType
+type PropDef interface{}
+
 // TODO Appendix 5.4
 // A node filter definition defines criteria for selection of a TOSCA Node Template based upon the template’s property values, capabilities and capability properties.
 type NodeFilter interface{}
@@ -106,16 +109,16 @@ type DataType struct {
 // NodeTemplate as described in Appendix 7.3
 // A Node Template specifies the occurrence of a manageable software component as part of an application’s topology model which is defined in a TOSCA Service Template.  A Node template is an instance of a specified Node Type and can provide customized properties, constraints or operations which override the defaults provided by its Node Type and its implementations.
 type NodeTemplate struct {
-	Type         string                          `yaml:"type"`                   // The required name of the Node Type the Node Template is based upon.
-	Decription   string                          `yaml:"description,omitempty"`  // An optional description for the Node Template.
-	Directives   []string                        `yaml:"directives,omitempty"`   // An optional list of directive values to provide processing instructions to orchestrators and tooling.
-	Properties   map[string]PropertyDefinition   `yaml:"properties,omitempty"`   // An optional list of property value assignments for the Node Template.
-	Attributes   map[string]AttributeDefinition  `yaml:"attributes,omitempty"`   // An optional list of attribute value assignments for the Node Template.
-	Requirements interface{}                     `yaml:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
-	Capabilities map[string]CapabilityDefinition `yaml:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
-	Interfaces   map[string]InterfaceDefinition  `yaml:"interfaces"`             // An optional list of named interface definitions for the Node Template.
-	Artifcats    map[string]ArtifactDefinition   `yaml:"artifcats,omitempty"`    // An optional list of named artifact definitions for the Node Template.
-	NodeFilter   map[string]NodeFilter           `yaml:"node_filter,omitempty"`  // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
+	Type         string                         `yaml:"type"`                   // The required name of the Node Type the Node Template is based upon.
+	Decription   string                         `yaml:"description,omitempty"`  // An optional description for the Node Template.
+	Directives   []string                       `yaml:"directives,omitempty"`   // An optional list of directive values to provide processing instructions to orchestrators and tooling.
+	Properties   map[string]interface{}         `yaml:"properties,omitempty"`   // An optional list of property value assignments for the Node Template.
+	Attributes   map[string]interface{}         `yaml:"attributes,omitempty"`   // An optional list of attribute value assignments for the Node Template.
+	Requirements interface{}                    `yaml:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
+	Capabilities map[string]interface{}         `yaml:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
+	Interfaces   map[string]InterfaceDefinition `yaml:"interfaces"`             // An optional list of named interface definitions for the Node Template.
+	Artifcats    map[string]ArtifactDefinition  `yaml:"artifcats,omitempty"`    // An optional list of named artifact definitions for the Node Template.
+	NodeFilter   map[string]NodeFilter          `yaml:"node_filter,omitempty"`  // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
 }
 
 // RepositoryDefinition as desribed in Appendix 5.6
