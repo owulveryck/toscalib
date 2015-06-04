@@ -17,14 +17,14 @@ func TestConstraint(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
-	log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
+	//log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
 	t.Logf("--- Result of the marshal:\n%v\n\n", mystruct)
 
 	d, err := yaml.Marshal(&mystruct)
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
-	log.Printf("%s\n\n", string(d))
+	//log.Printf("%s\n\n", string(d))
 
 	t.Logf("%s\n\n", string(d))
 }
@@ -39,6 +39,28 @@ func TestProperty(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
+	//log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
+	t.Logf("--- Result of the marshal:\n%v\n\n", mystruct)
+
+	d, err := yaml.Marshal(&mystruct)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	//log.Printf("%s\n\n", string(d))
+	t.Logf("%s\n\n", string(d))
+}
+
+// Test the Mashalling and Unmarshalling
+// of the all topology example
+func TestTopology(t *testing.T) {
+	// For  now, bypass this test
+	//t.SkipNow()
+	mystruct := TopologyTemplateStruct{}
+
+	err := yaml.Unmarshal([]byte(topologyExample), &mystruct)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
 	log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
 	t.Logf("--- Result of the marshal:\n%v\n\n", mystruct)
 
@@ -47,26 +69,6 @@ func TestProperty(t *testing.T) {
 		t.Errorf("error: %v", err)
 	}
 	log.Printf("%s\n\n", string(d))
-	t.Logf("%s\n\n", string(d))
-}
-
-// Test the Mashalling and Unmarshalling
-// of the all topology example
-func TestTopology(t *testing.T) {
-	// For  now, bypass this test
-	t.SkipNow()
-	topology := TopologyTemplateStruct{}
-
-	err := yaml.Unmarshal([]byte(topologyExample), &topology)
-	if err != nil {
-		t.Errorf("error: %v", err)
-	}
-	t.Logf("--- Result of the marshal:\n%v\n\n", topology)
-
-	d, err := yaml.Marshal(&topology)
-	if err != nil {
-		t.Errorf("error: %v", err)
-	}
 	t.Logf("%s\n\n", string(d))
 }
 

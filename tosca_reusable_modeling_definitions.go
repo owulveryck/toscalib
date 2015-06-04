@@ -71,7 +71,12 @@ type AttributeDefinition interface{}
 
 //TODO
 // A 6.2
-type RequirementDefinition interface{}
+type RequirementDefinition struct {
+	Capability   string     `yaml:"capability"`             // The required reserved keyname used that can be used to provide the name of a valid Capability Type that can fulfil the requirement
+	node         string     `yaml:"node,omitempty"`         // The optional reserved keyname used to provide the name of a valid Node Type that contains the capability definition that can be used to fulfil the requirement
+	Relationship string     `yaml:"relationship,omitempty"` //The optional reserved keyname used to provide the name of a valid Relationship Type to construct when fulfilling the requirement.
+	Occurrences  ToscaRange `yaml:"occurences,omitempty"`   // The optional minimum and maximum occurrences for the requirement.  Note: the keyword UNBOUNDED is also supported to represent any positive integer
+}
 
 //TODO
 // A 6.1
