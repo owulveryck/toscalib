@@ -1,3 +1,5 @@
+// Package gotosca implements the TOSCA syntax in its YAML version as described in
+// http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/TOSCA-Simple-Profile-YAML-v1.0.pdf
 package gotosca
 
 import (
@@ -6,7 +8,7 @@ import (
 
 // This implements the type defined in Appendix A 2 of the definition file
 
-// TOSCA version strings have the following grammar:
+// ToscaVersion - The version have the following grammar:
 // <major_version>.<minor_version>[.<fix_version>[.<qualifier>[-<build_version] ] ]
 type ToscaVersion struct {
 	MajorVersion int    // major_version : is a required integer value greater than or equ al to 0 (zero)
@@ -16,16 +18,18 @@ type ToscaVersion struct {
 	BuildVersion int    // build_version : is an optional integer value greater than or equal to 0 (zero) that can be used to further qualify different build versions of the code that has the same qualifer_string
 }
 
+// Parse parses a string representing a ToscaVersion and fill the structure
 // TODO: implement the Parse Function
 func (this *ToscaVersion) Parse(toscaVersion string) {}
 
-// A.2.3 TOCSA range type
-// The range type can be used to define numeric ranges with a lower and upper boundary. For example, this allows for specifying a range of ports to be opened in a firewall
+// UNBOUNDED: A.2.3 TOCSA range type
 const UNBOUNDED uint64 = 9223372036854775807
 
+// ToscaRange is defined in Appendix 2.3 
+// The range type can be used to define numeric ranges with a lower and upper boundary. For example, this allows for specifying a range of ports to be opened in a firewall
 type ToscaRange [2]uint64
 
-//A.2.4 TOSCA list type
+// ToscaList is defined is Appendix 2.4.
 // The list type allows for specifying multiple values for a parameter of property.
 // For example, if an application allows for being configured to listen on multiple ports, a list of ports could be configured using the list data type.
 // Note that entries in a list for one property or parameter must be of the same type.
