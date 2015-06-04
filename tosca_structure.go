@@ -1,43 +1,7 @@
 package gotosca
 
-import (
-	"time"
-)
-
-// Definition of the ScalarSize
-// A 2.6.4
-type Size int64
-
-// Size definition
-const (
-	B   Size = 1                 // A byte
-	KB  Size = 1000 * B          // kilobyte (1000 bytes)
-	KiB Size = 2014 * B          // kibibytes (1024 bytes)
-	MB  Size = 1000000 * B       // megabyte (1000000 bytes)
-	MiB Size = 1048576 * B       // mebibyte (1048576 bytes)
-	GB  Size = 1000000000 * B    // gigabyte (1000000000 bytes)
-	GiB Size = 1073741824 * B    // gibibytes (1073741824 bytes)
-	TB  Size = 1000000000000 * B // terabyte (1000000000000 bytes)
-	TiB Size = 1099511627776 * B // tebibyte (1099511627776 bytes)
-)
-
-// A.2.6.5 scalar-unit.time
-const (
-	D  time.Duration = H * 24           //  days
-	H  time.Duration = time.Hour        // hours
-	M  time.Duration = time.Minute      // minutes
-	S  time.Duration = time.Second      //  seconds
-	Ms time.Duration = time.Millisecond //  milliseconds
-	Us time.Duration = time.Microsecond // microseconds
-	Ns time.Duration = time.Nanosecond  // nanoseconds
-)
-
 // We define a type status used in the PropertyDefinition
 type Status int64
-
-// Maybe this could change
-type Scalar string
-type Regex interface{}
 
 // Valid values for Status
 // A 5.7.3
@@ -52,7 +16,7 @@ const (
 // A.5.2 Constraint clause
 type ConstraintClauses map[string]interface{}
 
-// Tihs function evaluate the Parameter an returns trus if equal
+// evaluates the Parameter an returns trus if equal
 func (this *ConstraintClauses) Equal(interface{}) bool          { return true }
 func (this *ConstraintClauses) GreaterThan(interface{}) bool    { return true }
 func (this *ConstraintClauses) GreaterOrEqual(interface{}) bool { return true }
@@ -65,23 +29,8 @@ func (this *ConstraintClauses) MinLength(interface{}) bool      { return true }
 func (this *ConstraintClauses) MaxLength(interface{}) bool      { return true }
 func (this *ConstraintClauses) Pattern(interface{}) bool        { return true }
 
-func (this *ConstraintClauses) UnmarshalYAML() {}
-
-/*
-{
-	Equal          Scalar      `yaml:"equal,omitempty"`            // Constrains a property or parameter to a value equal to (‘=’) the value declared
-	GreaterThan    Scalar      `yaml:"greater_than,omitempty"`     // Constrains a property or parameter to a value greater than (‘>’) the value declared
-	GreaterOrEqual Scalar      `yaml:"greater_or_equal,omitempty"` // Constrains a property or parameter to a value greater than or equal to (‘>=’) the value declared
-	LessThan       Scalar      `yaml:"less_than,omitempty"`
-	LessOrEqual    Scalar      `yaml:"less_or_equal,omitempty"`
-	InRange        interface{} `yaml:"in_range,omitempty"`
-	ValidValues    interface{} `yaml:"valid_values,omitempty"`
-	Length         Scalar      `yaml:"length,omitempty"`
-	MinLength      Scalar      `yaml:"min_length,omitempty"`
-	MaxLength      Scalar      `yaml:"max_length,omitempty"`
-	Pattern        Regex       `yaml:"regex,omitempty"`
-}
-*/
+// TODO: implement the Mashaler YAML interface for the constraint type
+// func (this *ConstraintClauses) UnmarshalYAML() {}
 
 //TOSCA
 // A.5.7 Property definition
@@ -92,24 +41,23 @@ func (this *ConstraintClauses) UnmarshalYAML() {}
 // TOSCA entities which indicate their “desired state” when they are instantiated.
 // The value of a property can be retrieved using the
 // get_property function within TOSCA Service Templates
-// TODO Implement a GetProperty function with a return type *PropertyDefinition
 type PropertyDefinition struct {
-	Type        string           `yaml:"type"`                  // The required data type for the property
-	Description string           `yaml:"description,omitempty"` // The optional description for the property.
-	Required    bool             `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
-	Default     interface{}      `yaml:"default"`
-	Status      Status           `yaml:"status"`
+	Type        string            `yaml:"type"`                  // The required data type for the property
+	Description string            `yaml:"description,omitempty"` // The optional description for the property.
+	Required    bool              `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
+	Default     interface{}       `yaml:"default"`
+	Status      Status            `yaml:"status"`
 	Constraints ConstraintClauses `yaml:"constraints,inline,omitempty"`
-	EntrySchema string           `yaml:"entry_schema"`
+	EntrySchema string            `yaml:"entry_schema,omitempty"`
 }
 
 // Type input corresponds to  `yaml:"inputs,omitempty"`
 type Input struct {
-	Type             string           `yaml:"type"`
-	Description      string           `yaml:"description,omitempty"` // Not required
+	Type             string            `yaml:"type"`
+	Description      string            `yaml:"description,omitempty"` // Not required
 	Constraints      ConstraintClauses `yaml:"constraints,omitempty,inline"`
-	ValidSourceTypes interface{}      `yaml:"valid_source_types,omitempty"`
-	Occurrences      interface{}      `yaml:"occurrences,omitempty"`
+	ValidSourceTypes interface{}       `yaml:"valid_source_types,omitempty"`
+	Occurrences      interface{}       `yaml:"occurrences,omitempty"`
 }
 
 type Output struct {
