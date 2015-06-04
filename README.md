@@ -4,9 +4,28 @@ This library is an implementation of the TOSCA definition as described in the do
 [TOSCA Simple Profile in YAML Version 1.0](http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html)
 
 # How to
-in your code
+See the test files for example but most likely what you will do is:
+- importing the library in your code
+- Read a tosca yaml file as a byte array
+- unmarshal the yaml document into the structure definied in this library
+- play with it:
 ```go
 import "github.com/owulveryck/toscalib"
+...
+mystruct := TopologyTemplateStruct{}
+
+err := yaml.Unmarshal([]byte(topologyExample), &mystruct)
+if err != nil {
+    t.Errorf("error: %v", err)
+}
+log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
+
+d, err := yaml.Marshal(&mystruct)
+if err != nil {
+    t.Errorf("error: %v", err)
+}
+log.Printf("%s\n\n", string(d))
+
 ```
 
 and then simply `go get github.com/owulveryck/toscalib`
@@ -16,3 +35,9 @@ I try as much as possible to develop some tests that may be run with `go test`
  
 # API
 The API documentation is on [godoc](http://godoc.org/github.com/owulveryck/toscalib)
+
+# Future
+This library may be used to:
+- create a TOSCA orchestrator
+- create a view tool that display the dependency diagram of a TOSCA file
+- implement a plugin for well knonw orchestrators such as [openstack](https://www.openstack.org/) or [cloudify](http://getcloudify.org/)
