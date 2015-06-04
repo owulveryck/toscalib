@@ -9,7 +9,7 @@ import (
 // This implements the type defined in Appendix A 2 of the definition file
 
 // ToscaVersion - The version have the following grammar:
-// <major_version>.<minor_version>[.<fix_version>[.<qualifier>[-<build_version] ] ]
+// MajorVersion.MinorVersion[.FixVersion[.Qualifier[-BuildVersion]]]
 type ToscaVersion struct {
 	MajorVersion int    // major_version : is a required integer value greater than or equ al to 0 (zero)
 	MinorVersion int    // minor_version : is a required integer value greater than or equal to 0 (zero).
@@ -25,7 +25,7 @@ func (this *ToscaVersion) Parse(toscaVersion string) {}
 // UNBOUNDED: A.2.3 TOCSA range type
 const UNBOUNDED uint64 = 9223372036854775807
 
-// ToscaRange is defined in Appendix 2.3 
+// ToscaRange is defined in Appendix 2.3
 // The range type can be used to define numeric ranges with a lower and upper boundary. For example, this allows for specifying a range of ports to be opened in a firewall
 type ToscaRange [2]uint64
 
@@ -44,26 +44,22 @@ type ToscaList []interface{}
 // the entry_schema attribute of the respective property definition, attribute definition, or input or output parameter definition
 type ToscaMap map[interface{}]interface{}
 
-// Maybe this could change
-// A.2.6 TOCSA scalar
+// Scalar type as defined in Appendis 2.6.
 // The scalar unit type can be used to define scalar values along with a unit from the list of recognized units
 type Scalar string
 
-// Returns the value of the scalar
+// GetScalar returns the value of the scalar.
 // TODO: implements the method
-func (this *Scalar) getScalar() interface{} { return nil }
+func (this *Scalar) GetScalar() interface{} { return nil }
 
-// Returns the unit of the scalar
+// GetUnit returns the unit of the scalar
 // TODO: implements the method
-func (this *Scalar) getUnit() interface{} { return nil }
+func (this *Scalar) GetUnit() interface{} { return nil }
 
-// UNITS DEFINITIONS
 // Definition of the ScalarSize
-// A 2.6.4
 type Size int64
 
-// Size definition
-// A.2.6.4 scalar - unit.size
+// Size definitions as described in Appendix 2.6.4
 const (
 	B   Size = 1                 // A byte
 	KB  Size = 1000 * B          // kilobyte (1000 bytes)
@@ -76,7 +72,7 @@ const (
 	TiB Size = 1099511627776 * B // tebibyte (1099511627776 bytes)
 )
 
-// A.2.6.5 scalar-unit.time
+// scalar-unit.time as described in Appendis 2.6.5
 const (
 	D  time.Duration = H * 24           //  days
 	H  time.Duration = time.Hour        // hours

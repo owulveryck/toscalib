@@ -16,7 +16,7 @@ const (
 type ConstraintClauses map[string]interface{}
 
 // Evaluate the constraint and return a boolean
-func (this *ConstraintClauses) Evaluate(interface{}) bool          { return true }
+func (this *ConstraintClauses) Evaluate(interface{}) bool { return true }
 
 // TODO: implement the Mashaler YAML interface for the constraint type
 func (this *ConstraintClauses) UnmarshalYAML() {}
