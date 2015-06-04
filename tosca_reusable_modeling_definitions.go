@@ -12,28 +12,17 @@ const (
 	Deprecated   Status = 4
 )
 
-/****************** Consstraint *************************/
 // A.5.2 Constraint clause
 type ConstraintClauses map[string]interface{}
 
-// evaluates the Parameter an returns trus if equal
-func (this *ConstraintClauses) Equal(interface{}) bool          { return true }
-func (this *ConstraintClauses) GreaterThan(interface{}) bool    { return true }
-func (this *ConstraintClauses) GreaterOrEqual(interface{}) bool { return true }
-func (this *ConstraintClauses) LessThan(interface{}) bool       { return true }
-func (this *ConstraintClauses) LessOrEqual(interface{}) bool    { return true }
-func (this *ConstraintClauses) InRange(interface{}) bool        { return true }
-func (this *ConstraintClauses) ValidValues(interface{}) bool    { return true }
-func (this *ConstraintClauses) Length(interface{}) bool         { return true }
-func (this *ConstraintClauses) MinLength(interface{}) bool      { return true }
-func (this *ConstraintClauses) MaxLength(interface{}) bool      { return true }
-func (this *ConstraintClauses) Pattern(interface{}) bool        { return true }
+// Evaluate the constraint and return a boolean
+func (this *ConstraintClauses) Evaluate(interface{}) bool          { return true }
 
 // TODO: implement the Mashaler YAML interface for the constraint type
-// func (this *ConstraintClauses) UnmarshalYAML() {}
+func (this *ConstraintClauses) UnmarshalYAML() {}
 
-//TOSCA
-// A.5.7 Property definition
+//TOSCA A.5.7 Property definition
+//
 // A property definition defines a named, typed value and related data
 // that can be associated with an entity defined in this specification
 // (e.g., Node Types, Relation ship Types, Capability Types, etc.).
@@ -90,10 +79,6 @@ type InterfaceDefinition interface{}
 // A 5.5
 type ArtifactDefinition interface{}
 
-/*********************************************************/
-/*               NODE TYPE DEFINITION                    */
-/*********************************************************/
-
 // Correspond to `yaml:"node_types"`
 // A 6.8
 type NodeType struct {
@@ -107,10 +92,6 @@ type NodeType struct {
 	Artifacts    map[string]ArtifactDefinition    `yaml:"artifacts,omitempty" `   // An optional list of named artifact definitions for the Node Type
 }
 
-/*********************************************************/
-/*               NODE TEMPLATE DEFINITION                */
-/*********************************************************/
-
 // TODO : to be verified, Capabilities is obviously not a map of properties...
 // Correspond to `yaml:"node_templates"`
 type NodeTemplate struct {
@@ -120,10 +101,6 @@ type NodeTemplate struct {
 	Capabilities map[string]PropertyDefinition `yaml:"capabilities,omitempty"`
 	Requirements interface{}                   `yaml:"requirements,omitempty"`
 }
-
-/*********************************************************/
-/*               MAIN TOPOLOGY STRUCTURE                 */
-/*********************************************************/
 
 // TopologyStructure as defined in
 //http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
