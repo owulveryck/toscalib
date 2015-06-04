@@ -1,5 +1,5 @@
 // Package toscalib implements the TOSCA syntax in its YAML version as described in
-// http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/TOSCA-Simple-Profile-YAML-v1.0.pdf
+// http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
 package toscalib
 
 import (
