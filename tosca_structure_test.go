@@ -11,7 +11,7 @@ import (
 // of the all topology example
 func TestProperty(t *testing.T) {
 
-	mystruct := PropertyDefinition{}
+	mystruct := map[string]PropertyDefinition{}
 
 	err := yaml.Unmarshal([]byte(propertyExample), &mystruct)
 	if err != nil {
