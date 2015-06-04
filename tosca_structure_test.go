@@ -87,7 +87,7 @@ func TestStructure(t *testing.T) {
 	log.Printf("Type of TopologyTemplate: %v\n", reflect.TypeOf(topology.TopologyTemplate).Kind())
 	for key, nodeTemplate := range topology.TopologyTemplate.NodeTemplates {
 		log.Printf("=> NodeTemplateName(%v): %v\n", reflect.TypeOf(key).Kind(), key)
-		log.Printf("==> NodeType (%v): %v\n", reflect.TypeOf(nodeTemplate.NodeType), nodeTemplate.NodeType)
+		log.Printf("==> Type (%v): %v\n", reflect.TypeOf(nodeTemplate.Type), nodeTemplate.Type)
 		if nodeTemplate.Requirements != nil {
 			log.Printf("===> Requirements type: %v\n", reflect.TypeOf(nodeTemplate.Requirements).Kind())
 			/*
