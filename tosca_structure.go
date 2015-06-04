@@ -48,8 +48,27 @@ const (
 	Deprecated   Status = 4
 )
 
+/****************** Consstraint *************************/
 // A.5.2 Constraint clause
-type ConstraintDefinition struct {
+type ConstraintClause map[string]interface{}
+
+// Tihs function evaluate the Parameter an returns trus if equal
+func (this *ConstraintClause) Equal(interface{}) bool          { return true }
+func (this *ConstraintClause) GreaterThan(interface{}) bool    { return true }
+func (this *ConstraintClause) GreaterOrEqual(interface{}) bool { return true }
+func (this *ConstraintClause) LessThan(interface{}) bool       { return true }
+func (this *ConstraintClause) LessOrEqual(interface{}) bool    { return true }
+func (this *ConstraintClause) InRange(interface{}) bool        { return true }
+func (this *ConstraintClause) ValidValues(interface{}) bool    { return true }
+func (this *ConstraintClause) Length(interface{}) bool         { return true }
+func (this *ConstraintClause) MinLength(interface{}) bool      { return true }
+func (this *ConstraintClause) MaxLength(interface{}) bool      { return true }
+func (this *ConstraintClause) Pattern(interface{}) bool        { return true }
+
+func (this *ConstraintClause) UnmarshalYAML() {}
+
+/*
+{
 	Equal          Scalar      `yaml:"equal,omitempty"`            // Constrains a property or parameter to a value equal to (‘=’) the value declared
 	GreaterThan    Scalar      `yaml:"greater_than,omitempty"`     // Constrains a property or parameter to a value greater than (‘>’) the value declared
 	GreaterOrEqual Scalar      `yaml:"greater_or_equal,omitempty"` // Constrains a property or parameter to a value greater than or equal to (‘>=’) the value declared
@@ -62,6 +81,7 @@ type ConstraintDefinition struct {
 	MaxLength      Scalar      `yaml:"max_length,omitempty"`
 	Pattern        Regex       `yaml:"regex,omitempty"`
 }
+*/
 
 //TOSCA
 // A.5.7 Property definition
@@ -74,22 +94,22 @@ type ConstraintDefinition struct {
 // get_property function within TOSCA Service Templates
 // TODO Implement a GetProperty function with a return type *PropertyDefinition
 type PropertyDefinition struct {
-	Type        string                 `yaml:"type"`                  // The required data type for the property
-	Description string                 `yaml:"description,omitempty"` // The optional description for the property.
-	Required    bool                   `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
-	Default     interface{}            `yaml:"default"`
-	Status      Status                 `yaml:"status"`
-	Constraints []ConstraintDefinition `yaml:"constraints"`
-	EntrySchema string                 `yaml:"entry_schema"`
+	Type        string             `yaml:"type"`                  // The required data type for the property
+	Description string             `yaml:"description,omitempty"` // The optional description for the property.
+	Required    bool               `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
+	Default     interface{}        `yaml:"default"`
+	Status      Status             `yaml:"status"`
+	Constraints []ConstraintClause `yaml:"constraints"`
+	EntrySchema string             `yaml:"entry_schema"`
 }
 
 // Type input corresponds to  `yaml:"inputs,omitempty"`
 type Input struct {
-	Type             string                          `yaml:"type"`
-	Description      string                          `yaml:"description,omitempty"` // Not required
-	Constraints      map[string]ConstraintDefinition `yaml:"constraints,omitempty"`
-	ValidSourceTypes interface{}                     `yaml:"valid_source_types,omitempty"`
-	Occurrences      interface{}                     `yaml:"occurrences,omitempty"`
+	Type             string             `yaml:"type"`
+	Description      string             `yaml:"description,omitempty"` // Not required
+	Constraints      []ConstraintClause `yaml:"constraints,omitempty"`
+	ValidSourceTypes interface{}        `yaml:"valid_source_types,omitempty"`
+	Occurrences      interface{}        `yaml:"occurrences,omitempty"`
 }
 
 type Output struct {

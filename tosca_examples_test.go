@@ -1,6 +1,6 @@
 package gotosca
 
-var constraintExamples = `
+var constraintExample = `
 # equal
 equal: 2
 

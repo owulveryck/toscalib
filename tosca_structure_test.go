@@ -8,7 +8,29 @@ import (
 )
 
 // Test the Mashalling and Unmarshalling
-// of the all topology example
+// of the all Constraint clauses
+func TestConstraint(t *testing.T) {
+
+	mystruct := ConstraintClause{}
+
+	err := yaml.Unmarshal([]byte(constraintExample), &mystruct)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
+	t.Logf("--- Result of the marshal:\n%v\n\n", mystruct)
+
+	d, err := yaml.Marshal(&mystruct)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	log.Printf("%s\n\n", string(d))
+
+	t.Logf("%s\n\n", string(d))
+}
+
+// Test the Mashalling and Unmarshalling
+// of the all Property example
 func TestProperty(t *testing.T) {
 
 	mystruct := map[string]PropertyDefinition{}
@@ -17,20 +39,22 @@ func TestProperty(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
+	log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
 	t.Logf("--- Result of the marshal:\n%v\n\n", mystruct)
 
 	d, err := yaml.Marshal(&mystruct)
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
+	log.Printf("%s\n\n", string(d))
 	t.Logf("%s\n\n", string(d))
 }
 
 // Test the Mashalling and Unmarshalling
 // of the all topology example
-func TestTopologyMashallAndUnmarshal(t *testing.T) {
+func TestTopology(t *testing.T) {
 	// For  now, bypass this test
-	// t.SkipNow()
+	t.SkipNow()
 	topology := TopologyTemplateStruct{}
 
 	err := yaml.Unmarshal([]byte(topologyExample), &topology)
