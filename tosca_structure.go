@@ -32,8 +32,36 @@ const (
 	Ns time.Duration = time.Nanosecond  // nanoseconds
 )
 
+// We define a type status used in the PropertyDefinition
+type Status int64
+
+// Maybe this could change
+type Scalar string
+type Regex interface{}
+
+// Valid values for Status
+// A 5.7.3
+const (
+	Supported    Status = 1
+	Unsupported  Status = 2
+	Experimental Status = 3
+	Deprecated   Status = 4
+)
+
 // A.5.2 Constraint clause
-type Constraint interface{}
+type ConstraintDefinition struct {
+	Equal          Scalar      `yaml:"equal"`            // Constrains a property or parameter to a value equal to (‘=’) the value declared
+	GreaterThan    Scalar      `yaml:"greater_than"`     // Constrains a property or parameter to a value greater than (‘>’) the value declared
+	GreaterOrEqual Scalar      `yaml:"greater_or_equal"` // Constrains a property or parameter to a value greater than or equal to (‘>=’) the value declared
+	LessThan       Scalar      `yaml:"less_than"`
+	LessOrEqual    Scalar      `yaml:"less_or_equal"`
+	InRange        interface{} `yaml:"in_range"`
+	ValidValues    interface{} `yaml:"valid_values"`
+	Length         Scalar      `yaml:"length"`
+	MinLength      Scalar      `yaml:"min_length"`
+	MaxLength      Scalar      `yaml:"max_length"`
+	Pattern        Regex       `yaml:"regex"`
+}
 
 //TOSCA
 // A.5.7 Property definition
@@ -46,22 +74,22 @@ type Constraint interface{}
 // get_property function within TOSCA Service Templates
 // TODO Implement a GetProperty function with a return type *PropertyDefinition
 type PropertyDefinition struct {
-	Type        string       `yaml:"type"`
-	Description string       `yaml:"description"`
-	Required    bool         `yaml:"required"`
-	Default     interface{}  `yaml:"default"`
-	Status      string       `yaml:"status"`
-	Constraints []Constraint `yaml:"constraints"`
-	EntrySchema string       `yaml:"entry_schema"`
+	Type        string                          `yaml:"type"`                  // The required data type for the property
+	Description string                          `yaml:"description,omitempty"` // The optional description for the property.
+	Required    bool                            `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
+	Default     interface{}                     `yaml:"default"`
+	Status      Status                          `yaml:"status"`
+	Constraints map[string]ConstraintDefinition `yaml:"constraints"`
+	EntrySchema string                          `yaml:"entry_schema"`
 }
 
 // Type input corresponds to  `yaml:"inputs,omitempty"`
 type Input struct {
-	Type             string      `yaml:"type"`
-	Description      string      `yaml:"description,omitempty"` // Not required
-	Constraints      interface{} `yaml:"constraints,omitempty"`
-	ValidSourceTypes interface{} `yaml:"valid_source_types,omitempty"`
-	Occurrences      interface{} `yaml:"occurrences,omitempty"`
+	Type             string                          `yaml:"type"`
+	Description      string                          `yaml:"description,omitempty"` // Not required
+	Constraints      map[string]ConstraintDefinition `yaml:"constraints,omitempty"`
+	ValidSourceTypes interface{}                     `yaml:"valid_source_types,omitempty"`
+	Occurrences      interface{}                     `yaml:"occurrences,omitempty"`
 }
 
 type Output struct {
