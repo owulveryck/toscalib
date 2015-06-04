@@ -35,8 +35,6 @@ const (
 // A.5.2 Constraint clause
 type Constraint interface{}
 
-type Constraints interface{}
-
 //TOSCA
 // A.5.7 Property definition
 // A property definition defines a named, typed value and related data
@@ -48,13 +46,13 @@ type Constraints interface{}
 // get_property function within TOSCA Service Templates
 // TODO Implement a GetProperty function with a return type *PropertyDefinition
 type PropertyDefinition struct {
-	Type        string        `yaml:"type"`
-	Description string        `yaml:"description"`
-	Required    bool          `yaml:"required"`
-	Default     interface{}   `yaml:"default"`
-	Status      string        `yaml:"status"`
-	Constraints []Constraints `yaml:"constraints"`
-	EntrySchema string        `yaml:"entry_schema"`
+	Type        string       `yaml:"type"`
+	Description string       `yaml:"description"`
+	Required    bool         `yaml:"required"`
+	Default     interface{}  `yaml:"default"`
+	Status      string       `yaml:"status"`
+	Constraints []Constraint `yaml:"constraints"`
+	EntrySchema string       `yaml:"entry_schema"`
 }
 
 // Type input corresponds to  `yaml:"inputs,omitempty"`
@@ -66,6 +64,53 @@ type Input struct {
 	Occurrences      interface{} `yaml:"occurrences,omitempty"`
 }
 
+type Output struct {
+	Value       interface{} `yaml:"value"`
+	Description string      `yaml:"description"`
+}
+
+// TODO
+// A 5.9
+type AttributeDefinition interface{}
+
+//TODO
+// A 6.2
+type RequirementDefinition interface{}
+
+//TODO
+// A 6.1
+type CapabilityDefinition interface{}
+
+// TODO
+// A 5.12
+type InterfaceDefinition interface{}
+
+// TODO
+// A 5.5
+type ArtifactDefinition interface{}
+
+/*********************************************************/
+/*               NODE TYPE DEFINITION                    */
+/*********************************************************/
+
+// Correspond to `yaml:"node_types"`
+// A 6.8
+type NodeType struct {
+	DerivedFrom  string                           `yaml:"derived_from,omitempty"` // An optional parent Node Type name this new Node Type derives from
+	Description  string                           `yaml:"description,omitempty"`  // An optional description for the Node Type
+	Properties   map[string]PropertyDefinition    `yaml:"properties,omitempty"`   // An optional list of property definitions for the Node Type.
+	Attributes   map[string]AttributeDefinition   `yaml:"attributes,omitempty"`   // An optional list of attribute definitions for the Node Type.
+	Requirements map[string]RequirementDefinition `yaml:"requirements,omitempty"` // An optional sequenced list of requirement definitions for the Node Type
+	Capabilities map[string]CapabilityDefinition  `yaml:"capabilities,omitempty"` // An optional list of capability definitions for the Node Type
+	Interfaces   map[string]InterfaceDefinition   `yaml:"interfaces,omitempty"`   // An optional list of interface definitions supported by the Node Type
+	Artifacts    map[string]ArtifactDefinition    `yaml:"artifacts,omitempty" `   // An optional list of named artifact definitions for the Node Type
+}
+
+/*********************************************************/
+/*               NODE TEMPLATE DEFINITION                */
+/*********************************************************/
+
+// TODO : to be verified, Capabilities is obviously not a map of properties...
 // Correspond to `yaml:"node_templates"`
 type NodeTemplate struct {
 	NodeType     string                        `yaml:"type"`
@@ -75,10 +120,9 @@ type NodeTemplate struct {
 	Requirements interface{}                   `yaml:"requirements,omitempty"`
 }
 
-type Output struct {
-	Value       interface{} `yaml:"value"`
-	Description string      `yaml:"description"`
-}
+/*********************************************************/
+/*               MAIN TOPOLOGY STRUCTURE                 */
+/*********************************************************/
 
 // TopologyStructure as defined in
 //http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
