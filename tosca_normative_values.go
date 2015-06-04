@@ -1,4 +1,4 @@
-package gotosca
+package toscalib
 
 // This implements the type defined in Appendix A 3 of the definition file
 const (

@@ -1,4 +1,4 @@
-package gotosca
+package toscalib
 
 var constraintExample = `
 # equal

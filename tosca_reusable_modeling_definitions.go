@@ -1,4 +1,4 @@
-package gotosca
+package toscalib
 
 // We define a type status used in the PropertyDefinition
 type Status int64

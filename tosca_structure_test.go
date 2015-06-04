@@ -1,4 +1,4 @@
-package gotosca
+package toscalib
 
 import (
 	"gopkg.in/yaml.v2"

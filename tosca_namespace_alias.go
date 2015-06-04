@@ -1,6 +1,6 @@
-// Package gotosca implements the TOSCA syntax in its YAML version as described in
+// Package toscalib implements the TOSCA syntax in its YAML version as described in
 // http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/TOSCA-Simple-Profile-YAML-v1.0.pdf
-package gotosca
+package toscalib
 
 import (
 	"time"
