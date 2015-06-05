@@ -1,6 +1,6 @@
 package toscalib
 
-// We define a type status used in the PropertyDefinition
+// Status is used in the PropertyDefinition
 type Status int64
 
 // Valid values for Status as described in Appendix 5.7.3
@@ -19,10 +19,10 @@ const (
 type ConstraintClauses map[string]interface{}
 
 // Evaluate the constraint and return a boolean
-func (this *ConstraintClauses) Evaluate(interface{}) bool { return true }
+func (constraint *ConstraintClauses) Evaluate(interface{}) bool { return true }
 
-// TODO: implement the Mashaler YAML interface for the constraint type
-func (this *ConstraintClauses) UnmarshalYAML() {}
+// UnmarshalYAML TODO: implement the Mashaler YAML interface for the constraint type
+func (constraint *ConstraintClauses) UnmarshalYAML() {}
 
 // PropertyDefinition as described in Appendix 5.7:
 // A property definition defines a named, typed value and related data
@@ -51,12 +51,13 @@ type Input struct {
 	Occurrences      interface{}       `yaml:"occurrences,omitempty"`
 }
 
+// Output is the output of the topology
 type Output struct {
 	Value       interface{} `yaml:"value"`
 	Description string      `yaml:"description"`
 }
 
-// TODO: Implement the type as defined in Appendix 5.9
+// AttributeDefinition TODO: Implement the type as defined in Appendix 5.9
 type AttributeDefinition interface{}
 
 // RequirementDefinition as described in Appendix 6.2
@@ -67,16 +68,16 @@ type RequirementDefinition struct {
 	Occurrences  ToscaRange `yaml:"occurences,omitempty"`   // The optional minimum and maximum occurrences for the requirement.  Note: the keyword UNBOUNDED is also supported to represent any positive integer
 }
 
-//TODO: Appendix 6.1
+// CapabilityDefinition TODO: Appendix 6.1
 type CapabilityDefinition interface{}
 
-// TODO: Appendix 5.12
+// InterfaceDefinition TODO: Appendix 5.12
 type InterfaceDefinition interface{}
 
-// TODO: Appendix 5.5
+// ArtifactDefinition TODO: Appendix 5.5
 type ArtifactDefinition interface{}
 
-// TODO Appendix 5.4
+// NodeFilter TODO Appendix 5.4
 // A node filter definition defines criteria for selection of a TOSCA Node Template based upon the template’s property values, capabilities and capability properties.
 type NodeFilter interface{}
 
@@ -155,7 +156,7 @@ type TopologyTemplateType struct {
 	Outputs       map[string]Output       `yaml:"outputs,omitempty"`
 }
 
-// TopologyStructure as defined in
+// TopologyTemplateStruct as defined in
 //http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
 type TopologyTemplateStruct struct {
 	DefinitionsVersion string                          `yaml:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
