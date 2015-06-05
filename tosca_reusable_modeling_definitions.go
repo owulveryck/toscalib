@@ -113,7 +113,7 @@ type NodeTemplate struct {
 	Attributes   map[string]interface{}         `yaml:"attributes,omitempty"`   // An optional list of attribute value assignments for the Node Template.
 	Requirements interface{}                    `yaml:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
 	Capabilities map[string]interface{}         `yaml:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
-	Interfaces   map[string]InterfaceDefinition `yaml:"interfaces"`             // An optional list of named interface definitions for the Node Template.
+	Interfaces   map[string]InterfaceDefinition `yaml:"interfaces,omitempty"`   // An optional list of named interface definitions for the Node Template.
 	Artifcats    map[string]ArtifactDefinition  `yaml:"artifcats,omitempty"`    // An optional list of named artifact definitions for the Node Template.
 	NodeFilter   map[string]NodeFilter          `yaml:"node_filter,omitempty"`  // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
 }
