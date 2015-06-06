@@ -14,7 +14,11 @@ func TestConstraint(t *testing.T) {
 
 	mystruct := ConstraintClauses{}
 
-	err := yaml.Unmarshal([]byte(constraintExample), &mystruct)
+	file, err := ioutil.ReadFile("testFiles/constraintsTest.yaml")
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	err = yaml.Unmarshal(file, &mystruct)
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
@@ -36,7 +40,11 @@ func TestProperty(t *testing.T) {
 
 	mystruct := map[string]PropertyDefinition{}
 
-	err := yaml.Unmarshal([]byte(propertyExample), &mystruct)
+	file, err := ioutil.ReadFile("testFiles/propertyTest.yaml")
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	err = yaml.Unmarshal(file, &mystruct)
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
@@ -58,7 +66,11 @@ func TestTopology(t *testing.T) {
 	//t.SkipNow()
 	mystruct := TopologyTemplateStruct{}
 
-	err := yaml.Unmarshal([]byte(topologyExample), &mystruct)
+	file, err := ioutil.ReadFile("testFiles/topologyTest.yaml")
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	err = yaml.Unmarshal(file, &mystruct)
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
@@ -97,8 +109,12 @@ func TestStructure(t *testing.T) {
 	// For  now, bypass this test
 	t.SkipNow()
 	topology := TopologyTemplateStruct{}
+	file, err := ioutil.ReadFile("examples/tosca_single_instance_wordpress.yaml")
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
 
-	err := yaml.Unmarshal([]byte(topologyExample), &topology)
+	err = yaml.Unmarshal(file, &topology)
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}

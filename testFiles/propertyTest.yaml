@@ -1,0 +1,8 @@
+num_cpus:
+    type: integer
+    description: Number of CPUs requested for a software node instance.
+    default: 1
+    required: true
+    constraints:
+        - valid_values: [ 1, 2, 4, 8 ]
+

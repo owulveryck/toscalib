@@ -1,0 +1,29 @@
+# equal
+equal: 2
+
+# greater_than
+greater_than: 1
+
+# greater_or_equal
+greater_or_equal: 2
+
+# less_than
+less_than: 5
+
+# less_or_equal
+less_or_equal: 4
+
+# in_range
+in_range: [ 1, 4 ]
+
+# valid_values
+valid_values: [ 1, 2, 4 ]
+
+# specific length (in characters)
+length: 32
+
+# min_length (in characters)
+min_length: 8
+
+# max_length (in characters)
+max_length: 64
