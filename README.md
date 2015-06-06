@@ -40,4 +40,4 @@ The API documentation is on [godoc](http://godoc.org/github.com/owulveryck/tosca
 This library may be used to:
 - create a TOSCA orchestrator
 - create a view tool that display the dependency diagram of a TOSCA file
-- implement a plugin for well knonw orchestrators such as [openstack](https://www.openstack.org/) or [cloudify](http://getcloudify.org/)
+- implement a plugin for well known orchestrators such as [openstack](https://www.openstack.org/) or [cloudify](http://getcloudify.org/)
