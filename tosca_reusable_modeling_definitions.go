@@ -21,7 +21,7 @@ const (
 // {"equal","greater_than", ...} (see Appendix 5.2) a,s value is an interface
 // for the definition.
 // Example: ConstraintClause may be [ "greater_than": 3 ]
-type ConstraintClause string
+type ConstraintClause []string
 
 // Evaluate the constraint and return a boolean
 func (constraint *ConstraintClause) Evaluate(interface{}) bool { return true }
@@ -44,7 +44,7 @@ func (constraint *ConstraintClause) UnmarshalYAML(unmarshal func(interface{}) er
 	default:
 		return errors.New("Not a valid constraint")
 	}
-	*constraint = ConstraintClause(constraintString)
+	//*constraint = ConstraintClause(constraintString)
 	return nil
 }
 

@@ -11,6 +11,6 @@ format:
 	$(GOFMT) *.go
 
 test: *.go
-	$(GO) test
+	$(GO) test -coverprofile=coverage.out 
 clean:
 	rm tosca
