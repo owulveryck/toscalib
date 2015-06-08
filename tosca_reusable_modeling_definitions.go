@@ -21,7 +21,7 @@ const (
 // {"equal","greater_than", ...} (see Appendix 5.2) a,s value is an interface
 // for the definition.
 // Example: ConstraintClause may be [ "greater_than": 3 ]
-type ConstraintClause []string
+type ConstraintClause map[string]interface{}
 
 // Evaluate the constraint and return a boolean
 func (constraint *ConstraintClause) Evaluate(interface{}) bool { return true }
@@ -57,22 +57,22 @@ func (constraint *ConstraintClause) UnmarshalYAML(unmarshal func(interface{}) er
 // The value of a property can be retrieved using the
 // get_property function within TOSCA Service Templates
 type PropertyDefinition struct {
-	Type        string             `yaml:"type"`                  // The required data type for the property
-	Description string             `yaml:"description,omitempty"` // The optional description for the property.
-	Required    bool               `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
-	Default     interface{}        `yaml:"default"`
-	Status      Status             `yaml:"status"`
-	Constraints []ConstraintClause `yaml:"constraints,inline,omitempty"`
-	EntrySchema string             `yaml:"entry_schema,omitempty"`
+	Type        string           `yaml:"type"`                  // The required data type for the property
+	Description string           `yaml:"description,omitempty"` // The optional description for the property.
+	Required    bool             `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
+	Default     interface{}      `yaml:"default"`
+	Status      Status           `yaml:"status"`
+	Constraints ConstraintClause `yaml:"constraints,omitempty,inline"`
+	EntrySchema string           `yaml:"entry_schema,omitempty"`
 }
 
 // Input corresponds to  `yaml:"inputs,omitempty"`
 type Input struct {
-	Type             string             `yaml:"type"`
-	Description      string             `yaml:"description,omitempty"` // Not required
-	Constraints      []ConstraintClause `yaml:"constraints,omitempty,inline"`
-	ValidSourceTypes interface{}        `yaml:"valid_source_types,omitempty"`
-	Occurrences      interface{}        `yaml:"occurrences,omitempty"`
+	Type             string           `yaml:"type"`
+	Description      string           `yaml:"description,omitempty"` // Not required
+	Constraints      ConstraintClause `yaml:"constraints,omitempty,inline"`
+	ValidSourceTypes interface{}      `yaml:"valid_source_types,omitempty"`
+	Occurrences      interface{}      `yaml:"occurrences,omitempty"`
 }
 
 // Output is the output of the topology
