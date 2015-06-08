@@ -40,12 +40,12 @@ func TestStructures(t *testing.T) {
 
 }
 
-func TestGetValue(t *testing.T) {
+func TestScalar(t *testing.T) {
 	var tests []Scalar
 	// Those test should be ok
 	tests = []Scalar{"1022.4 h", "1420 s", "12.4 MiB", "0.5 h"}
 	for _, test := range tests {
-		val, err := test.GetValue()
+		val, err := test.Evaluate()
 		if err != nil {
 			t.Errorf("error: %v", err)
 		}
@@ -54,7 +54,7 @@ func TestGetValue(t *testing.T) {
 	// Those tests should be ko
 	tests = []Scalar{"1022", "qdfsf s", "12.4 G", "1 0.5 h"}
 	for _, test := range tests {
-		val, err := test.GetValue()
+		val, err := test.Evaluate()
 		if err == nil {
 			t.Errorf("error: %v", err)
 		}

@@ -48,27 +48,61 @@ type ToscaList []interface{}
 // the entry_schema attribute of the respective property definition, attribute definition, or input or output parameter definition
 type ToscaMap map[interface{}]interface{}
 
+type Size int64
+type Frequency int64
+
 // Scalar type as defined in Appendis 2.6.
 // The scalar unit type can be used to define scalar values along with a unit from the list of recognized units
+// Scalar type may be time.Duration, Size or Frequency
 type Scalar string
 
-// GetValue returns the "go" value for scalar
-func (scalar *Scalar) GetValue() (interface{}, error) {
+// UnmarshalYAML implements the yaml.Unmarshaler interface
+// Unmarshals a string of the form "scalar unit" into a Scalar, validating that scalar and unit are valid
+func (scalar *Scalar) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var scalarString string
+	err := unmarshal(&scalarString)
+	if err != nil {
+		return err
+	}
 	// Check if the scalar has two fields (one for the value, and the other one for the unit)
 	if strings.Count(string(*scalar), " ") != 1 {
-		return nil, errors.New("scalar has wrong format")
+		return errors.New("Not a TOSCA scalar")
+	}
+	scalars := strings.Fields(string(*scalar))
+	// Check if the scalar is a float64
+	_, err = strconv.ParseFloat(scalars[0], 64)
+	if err != nil {
+		return err
+	}
+	// Check if a unit is known
+	res, err := regexp.MatchString("B|kB|KiB|MB|MiB|GB|GiB|TB|TiB|d|h|m|s|ms|us|ns|Hz|kHz|MHz|GHz", scalars[1])
+	if err != nil || res == false {
+		return errors.New("Tosca type unkown")
+	}
+	return nil
+}
+
+// GetValue returns the "go" value for scalar
+// If type is a Duration, returns a time.Duration type with the associated value
+// If type is Size, returns the size in "byte number"
+// If type is Frequency, returns the frequency in Hz (= one cycle per second)
+func (scalar *Scalar) Evaluate() (interface{}, error) {
+	// Check if the scalar has two fields (one for the value, and the other one for the unit)
+	if strings.Count(string(*scalar), " ") != 1 {
+		return nil, errors.New("Not a TOSCA scalar")
 	}
 	// Value should be numeric convert it
 	var val float64
 	val, err := strconv.ParseFloat(strings.Fields(string(*scalar))[0], 64)
-	unit := strings.Fields(string(*scalar))[1]
 	if err != nil {
 		return nil, err
 	}
+	unit := strings.Fields(string(*scalar))[1]
 	// Size definition
 	var isSize = regexp.MustCompile("B|kB|KiB|MB|MiB|GB|GiB|TB|TiB")
 	// scalar-unit.time as described in Appendis 2.6.5
 	var isDuration = regexp.MustCompile("d|h|m|s|ms|us|ns")
+	var isFrequency = regexp.MustCompile("Hz|kHz|MHz|GHz")
 	switch {
 	case isSize.MatchString(unit):
 		var B float64 = 1
@@ -84,6 +118,15 @@ func (scalar *Scalar) GetValue() (interface{}, error) {
 			"TiB": 1099511627776 * B, // tebibyte (1099511627776 bytes)
 		}
 		return val * unitMapSize[unit], nil
+	case isFrequency.MatchString(unit):
+		var HZ float64 = 1
+		var unitMapFrequency = map[string]float64{
+			"Hz":  HZ,              // Hertz, or Hz. equals one cycle per second.
+			"kHz": 1000 * HZ,       // Kilohertz, or kHz, equals to 1,000 Hertz
+			"MHz": 1000000 * HZ,    //    Megahertz, or MHz, equals to 1,000,000 Hertz or 1,000 kHz
+			"GHz": 1000000000 * HZ, // Gigahertz, or GHz, equals to 1,000,000,000 Hertz, or 1,000,000 kHz, or 1,000 MHz.
+		}
+		return val * unitMapFrequency[unit], nil
 	case isDuration.MatchString(unit):
 		var H = time.Hour
 		var unitMapTime = map[string]time.Duration{
