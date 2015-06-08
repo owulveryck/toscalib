@@ -1,5 +1,10 @@
 package toscalib
 
+import (
+	"errors"
+	"strings"
+)
+
 // Status is used in the PropertyDefinition
 type Status int64
 
@@ -11,18 +16,37 @@ const (
 	Deprecated   Status = 4
 )
 
-// ConstraintClauses definition as described in Appendix 5.2.
+// ConstraintClause definition as described in Appendix 5.2.
 // This is a map where the index is a string that may have a value in
 // {"equal","greater_than", ...} (see Appendix 5.2) a,s value is an interface
 // for the definition.
-// Example: ConstraintClauses may be [ "greater_than": 3 ]
-type ConstraintClauses map[string]interface{}
+// Example: ConstraintClause may be [ "greater_than": 3 ]
+type ConstraintClause string
 
 // Evaluate the constraint and return a boolean
-func (constraint *ConstraintClauses) Evaluate(interface{}) bool { return true }
+func (constraint *ConstraintClause) Evaluate(interface{}) bool { return true }
 
 // UnmarshalYAML TODO: implement the Mashaler YAML interface for the constraint type
-func (constraint *ConstraintClauses) UnmarshalYAML() {}
+func (constraint *ConstraintClause) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var constraintString string
+	err := unmarshal(&constraintString)
+	if err != nil {
+		return err
+	}
+	// Check if the constraints has at least two fields
+	constraints := strings.Fields(constraintString)
+	if len(constraints) < 2 {
+		return errors.New("Not a TOSCA constraint")
+	}
+	// Check if the constraint is ok
+	switch constraints[0] {
+	case "equal", "greater_than", "greater_or_equal", "less_than", "less_or_equal", "in_range", "valid_values", "length", "min_length", "max_length", "pattern":
+	default:
+		return errors.New("Not a valid constraint")
+	}
+	*constraint = ConstraintClause(constraintString)
+	return nil
+}
 
 // PropertyDefinition as described in Appendix 5.7:
 // A property definition defines a named, typed value and related data
@@ -33,22 +57,22 @@ func (constraint *ConstraintClauses) UnmarshalYAML() {}
 // The value of a property can be retrieved using the
 // get_property function within TOSCA Service Templates
 type PropertyDefinition struct {
-	Type        string            `yaml:"type"`                  // The required data type for the property
-	Description string            `yaml:"description,omitempty"` // The optional description for the property.
-	Required    bool              `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
-	Default     interface{}       `yaml:"default"`
-	Status      Status            `yaml:"status"`
-	Constraints ConstraintClauses `yaml:"constraints,inline,omitempty"`
-	EntrySchema string            `yaml:"entry_schema,omitempty"`
+	Type        string             `yaml:"type"`                  // The required data type for the property
+	Description string             `yaml:"description,omitempty"` // The optional description for the property.
+	Required    bool               `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
+	Default     interface{}        `yaml:"default"`
+	Status      Status             `yaml:"status"`
+	Constraints []ConstraintClause `yaml:"constraints,inline,omitempty"`
+	EntrySchema string             `yaml:"entry_schema,omitempty"`
 }
 
 // Input corresponds to  `yaml:"inputs,omitempty"`
 type Input struct {
-	Type             string            `yaml:"type"`
-	Description      string            `yaml:"description,omitempty"` // Not required
-	Constraints      ConstraintClauses `yaml:"constraints,omitempty,inline"`
-	ValidSourceTypes interface{}       `yaml:"valid_source_types,omitempty"`
-	Occurrences      interface{}       `yaml:"occurrences,omitempty"`
+	Type             string             `yaml:"type"`
+	Description      string             `yaml:"description,omitempty"` // Not required
+	Constraints      []ConstraintClause `yaml:"constraints,omitempty,inline"`
+	ValidSourceTypes interface{}        `yaml:"valid_source_types,omitempty"`
+	Occurrences      interface{}        `yaml:"occurrences,omitempty"`
 }
 
 // Output is the output of the topology
@@ -100,7 +124,7 @@ type NodeType struct {
 type DataType struct {
 	DerivedFrom string                        `yaml:"derived_from,omitempty"` // The optional key used when a datatype is derived from an existing TOSCA Data Type.
 	Description string                        `yaml:"description,omitempty"`  // The optional description for the Data Type.
-	Constraints ConstraintClauses             `yaml:"constraints"`            // The optional list of sequenced constraint clauses for the Data Type.
+	Constraints []ConstraintClause            `yaml:"constraints"`            // The optional list of sequenced constraint clauses for the Data Type.
 	Properties  map[string]PropertyDefinition `yaml:"properties"`             // The optional list property definitions that comprise the schema for a complex Data Type in TOSCA.
 }
 
@@ -159,7 +183,7 @@ type TopologyTemplateType struct {
 // TopologyTemplateStruct as defined in
 //http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
 type TopologyTemplateStruct struct {
-	DefinitionsVersion string                          `yaml:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
+	DefinitionsVersion ToscaVersion                    `yaml:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
 	Description        string                          `yaml:"description,omitempty"`
 	Imports            []string                        `yaml:"imports,omitempty"`            // Declares import statements external TOSCA Definitions documents. For example, these may be file location or URIs relative to the service template file within the same TOSCA CSAR file.
 	Repositories       map[string]RepositoryDefinition `yaml:"repositories,omitempty"`       // Declares the list of external repositories which contain artifacts that are referenced in the service template along with their addresses and necessary credential information used to connect to them in order to retrieve the artifacts.

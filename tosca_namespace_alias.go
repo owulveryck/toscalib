@@ -14,17 +14,47 @@ import (
 
 // ToscaVersion - The version have the following grammar:
 // MajorVersion.MinorVersion[.FixVersion[.Qualifier[-BuildVersion]]]
-type ToscaVersion struct {
-	MajorVersion int    // major_version : is a required integer value greater than or equ al to 0 (zero)
-	MinorVersion int    // minor_version : is a required integer value greater than or equal to 0 (zero).
-	FixVersion   int    // fix_version : is a optional integer value greater than or equal to 0 (zero)
-	Qualifier    string // is an optional string that indicates a named, pre-release version of the associated code that has been derived from the version of the code identified by the combination major_version, minor_version and fix_version numbers
-	BuildVersion int    // build_version : is an optional integer value greater than or equal to 0 (zero) that can be used to further qualify different build versions of the code that has the same qualifer_string
-}
+// MajorVersion : is a required integer value greater than or equ al to 0 (zero)
+// MinorVersion : is a required integer value greater than or equal to 0 (zero).
+// FixVersion    : is a optional integer value greater than or equal to 0 (zero)
+//Qualifier is an optional string that indicates a named, pre-release version of the associated code that has been derived from the version of the code identified by the combination major_version, minor_version and fix_version numbers
+//BuildVersion is an optional integer value greater than or equal to 0 (zero) that can be used to further qualify different build versions of the code that has the same qualifer_string
+type ToscaVersion string
 
-// Parse parses a string representing a ToscaVersion and fill the structure
-// TODO: implement the Parse Function
-func (this *ToscaVersion) Parse(toscaVersion string) {}
+/*TODO
+// GetMajor returns the major_version number
+func (toscaVersion *ToscaVersion) GetMajor() int {
+	return 0
+}
+*/
+
+/*TODO
+// GetMinor returns the minor_version number
+func (toscaVersion *ToscaVersion) GetMinor() int {
+	return 0
+}
+*/
+
+/*TODO
+// GetFixVersion returns the fix_version integer value
+func (toscaVersion *ToscaVersion) GetFixVersion() int {
+	return 0
+}
+*/
+
+/*TODO
+// GetQualifier returns the named, pre-release version of the associated code that has been derived    from the version of the code identified by the combination major_version, minor_version and fix_version numbers
+func (toscaVersion *ToscaVersion) GetQualifier() string {
+	return nil
+}
+*/
+
+/*TODO
+// GetBuildVersion returns an  integer value greater than or equal to 0 (zero) that can be used to further        qualify different build versions of the code that has the same qualifer_string
+func (toscaVersion *ToscaVersion) GetBuildVersion() int {
+	return 0
+}
+*/
 
 // UNBOUNDED: A.2.3 TOCSA range type
 const UNBOUNDED uint64 = 9223372036854775807
@@ -65,20 +95,23 @@ func (scalar *Scalar) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return err
 	}
 	// Check if the scalar has two fields (one for the value, and the other one for the unit)
-	if strings.Count(string(*scalar), " ") != 1 {
+	scalars := strings.Fields(scalarString)
+	if len(scalars) > 2 {
 		return errors.New("Not a TOSCA scalar")
 	}
-	scalars := strings.Fields(string(*scalar))
 	// Check if the scalar is a float64
 	_, err = strconv.ParseFloat(scalars[0], 64)
 	if err != nil {
 		return err
 	}
-	// Check if a unit is known
-	res, err := regexp.MatchString("B|kB|KiB|MB|MiB|GB|GiB|TB|TiB|d|h|m|s|ms|us|ns|Hz|kHz|MHz|GHz", scalars[1])
-	if err != nil || res == false {
-		return errors.New("Tosca type unkown")
+	if len(scalars) == 2 {
+		// Check if a unit is known
+		res, err := regexp.MatchString("B|kB|KiB|MB|MiB|GB|GiB|TB|TiB|d|h|m|s|ms|us|ns|Hz|kHz|MHz|GHz", scalars[1])
+		if err != nil || res == false {
+			return errors.New("Tosca type unkown")
+		}
 	}
+	*scalar = Scalar(scalarString)
 	return nil
 }
 
