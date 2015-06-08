@@ -3,6 +3,10 @@
 package toscalib
 
 import (
+	"errors"
+	"regexp"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -48,39 +52,53 @@ type ToscaMap map[interface{}]interface{}
 // The scalar unit type can be used to define scalar values along with a unit from the list of recognized units
 type Scalar string
 
-// GetScalar returns the value of the scalar.
-// TODO: implements the method
-func (this *Scalar) GetScalar() interface{} { return nil }
-
-// GetUnit returns the unit of the scalar
-// TODO: implements the method
-func (this *Scalar) GetUnit() interface{} { return nil }
-
-// Definition of the ScalarSize
-type Size int64
-
-// Size definitions as described in Appendix 2.6.4
-const (
-	B   Size = 1                 // A byte
-	KB  Size = 1000 * B          // kilobyte (1000 bytes)
-	KiB Size = 2014 * B          // kibibytes (1024 bytes)
-	MB  Size = 1000000 * B       // megabyte (1000000 bytes)
-	MiB Size = 1048576 * B       // mebibyte (1048576 bytes)
-	GB  Size = 1000000000 * B    // gigabyte (1000000000 bytes)
-	GiB Size = 1073741824 * B    // gibibytes (1073741824 bytes)
-	TB  Size = 1000000000000 * B // terabyte (1000000000000 bytes)
-	TiB Size = 1099511627776 * B // tebibyte (1099511627776 bytes)
-)
-
-// scalar-unit.time as described in Appendis 2.6.5
-const (
-	D  time.Duration = H * 24           //  days
-	H  time.Duration = time.Hour        // hours
-	M  time.Duration = time.Minute      // minutes
-	S  time.Duration = time.Second      //  seconds
-	Ms time.Duration = time.Millisecond //  milliseconds
-	Us time.Duration = time.Microsecond // microseconds
-	Ns time.Duration = time.Nanosecond  // nanoseconds
-)
+// GetValue returns the "go" value for scalar
+func (scalar *Scalar) GetValue() (interface{}, error) {
+	// Check if the scalar has two fields (one for the value, and the other one for the unit)
+	if strings.Count(string(*scalar), " ") != 1 {
+		return nil, errors.New("scalar has wrong format")
+	}
+	// Value should be numeric convert it
+	var val float64
+	val, err := strconv.ParseFloat(strings.Fields(string(*scalar))[0], 64)
+	unit := strings.Fields(string(*scalar))[1]
+	if err != nil {
+		return nil, err
+	}
+	// Size definition
+	var isSize = regexp.MustCompile("B|kB|KiB|MB|MiB|GB|GiB|TB|TiB")
+	// scalar-unit.time as described in Appendis 2.6.5
+	var isDuration = regexp.MustCompile("d|h|m|s|ms|us|ns")
+	switch {
+	case isSize.MatchString(unit):
+		var B float64 = 1
+		var unitMapSize = map[string]float64{
+			"B":   B,                 // A Byte
+			"kB":  1000 * B,          // kilobyte (1000 bytes)
+			"KiB": 2014 * B,          // kibibytes (1024 bytes)
+			"MB":  1000000 * B,       // megabyte (1000000 bytes)
+			"MiB": 1048576 * B,       // mebibyte (1048576 bytes)
+			"GB":  1000000000 * B,    // gigabyte (1000000000 bytes)
+			"GiB": 1073741824 * B,    // gibibytes (1073741824 bytes)
+			"TB":  1000000000000 * B, // terabyte (1000000000000 bytes)
+			"TiB": 1099511627776 * B, // tebibyte (1099511627776 bytes)
+		}
+		return val * unitMapSize[unit], nil
+	case isDuration.MatchString(unit):
+		var H = time.Hour
+		var unitMapTime = map[string]time.Duration{
+			"D":  H * 24,           //  days
+			"H":  time.Hour,        // hours
+			"M":  time.Minute,      // minutes
+			"S":  time.Second,      //  seconds
+			"Ms": time.Millisecond, //  milliseconds
+			"Us": time.Microsecond, // microseconds
+			"Ns": time.Nanosecond,  // nanoseconds
+		}
+		return time.Duration(val) * unitMapTime[unit], nil
+	default:
+		return nil, errors.New("Cannot parse scalar")
+	}
+}
 
 type Regex interface{}
