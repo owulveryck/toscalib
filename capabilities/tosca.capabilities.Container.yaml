@@ -1,0 +1,23 @@
+tosca.capabilities.Container:
+  derived_from: tosca.capabilities.Root
+  properties:
+    num_cpus:
+      type: integer
+      required: false
+      constraints:
+        - greater_or_equal: 1
+    cpu_frequency:
+      type: scalar-unit.frequency
+      required: false
+      constraints:
+        - greater_or_equal: 0.1 GHz
+    disk_size:
+      type: scalar-unit.size
+      required: false
+      constraints:
+        - greater_or_equal: 0 MB
+    mem_size:
+      type: scalar-unit.size
+      required: false
+      constraints:
+        - greater_or_equal: 0 MB

@@ -1,0 +1,2 @@
+tosca.capabilities.Attachment:
+  derived_from: tosca.capabilities.Root

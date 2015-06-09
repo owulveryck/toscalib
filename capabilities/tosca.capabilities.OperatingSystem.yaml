@@ -1,0 +1,15 @@
+tosca.capabilities.OperatingSystem:
+  derived_from: tosca.capabilities.Root
+  properties:
+    architecture:
+      type: string
+      required: false
+    type:
+      type: string
+      required: false
+    distribution:
+      type: string
+      required: false
+    version:
+      type: version
+      required: false
