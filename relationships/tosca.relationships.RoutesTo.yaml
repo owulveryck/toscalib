@@ -1,0 +1,3 @@
+tosca.relationships.RoutesTo:
+  derived_from: tosca.relationships.ConnectsTo
+  valid_target_types: [ tosca.capabilities.Endpoint ]

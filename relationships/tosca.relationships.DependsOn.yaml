@@ -1,0 +1,3 @@
+tosca.relationships.DependsOn:
+  derived_from: tosca.relationships.Root
+  valid_target_types: [ tosca.capabilities.Node ]
