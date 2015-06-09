@@ -2,8 +2,6 @@ package toscalib
 
 import (
 	"errors"
-	"fmt"
-	"io"
 	"strings"
 )
 
@@ -197,22 +195,4 @@ type TopologyTemplateStruct struct {
 	DlsDefinitions     interface{}                     `yaml:"dsl_definitions,omitempty"`    // Declares optional DSL-specific definitions and conventions.  For example, in YAML, this allows defining reusable YAML macros (i.e., YAML alias anchors) for use throughout the TOSCA Service Template.
 	InterfaceTypes     map[string]InterfaceType        `yaml:"interface_types,omitempty"`    // This section contains an optional list of interface type definitions for use in service templates.
 	TopologyTemplate   TopologyTemplateType            `yaml:"topology_template"`            // Defines the topology template of an application or service, consisting of node templates that represent the application’s or service’s components, as well as relationship templates representing relations between the components.
-}
-
-// PrintDot convert the TopologyTemplateStructure in dot format
-// in order to generate a graph with graphviz
-// This function is mostly used for debugging purpose and may change a lot in the future
-func (topology *TopologyTemplateStruct) PrintDot(w io.Writer) {
-	fmt.Fprintf(w, "digraph G {\n")
-	for nodeName, nodeDetail := range topology.TopologyTemplate.NodeTemplates {
-		// If requirements are found
-		if nodeDetail.Requirements != nil {
-			for _, requirementType := range nodeDetail.Requirements {
-				for requirementTypeProp, value := range requirementType {
-					fmt.Fprintf(w, "\t%v -> %v [label = %v];\n", value["node"], nodeName, requirementTypeProp)
-				}
-			}
-		}
-	}
-	fmt.Fprintf(w, "}\n")
 }
