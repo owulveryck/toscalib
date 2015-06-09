@@ -136,7 +136,7 @@ type NodeTemplate struct {
 	Directives   []string                       `yaml:"directives,omitempty"`   // An optional list of directive values to provide processing instructions to orchestrators and tooling.
 	Properties   map[string]interface{}         `yaml:"properties,omitempty"`   // An optional list of property value assignments for the Node Template.
 	Attributes   map[string]interface{}         `yaml:"attributes,omitempty"`   // An optional list of attribute value assignments for the Node Template.
-	Requirements map[string]map[string]string   `yaml:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
+	Requirements []map[string]map[string]string `yaml:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
 	Capabilities map[string]interface{}         `yaml:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
 	Interfaces   map[string]InterfaceDefinition `yaml:"interfaces,omitempty"`   // An optional list of named interface definitions for the Node Template.
 	Artifcats    map[string]ArtifactDefinition  `yaml:"artifcats,omitempty"`    // An optional list of named artifact definitions for the Node Template.
