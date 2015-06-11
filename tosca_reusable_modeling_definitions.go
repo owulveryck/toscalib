@@ -102,6 +102,26 @@ type RequirementDefinition struct {
 	Occurrences  ToscaRange `yaml:"occurences,omitempty"`   // The optional minimum and maximum occurrences for the requirement.  Note: the keyword UNBOUNDED is also supported to represent any positive integer
 }
 
+// RequirementAssignement as described in Appendix 7.2
+type RequirementAssignment struct {
+	Capability string `yaml:"capability,omitempty"` /* The optional reserved keyname used to provide the name of either a:
+	- Capability definition within a target node template that can fulfill the requirement.
+	- Capability Type that the provider will use to select a type-compatible target node template to fulfill the requirement at runtime.  */
+	Node string `yaml:"node,omitempty"` /* The optional reserved keyname used to identify the target node of a relationship.  specifically, it is used to provide either a:
+	-  Node Template name that can fulfil the target node requirement.
+	- Node Type name that the provider will use to select a type-compatible node template to fulfil the requirement at runtime.  */
+	//Relationship string `yaml:"relationship,omitempty"` /* The optional reserved keyname used to provide the name of either a:
+	//- Relationship Template to use to relate the source node to the (capability in the) target node when fulfilling the requirement.
+	//- Relationship Type that the provider will use to select a type-compatible relationship template to relate the source node to the target node at runtime. */
+	Nodefilter NodeFilter `yaml:"node_filter,omitempty"` // The optional filter definition that TOSCA orchestrators or providers would use to select a type-compatible target node that can fulfill the associated abstract requirement at runtime.o
+	/* The following is the list of recognized keynames for a TOSCA requirement assignment’s relationship keyname which is used when Property assignments need to be provided to inputs of declared interfaces or their operations:*/
+	Relationship struct {
+		Type       string                         `yaml:"type"`                 // The optional reserved keyname used to provide the name of the Relationship Type for the requirement assignment’s relationship keyname.
+		Interfaces map[string]InterfaceDefinition `yaml:"interfaces,omitempty"` // The optional reserved keyname used to reference declared (named) interface definitions of the corresponding Relationship Type in order to provide Property assignments for these interfaces or operations of these interfaces.
+
+	} `yaml:"relationship,omitempty"`
+}
+
 // CapabilityDefinition TODO: Appendix 6.1
 type CapabilityDefinition interface{}
 
@@ -141,16 +161,16 @@ type DataType struct {
 // NodeTemplate as described in Appendix 7.3
 // A Node Template specifies the occurrence of a manageable software component as part of an application’s topology model which is defined in a TOSCA Service Template.  A Node template is an instance of a specified Node Type and can provide customized properties, constraints or operations which override the defaults provided by its Node Type and its implementations.
 type NodeTemplate struct {
-	Type         string                              `yaml:"type"`                   // The required name of the Node Type the Node Template is based upon.
-	Decription   string                              `yaml:"description,omitempty"`  // An optional description for the Node Template.
-	Directives   []string                            `yaml:"directives,omitempty"`   // An optional list of directive values to provide processing instructions to orchestrators and tooling.
-	Properties   map[string]PropertyAssignement      `yaml:"properties,omitempty"`   // An optional list of property value assignments for the Node Template.
-	Attributes   map[string]interface{}              `yaml:"attributes,omitempty"`   // An optional list of attribute value assignments for the Node Template.
-	Requirements []map[string]map[string]interface{} `yaml:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
-	Capabilities map[string]interface{}              `yaml:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
-	Interfaces   map[string]InterfaceDefinition      `yaml:"interfaces,omitempty"`   // An optional list of named interface definitions for the Node Template.
-	Artifcats    map[string]ArtifactDefinition       `yaml:"artifcats,omitempty"`    // An optional list of named artifact definitions for the Node Template.
-	NodeFilter   map[string]NodeFilter               `yaml:"node_filter,omitempty"`  // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
+	Type         string                             `yaml:"type"`                   // The required name of the Node Type the Node Template is based upon.
+	Decription   string                             `yaml:"description,omitempty"`  // An optional description for the Node Template.
+	Directives   []string                           `yaml:"directives,omitempty"`   // An optional list of directive values to provide processing instructions to orchestrators and tooling.
+	Properties   map[string]PropertyAssignement     `yaml:"properties,omitempty"`   // An optional list of property value assignments for the Node Template.
+	Attributes   map[string]interface{}             `yaml:"attributes,omitempty"`   // An optional list of attribute value assignments for the Node Template.
+	Requirements []map[string]RequirementAssignment `yaml:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
+	Capabilities map[string]interface{}             `yaml:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
+	Interfaces   map[string]InterfaceDefinition     `yaml:"interfaces,omitempty"`   // An optional list of named interface definitions for the Node Template.
+	Artifcats    map[string]ArtifactDefinition      `yaml:"artifcats,omitempty"`    // An optional list of named artifact definitions for the Node Template.
+	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty"`  // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
 }
 
 // RepositoryDefinition as desribed in Appendix 5.6
