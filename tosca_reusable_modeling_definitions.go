@@ -180,9 +180,9 @@ type TopologyTemplateType struct {
 	Outputs       map[string]Output       `yaml:"outputs,omitempty"`
 }
 
-// TopologyTemplateStruct as defined in
+// ToscaDefinition is the meta structure containing an entire tosca document as described in
 //http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
-type TopologyTemplateStruct struct {
+type ToscaDefinition struct {
 	DefinitionsVersion ToscaVersion                    `yaml:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
 	Description        string                          `yaml:"description,omitempty"`
 	Imports            []string                        `yaml:"imports,omitempty"`            // Declares import statements external TOSCA Definitions documents. For example, these may be file location or URIs relative to the service template file within the same TOSCA CSAR file.

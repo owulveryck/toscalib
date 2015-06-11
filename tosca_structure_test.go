@@ -13,7 +13,7 @@ func TestStructures(t *testing.T) {
 	// this is a map with the structure to be tested and the corresponding example
 	examples := map[string]interface{}{
 		"testFiles/constraintsTest.yaml": ConstraintClause{},
-		"testFiles/topologyTest.yaml":    TopologyTemplateStruct{},
+		"testFiles/topologyTest.yaml":    ToscaDefinition{},
 		"testFiles/propertyTest.yaml":    map[string]PropertyDefinition{},
 	}
 
