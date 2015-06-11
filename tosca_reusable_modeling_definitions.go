@@ -66,6 +66,16 @@ type PropertyDefinition struct {
 	EntrySchema string           `yaml:"entry_schema,omitempty"`
 }
 
+// PropertyAssignement is a structure describing the property assignmenet in the node template
+// This notion is described in appendix 5.9 of the document
+type PropertyAssignement struct {
+	Type        string      `yaml:"type"`                   //    The required data type for the attribute.
+	Description string      `yaml:"description,omitempty"`  // The optional description for the attribute.
+	Default     interface{} `yaml:"default,omitempty"`      //	An optional key that may provide a value to be used as a default if not provided by another means.
+	Status      string      `yaml:"status,omitempty"`       // The optional status of the attribute relative to the specification or implementation.
+	EntrySchema string      `yaml:"entry_schema,omitempty"` // The optional key that is used to declare the name of the Datatype definition for entries of set types such as the TOSCA list or map.
+}
+
 // Input corresponds to  `yaml:"inputs,omitempty"`
 type Input struct {
 	Type             string           `yaml:"type"`
@@ -134,7 +144,7 @@ type NodeTemplate struct {
 	Type         string                              `yaml:"type"`                   // The required name of the Node Type the Node Template is based upon.
 	Decription   string                              `yaml:"description,omitempty"`  // An optional description for the Node Template.
 	Directives   []string                            `yaml:"directives,omitempty"`   // An optional list of directive values to provide processing instructions to orchestrators and tooling.
-	Properties   map[string]interface{}              `yaml:"properties,omitempty"`   // An optional list of property value assignments for the Node Template.
+	Properties   map[string]PropertyAssignement      `yaml:"properties,omitempty"`   // An optional list of property value assignments for the Node Template.
 	Attributes   map[string]interface{}              `yaml:"attributes,omitempty"`   // An optional list of attribute value assignments for the Node Template.
 	Requirements []map[string]map[string]interface{} `yaml:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
 	Capabilities map[string]interface{}              `yaml:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
