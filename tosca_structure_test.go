@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"gopkg.in/yaml.v2"
+	"log"
 	"os"
 )
 
@@ -27,8 +28,8 @@ func TestStructures(t *testing.T) {
 		if err != nil {
 			t.Errorf("error: %v", err)
 		}
-		//log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
-		t.Logf("--- Result of the marshal:\n%v\n\n", mystruct)
+		log.Printf("--- Result of the unmarshal:\n%v\n\n", mystruct)
+		t.Logf("--- Result of the unmarshal:\n%v\n\n", mystruct)
 
 		d, err := yaml.Marshal(&mystruct)
 		if err != nil {
@@ -53,6 +54,17 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
+	log.Printf("--- Result of the unmarshal:\n%v\n\n", toscaStructure)
+	t.Logf("--- Result of the unmarshal:\n%v\n\n", toscaStructure)
+	d, err := yaml.Marshal(&toscaStructure)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	//log.Printf("%s\n\n", string(d))
+
+	t.Logf("%s\n\n", string(d))
+	//log.Printf("%s\n\n", string(d))
+
 }
 
 func TestScalar(t *testing.T) {
