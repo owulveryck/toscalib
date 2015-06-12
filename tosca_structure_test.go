@@ -37,9 +37,7 @@ func TestStructures(t *testing.T) {
 		//log.Printf("%s\n\n", string(d))
 
 		t.Logf("%s\n\n", string(d))
-
 	}
-
 }
 
 func TestParse(t *testing.T) {

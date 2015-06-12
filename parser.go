@@ -10,7 +10,7 @@ import (
 )
 
 // Parse a TOSCA document and fill in the structure
-// If the structure already contains data, the new data are append to the structure
+// If the structure already contains data
 func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 	var tempStruct ToscaDefinition
 	tempStruct.NodeTypes = make(map[string]NodeType)
