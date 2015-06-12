@@ -2,8 +2,9 @@ package toscalib
 
 import (
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
+
 	"io"
+	"io/ioutil"
 )
 
 // Parse a TOSCA document and fill in the structure
@@ -23,8 +24,6 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 	// Check the interface type (should be a map)
 	// Otherwise, it may not be a tosca file
 
-
-	toscaStructure = &tempStruct
 	return nil
 
 }
