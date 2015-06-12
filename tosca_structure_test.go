@@ -2,10 +2,10 @@ package toscalib
 
 import (
 	"io/ioutil"
-	"log"
 	"testing"
 
 	"gopkg.in/yaml.v2"
+	"os"
 )
 
 // teststructures does a simple mashalling/unmarshalling of some testfiles
@@ -27,19 +27,32 @@ func TestStructures(t *testing.T) {
 		if err != nil {
 			t.Errorf("error: %v", err)
 		}
-		log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
+		//log.Printf("--- Result of the marshal:\n%v\n\n", mystruct)
 		t.Logf("--- Result of the marshal:\n%v\n\n", mystruct)
 
 		d, err := yaml.Marshal(&mystruct)
 		if err != nil {
 			t.Errorf("error: %v", err)
 		}
-		log.Printf("%s\n\n", string(d))
+		//log.Printf("%s\n\n", string(d))
 
 		t.Logf("%s\n\n", string(d))
 
 	}
 
+}
+
+func TestParse(t *testing.T) {
+	var toscaStructure ToscaDefinition
+	file, err := os.Open("examples/tosca_elk.yaml")
+
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	err = toscaStructure.Parse(file)
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
 }
 
 func TestScalar(t *testing.T) {
