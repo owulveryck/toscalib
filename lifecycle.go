@@ -1,7 +1,7 @@
 package toscalib
 
 // ToscaInterfacesNodeLifecycleStandard is a go interface for the standard normative lifecycle
-type ToscaInterfacesNodeLifecycleStandard interface {
+type ToscaInterfacesNodeLifecycleStandarder interface {
 	Create() error    // description: Standard lifecycle create operation.
 	Configure() error // description: Standard lifecycle configure operation.
 	Start() error     // description: Standard lifecycle start operation.
