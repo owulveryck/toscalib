@@ -146,7 +146,7 @@ type NodeType struct {
 	Capabilities map[string]CapabilityDefinition    `yaml:"capabilities,omitempty"` // An optional list of capability definitions for the Node Type
 	Interfaces   map[string]InterfaceDefinition     `yaml:"interfaces,omitempty"`   // An optional list of interface definitions supported by the Node Type
 	Artifacts    map[string]ArtifactDefinition      `yaml:"artifacts,omitempty" `   // An optional list of named artifact definitions for the Node Type
-	Copy         string                             `yaml:"copy"`                   // The optional (symbolic) name of another node template to copy into (all keynames and values) and use as a basis for this node template.
+	Copy         string                             `yaml:"copy,omitempty"`         // The optional (symbolic) name of another node template to copy into (all keynames and values) and use as a basis for this node template.
 }
 
 // DataType as described in Appendix 6.5
