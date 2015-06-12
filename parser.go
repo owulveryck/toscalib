@@ -38,14 +38,12 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 				//  For debuging purpode
 				log.Printf("DEBUG: Cannot find the NodeType definition for %v", nodeType)
 			}
-			log.Printf("DEBUG: data for %v: \n%v", nodeType, string(data))
 			var nt map[string]NodeType
 			// Unmarshal the data in an interface
 			err = yaml.Unmarshal(data, &nt)
 			if err != nil {
 				return errors.New(fmt.Sprintf("cannot unmarshal %v (%v)", nodeType, err))
 			}
-			log.Printf("DEBUG: structure for %v:\n%v", nodeType, nt)
 			tempStruct.NodeTypes[nodeType] = nt[nodeType]
 		}
 	}

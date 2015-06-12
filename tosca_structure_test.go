@@ -28,7 +28,6 @@ func TestStructures(t *testing.T) {
 		if err != nil {
 			t.Errorf("error: %v", err)
 		}
-		log.Printf("--- Result of the unmarshal:\n%v\n\n", mystruct)
 		t.Logf("--- Result of the unmarshal:\n%v\n\n", mystruct)
 
 		d, err := yaml.Marshal(&mystruct)
@@ -54,7 +53,6 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
-	log.Printf("--- Result of the unmarshal:\n%v\n\n", toscaStructure)
 	t.Logf("--- Result of the unmarshal:\n%v\n\n", toscaStructure)
 	d, err := yaml.Marshal(&toscaStructure)
 	if err != nil {
@@ -63,7 +61,7 @@ func TestParse(t *testing.T) {
 	//log.Printf("%s\n\n", string(d))
 
 	t.Logf("%s\n\n", string(d))
-	//log.Printf("%s\n\n", string(d))
+	log.Printf("%s\n\n", string(d))
 
 }
 

@@ -61,7 +61,7 @@ const UNBOUNDED uint64 = 9223372036854775807
 
 // ToscaRange is defined in Appendix 2.3
 // The range type can be used to define numeric ranges with a lower and upper boundary. For example, this allows for specifying a range of ports to be opened in a firewall
-type ToscaRange [2]uint64
+type ToscaRange interface{}
 
 // ToscaList is defined is Appendix 2.4.
 // The list type allows for specifying multiple values for a parameter of property.
