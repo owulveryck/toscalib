@@ -17,5 +17,5 @@ clean:
 	rm tosca
 
 tosca_normative_definitions.go: NormativeTypes/capabilities NormativeTypes/interfaces NormativeTypes/nodes NormativeTypes/relationships
-	$(GOBINDATA) -o tosca_normative_definitions.go NormativeTypes/capabilities NormativeTypes/interfaces NormativeTypes/nodes NormativeTypes/relationships
+	$(GOBINDATA) -pkg=toscalib -prefix=NormativeTypes/all/ -o tosca_normative_definitions.go NormativeTypes/all 
 
