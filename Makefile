@@ -16,9 +16,6 @@ test: *.go
 clean:
 	rm tosca
 
-normative: NormativeTypes/capabilities NormativeTypes/interfaces NormativeTypes/nodes NormativeTypes/relationships
-	$(GOBINDATA) -pkg=toscalib -prefix=NormativeTypes/ -o normative_capabilities.go NormativeTypes/capabilities
-	$(GOBINDATA) -pkg=toscalib -prefix=NormativeTypes/ -o normative_interfaces.go NormativeTypes/interfaces
-	$(GOBINDATA) -pkg=toscalib -prefix=NormativeTypes/ -o normative_nodes.go NormativeTypes/nodes
-	$(GOBINDATA) -pkg=toscalib -prefix=NormativeTypes/ -o normative_relationships.go NormativeTypes/relationships
+normative_definitions.go: NormativeTypes/
+	$(GOBINDATA) -pkg=toscalib -prefix=NormativeTypes/ -o normative_definitions.go NormativeTypes/
 
