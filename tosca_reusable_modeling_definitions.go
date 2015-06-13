@@ -57,13 +57,13 @@ func (constraint *ConstraintClause) UnmarshalYAML(unmarshal func(interface{}) er
 // The value of a property can be retrieved using the
 // get_property function within TOSCA Service Templates
 type PropertyDefinition struct {
-	Type        string           `yaml:"type"`                  // The required data type for the property
-	Description string           `yaml:"description,omitempty"` // The optional description for the property.
-	Required    bool             `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
-	Default     interface{}      `yaml:"default"`
-	Status      Status           `yaml:"status"`
-	Constraints ConstraintClause `yaml:"constraints,omitempty,inline"`
-	EntrySchema string           `yaml:"entry_schema,omitempty"`
+	Type        string            `yaml:"type"`                  // The required data type for the property
+	Description string            `yaml:"description,omitempty"` // The optional description for the property.
+	Required    bool              `yaml:"required"`              // An optional key that declares a property as required ( true) or not ( false) Default: true
+	Default     interface{}       `yaml:"default"`
+	Status      Status            `yaml:"status"`
+	Constraints *ConstraintClause `yaml:"constraints,omitempty"`
+	EntrySchema string            `yaml:"entry_schema,omitempty"`
 }
 
 // PropertyAssignement is a structure describing the property assignmenet in the node template
@@ -126,7 +126,7 @@ type RequirementAssignment struct {
 type CapabilityDefinition interface{}
 
 // InterfaceDefinition TODO: Appendix 5.12
-type InterfaceDefinition interface{}
+type InterfaceDefinition map[string]interface{}
 
 // ArtifactDefinition TODO: Appendix 5.5
 type ArtifactDefinition interface{}
