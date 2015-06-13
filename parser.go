@@ -50,25 +50,8 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 	// Create the adjacency matrix
 	// Every node state must be represented in the matrix
 	// Suppose nodeA and nodeB where nodeA requires nodeB
-	// nodeB must be setup prior to nodeA
-	// There are the following states defined:
-	// - initial
-	// - creating
-	// - created
-	// - configuring
-	// - configured
-	// - starting
-	// - started
-	// - stopping
-	// - deleting
-	// - error
-
-	// if nodeA has an artifact for one of the following interface:
-	// pre_configure_soure
-	// post_configure_source
-	// or if nodeB has an artifcat for one of the following interface:
-	// pre_configure_target
-	// post_configure_target
+	//
+	// if nodeA and nodeB has a Configure relationship,
 	// then the workflow is:
 	// digraph WorkflowStart {
 	//     nodeB:Create() -> nodeA:Create()
@@ -86,7 +69,6 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 	// digraph WorkflowStart {
 	// nodeB:Create() -> nodeB:Configure() -> nodeB:Start() -> nodeA:Create() -> nodeA:Configure() -> nodeA:Start()
 	// }
-	// FIXME: By now, only the second case is implemented
 
 	*toscaStructure = tempStruct
 	return nil
