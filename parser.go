@@ -32,7 +32,8 @@ const NodeGap int = 8
 //   digraph WorkflowStart {
 //     nodeB:Create() -> nodeB:Configure() -> nodeB:Start() -> nodeA:Create() -> nodeA:Configure() -> nodeA:Start()
 //   }
-// Elements of the Matrix
+//
+// elements of the Matrix
 // Let i be the index of nodeA in the adjacency matrix
 //   i+i is the index of nodeA:Create()
 //   i+2 is the index of nodeA:PreConfigureSource()
