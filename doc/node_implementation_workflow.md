@@ -22,6 +22,10 @@ digraph WorkflowStart {
     nodeA:Start() -> nodeB:Start()
 }
 ```
+
+Which leads to this graph:
+[!workflow](workflow_interfaces_configure.svg)
+
 otherwise the workflow is:
 ```dot
    digraph WorkflowStart {
