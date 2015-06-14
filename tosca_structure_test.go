@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"gopkg.in/yaml.v2"
-	"log"
 	"os"
+
+	"gopkg.in/yaml.v2"
 )
 
 // teststructures does a simple mashalling/unmarshalling of some testfiles
@@ -34,7 +34,6 @@ func TestStructures(t *testing.T) {
 		if err != nil {
 			t.Errorf("error: %v", err)
 		}
-		//log.Printf("%s\n\n", string(d))
 
 		t.Logf("%s\n\n", string(d))
 	}
@@ -56,10 +55,8 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
-	//log.Printf("%s\n\n", string(d))
 
 	t.Logf("%s\n\n", string(d))
-	log.Printf("%s\n\n", string(d))
 
 }
 
