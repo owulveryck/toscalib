@@ -69,6 +69,20 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 	// digraph WorkflowStart {
 	// nodeB:Create() -> nodeB:Configure() -> nodeB:Start() -> nodeA:Create() -> nodeA:Configure() -> nodeA:Start()
 	// }
+	// let i be the index of nodeA in the adjacency matrix
+	// i+i is the index of nodeA:Create()
+	// i+2 is the index of nodeA:PreConfigureSource()
+	// i+2 is the index of nodeA:PreConfigureTarget()
+	// i+3 is the index of nodeA:Configure()
+	// i+4 is the index of nodeA:PostConfigureSource()
+	// i+5 is the index of nodeA:PostConfigureTarget()
+	// i+6 is the index of Start()
+	// i+7 is the index of Stop()
+	// i+8 is the index of Delete()
+
+	// For each nodeSource in the NodeTemplates structure
+	// nodeSource.Id is the column Id (because it is a destination)
+	// for each requirement req.Id is the row.Id
 
 	*toscaStructure = tempStruct
 	return nil
