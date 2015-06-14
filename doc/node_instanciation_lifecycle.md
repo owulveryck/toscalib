@@ -1,4 +1,4 @@
-# Node implementation workflow
+# Node instanciation lifecycle
 
 ## Abstract
 At runtime, the node template must be instanciated according its lifecycle.
