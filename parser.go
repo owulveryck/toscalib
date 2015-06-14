@@ -16,7 +16,7 @@ const NodeGap int = 8
 //
 // if nodeA and nodeB has a Configure relationship,
 // then the workflow is:
-// digraph WorkflowStart {
+//   digraph WorkflowStart {
 //     nodeB:Create() -> nodeA:Create()
 //     nodeA:Create() -> nodeA:PreConfigureSource()
 //     nodeA:PreConfigureSource -> nodeB:PreConfigureTarget()
@@ -27,11 +27,11 @@ const NodeGap int = 8
 //     nodeA:PostConfigureSource() -> nodeA:Start()
 //     nodeB:PostConfigureTarget() -> nodeB:Start()
 //     nodeA:Start() -> nodeB:Start()
-// }
+//   }
 // otherwise the workflow is
-// digraph WorkflowStart {
-// nodeB:Create() -> nodeB:Configure() -> nodeB:Start() -> nodeA:Create() -> nodeA:Configure() -> nodeA:Start()
-// }
+//   digraph WorkflowStart {
+//     nodeB:Create() -> nodeB:Configure() -> nodeB:Start() -> nodeA:Create() -> nodeA:Configure() -> nodeA:Start()
+//   }
 // let i be the index of nodeA in the adjacency matrix
 // i+i is the index of nodeA:Create()
 // i+2 is the index of nodeA:PreConfigureSource()
