@@ -34,7 +34,7 @@ and then simply `go get github.com/owulveryck/toscalib`
 I try as much as possible to develop some tests that may be run with `go test`
  
 # API
-The API documentation is on [godoc](http://godoc.org/github.com/owulveryck/toscalib)
+The API documentation can be found here [![GoDoc](https://godoc.org/github.com/owulveryck/toscalib?status.svg)](https://godoc.org/github.com/owulveryck/toscalib)
 
 # Future
 This library may be used to:
