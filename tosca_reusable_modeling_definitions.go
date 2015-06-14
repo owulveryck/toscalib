@@ -120,6 +120,8 @@ type RequirementAssignment struct {
 		Interfaces map[string]InterfaceDefinition `yaml:"interfaces,omitempty"` // The optional reserved keyname used to reference declared (named) interface definitions of the corresponding Relationship Type in order to provide Property assignments for these interfaces or operations of these interfaces.
 
 	} `yaml:"relationship,omitempty"`
+	// It looks like the Relationship type is not always present and from times to time (at least in the ELK example, we find the Interfaces directly)
+	Interfaces map[string]InterfaceDefinition `yaml:"interfaces,omitempty"` // The optional reserved keyname used to reference declared (named) interface definitions of the corresponding Relationship Type in order to provide Property assignments for these interfaces or operations of these interfaces.
 }
 
 // CapabilityDefinition TODO: Appendix 6.1
@@ -171,7 +173,7 @@ type NodeTemplate struct {
 	Interfaces   map[string]InterfaceDefinition     `yaml:"interfaces,omitempty"`   // An optional list of named interface definitions for the Node Template.
 	Artifcats    map[string]ArtifactDefinition      `yaml:"artifcats,omitempty"`    // An optional list of named artifact definitions for the Node Template.
 	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty"`  // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
-	Id           string                             `yaml:"tosca_id,omitempty"`     // From tosca.nodes.Root: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+	Id           int                                `yaml:"tosca_id,omitempty"`     // From tosca.nodes.Root: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
 	Name         string                             `yaml:"toca_name,omitempty"`    // From tosca.nodes.root This attribute reflects the name of the Node Template as defined in the TOSCA service template.  This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
 	State        int                                // The state (see constants definitions)
 }

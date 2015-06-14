@@ -1,51 +1,124 @@
 package toscalib
 
 import (
+	"fmt"
+	"github.com/gonum/matrix/mat64"
 	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
+	"regexp"
 )
 
 // NodeGap is the gap between each node see @FillAdjacencyMatrix for explanation
-const NodeGap int = 8
+const nodeGap int = 10
 
-// FIllAdjacencyMatrix fills the adjacency matrix AdjacencyMatri the current ToscaDefinition structure
-//
-// Every node state must be represented in the matrix
-// Suppose nodeA and nodeB where nodeA requires nodeB
-//
-// if nodeA and nodeB has a Configure relationship,
-// then the workflow is:
-//   digraph WorkflowStart {
-//     nodeB:Create() -> nodeA:Create()
-//     nodeA:Create() -> nodeA:PreConfigureSource()
-//     nodeA:PreConfigureSource -> nodeB:PreConfigureTarget()
-//     nodeB:PreConfigureTarget -> nodeA:Configure()
-//     nodeB:PreConfigureTarget -> nodeB:Configure()
-//     nodeA:Configure() -> nodeA:PostConfigureSource()
-//     nodeB:Configure() -> nodeB:PostConfigureTarget()
-//     nodeA:PostConfigureSource() -> nodeA:Start()
-//     nodeB:PostConfigureTarget() -> nodeB:Start()
-//     nodeA:Start() -> nodeB:Start()
-//   }
-// otherwise the workflow is
-//   digraph WorkflowStart {
-//     nodeB:Create() -> nodeB:Configure() -> nodeB:Start() -> nodeA:Create() -> nodeA:Configure() -> nodeA:Start()
-//   }
-// Elements of the Matrix:
-// Let i be the index of nodeA in the adjacency matrix
-//   i+i is the index of nodeA:Create()
-//   i+2 is the index of nodeA:PreConfigureSource()
-//   i+2 is the index of nodeA:PreConfigureTarget()
-//   i+3 is the index of nodeA:Configure()
-//   i+4 is the index of nodeA:PostConfigureSource()
-//   i+5 is the index of nodeA:PostConfigureTarget()
-//   i+6 is the index of Start()
-//   i+7 is the index of Stop()
-//   i+8 is the index of Delete()
-func (toscaStructure *ToscaDefinition) FIllAdjacencyMatrix() error {
+func (nodeTemplate *NodeTemplate) GetInitialIndex() int             { return nodeTemplate.Id }
+func (nodeTemplate *NodeTemplate) GetCreateIndex() int              { return nodeTemplate.Id + 1 }
+func (nodeTemplate *NodeTemplate) GetPreConfigureSourceIndex() int  { return nodeTemplate.Id + 2 }
+func (nodeTemplate *NodeTemplate) GetPreConfigureTargetIndex() int  { return nodeTemplate.Id + 3 }
+func (nodeTemplate *NodeTemplate) GetConfigureIndex() int           { return nodeTemplate.Id + 4 }
+func (nodeTemplate *NodeTemplate) GetPostConfigureSourceIndex() int { return nodeTemplate.Id + 5 }
+func (nodeTemplate *NodeTemplate) GetPostConfigureTargetIndex() int { return nodeTemplate.Id + 6 }
+func (nodeTemplate *NodeTemplate) GetStartIndex() int               { return nodeTemplate.Id + 7 }
+func (nodeTemplate *NodeTemplate) GetStopIndex() int                { return nodeTemplate.Id + 8 }
+func (nodeTemplate *NodeTemplate) GetDeleteIndex() int              { return nodeTemplate.Id + 9 }
 
+// GetNodeTemplate returns a pointer to a node template given its name
+// its returns nil if not found
+func (toscaStructure *ToscaDefinition) GetNodeTemplate(nodeName string) *NodeTemplate {
+	for name, nodeTemplate := range toscaStructure.TopologyTemplate.NodeTemplates {
+		if name == nodeName {
+			return &nodeTemplate
+		}
+	}
 	return nil
+}
+
+// FIllAdjacencyMatrix fills the adjacency matrix AdjacencyMatrix in the current ToscaDefinition structure
+// for more information, see doc/node_instanciation_lifecycle.md
+func (toscaStructure *ToscaDefinition) FIllAdjacencyMatrix() (*mat64.Dense, *map[int]string, error) {
+	// Get the number of nodes
+	numberOfNodes := len(toscaStructure.TopologyTemplate.NodeTemplates)
+	// Initialize the AdjacencyMatrix
+	adjacencyMatrix := mat64.NewDense(numberOfNodes*nodeGap, numberOfNodes*nodeGap, nil)
+	index := 1
+	// First, assign an Id to all nodes...
+	var references = make(map[int]string, numberOfNodes*nodeGap)
+	for nodeName, nodeDetail := range toscaStructure.TopologyTemplate.NodeTemplates {
+		// Set the Id of the node
+		nodeDetail.Id = index
+		references[index] = nodeName
+		references[index+1] = fmt.Sprintf("%v_Create", nodeName)
+		references[index+2] = fmt.Sprintf("%v_PreConfigureSource", nodeName)
+		references[index+3] = fmt.Sprintf("%v_PreConfigureTarget", nodeName)
+		references[index+4] = fmt.Sprintf("%v_Configure", nodeName)
+		references[index+5] = fmt.Sprintf("%v_PostConfigureSource", nodeName)
+		references[index+6] = fmt.Sprintf("%v_PostConfigureTarget", nodeName)
+		references[index+7] = fmt.Sprintf("%v_Start", nodeName)
+		references[index+8] = fmt.Sprintf("%v_Stop", nodeName)
+		references[index+9] = fmt.Sprintf("%v_Delete", nodeName)
+		index = index + nodeGap
+	}
+	// Then set the matrix
+	for nodeAName, nodeDetail := range toscaStructure.TopologyTemplate.NodeTemplates {
+		// Check if the current node has at least one requirement with an interface of type tosca.interfaces.relationship.Configure
+		var res1 bool
+		var res2 bool
+		if nodeDetail.Requirements != nil {
+			for _, requirementAssignements := range nodeDetail.Requirements {
+				for _, requirementAssignement := range requirementAssignements {
+					nodeBName := requirementAssignement.Node
+					// Check if we have a requirement type that is .*Configure of if we have an Interface key that is .*Configure
+					res1, _ = regexp.MatchString(".*Configure", requirementAssignement.Relationship.Type)
+					for inter, _ := range requirementAssignement.Relationship.Interfaces {
+						res2, _ = regexp.MatchString(".*Configure", inter)
+						if res2 == true {
+							break
+						}
+					}
+					// We have a Configure relationship
+					if res1 == true || res2 == true {
+						//log.Printf("%v Special workflow with %v", nodeAName, nodeBName)
+						nodeA := toscaStructure.GetNodeTemplate(nodeAName)
+						nodeB := toscaStructure.GetNodeTemplate(nodeBName)
+						//nodeB:Create() -> nodeA:Create()
+						adjacencyMatrix.Set(nodeB.GetCreateIndex(), nodeA.GetCreateIndex(), 1)
+						//nodeA:Create() -> nodeA:PreConfigureSource()
+						adjacencyMatrix.Set(nodeA.GetCreateIndex(), nodeA.GetPreConfigureSourceIndex(), 1)
+						//nodeA:PreConfigureSource -> nodeB:PreConfigureTarget()
+						adjacencyMatrix.Set(nodeA.GetPreConfigureSourceIndex(), nodeB.GetPreConfigureTargetIndex(), 1)
+						//nodeB:PreConfigureTarget -> nodeA:Configure()
+						adjacencyMatrix.Set(nodeB.GetPreConfigureTargetIndex(), nodeA.GetConfigureIndex(), 1)
+						//nodeB:PreConfigureTarget -> nodeB:Configure()
+						adjacencyMatrix.Set(nodeB.GetPreConfigureTargetIndex(), nodeB.GetConfigureIndex(), 1)
+						//nodeA:Configure() -> nodeA:PostConfigureSource()
+						adjacencyMatrix.Set(nodeA.GetConfigureIndex(), nodeA.GetPostConfigureSourceIndex(), 1)
+						//nodeB:Configure() -> nodeB:PostConfigureTarget()
+						adjacencyMatrix.Set(nodeB.GetConfigureIndex(), nodeB.GetPostConfigureTargetIndex(), 1)
+						//nodeA:PostConfigureSource() -> nodeA:Start()
+						adjacencyMatrix.Set(nodeA.GetPostConfigureSourceIndex(), nodeA.GetStartIndex(), 1)
+						//nodeB:PostConfigureTarget() -> nodeB:Start()
+						adjacencyMatrix.Set(nodeB.GetPostConfigureTargetIndex(), nodeB.GetStartIndex(), 1)
+						//nodeB:Start() -> nodeA:Start()
+						adjacencyMatrix.Set(nodeA.GetStartIndex(), nodeA.GetStartIndex(), 1)
+					} else {
+						//log.Printf("%v normal workflow with %v", nodeAName, nodeBName)
+						nodeA := toscaStructure.GetNodeTemplate(nodeAName)
+						nodeB := toscaStructure.GetNodeTemplate(nodeBName)
+						// nodeB:Create() -> nodeB:Configure() -> nodeB:Start() -> nodeA:Create() -> nodeA:Configure() -> nodeA:Start()
+						adjacencyMatrix.Set(nodeB.GetCreateIndex(), nodeB.GetConfigureIndex(), 1)
+						adjacencyMatrix.Set(nodeB.GetConfigureIndex(), nodeB.GetStartIndex(), 1)
+						adjacencyMatrix.Set(nodeB.GetStartIndex(), nodeA.GetCreateIndex(), 1)
+						adjacencyMatrix.Set(nodeA.GetCreateIndex(), nodeA.GetConfigureIndex(), 1)
+						adjacencyMatrix.Set(nodeA.GetConfigureIndex(), nodeA.GetStartIndex(), 1)
+					}
+				}
+
+			}
+		}
+		index = index + nodeGap
+	}
+	return adjacencyMatrix, &references, nil
 }
 
 // Parse a TOSCA document and fill in the structure
