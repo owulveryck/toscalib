@@ -6,8 +6,48 @@ import (
 	"io/ioutil"
 )
 
+// NodeGap is the gap between each node see @FillAdjacencyMatrix for explanation
+const NodeGap int = 8
+
+// FIllAdjacencyMatrix fills the adjacency matrix AdjacencyMatri the current ToscaDefinition structure
+//
+// Every node state must be represented in the matrix
+// Suppose nodeA and nodeB where nodeA requires nodeB
+//
+// if nodeA and nodeB has a Configure relationship,
+// then the workflow is:
+// digraph WorkflowStart {
+//     nodeB:Create() -> nodeA:Create()
+//     nodeA:Create() -> nodeA:PreConfigureSource()
+//     nodeA:PreConfigureSource -> nodeB:PreConfigureTarget()
+//     nodeB:PreConfigureTarget -> nodeA:Configure()
+//     nodeB:PreConfigureTarget -> nodeB:Configure()
+//     nodeA:Configure() -> nodeA:PostConfigureSource()
+//     nodeB:Configure() -> nodeB:PostConfigureTarget()
+//     nodeA:PostConfigureSource() -> nodeA:Start()
+//     nodeB:PostConfigureTarget() -> nodeB:Start()
+//     nodeA:Start() -> nodeB:Start()
+// }
+// otherwise the workflow is
+// digraph WorkflowStart {
+// nodeB:Create() -> nodeB:Configure() -> nodeB:Start() -> nodeA:Create() -> nodeA:Configure() -> nodeA:Start()
+// }
+// let i be the index of nodeA in the adjacency matrix
+// i+i is the index of nodeA:Create()
+// i+2 is the index of nodeA:PreConfigureSource()
+// i+2 is the index of nodeA:PreConfigureTarget()
+// i+3 is the index of nodeA:Configure()
+// i+4 is the index of nodeA:PostConfigureSource()
+// i+5 is the index of nodeA:PostConfigureTarget()
+// i+6 is the index of Start()
+// i+7 is the index of Stop()
+// i+8 is the index of Delete()
+func (toscaStructure *ToscaDefinition) FIllAdjacencyMatrix() error {
+
+	return nil
+}
+
 // Parse a TOSCA document and fill in the structure
-// If the structure already contains data
 func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 	var tempStruct ToscaDefinition
 	tempStruct.NodeTypes = make(map[string]NodeType)
@@ -47,43 +87,6 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 		}
 	*/
 	// TODO: deal with the import files
-	// Create the adjacency matrix
-	// Every node state must be represented in the matrix
-	// Suppose nodeA and nodeB where nodeA requires nodeB
-	//
-	// if nodeA and nodeB has a Configure relationship,
-	// then the workflow is:
-	// digraph WorkflowStart {
-	//     nodeB:Create() -> nodeA:Create()
-	//     nodeA:Create() -> nodeA:PreConfigureSource()
-	//     nodeA:PreConfigureSource -> nodeB:PreConfigureTarget()
-	//     nodeB:PreConfigureTarget -> nodeA:Configure()
-	//     nodeB:PreConfigureTarget -> nodeB:Configure()
-	//     nodeA:Configure() -> nodeA:PostConfigureSource()
-	//     nodeB:Configure() -> nodeB:PostConfigureTarget()
-	//     nodeA:PostConfigureSource() -> nodeA:Start()
-	//     nodeB:PostConfigureTarget() -> nodeB:Start()
-	//     nodeA:Start() -> nodeB:Start()
-	// }
-	// otherwise the workflow is
-	// digraph WorkflowStart {
-	// nodeB:Create() -> nodeB:Configure() -> nodeB:Start() -> nodeA:Create() -> nodeA:Configure() -> nodeA:Start()
-	// }
-	// let i be the index of nodeA in the adjacency matrix
-	// i+i is the index of nodeA:Create()
-	// i+2 is the index of nodeA:PreConfigureSource()
-	// i+2 is the index of nodeA:PreConfigureTarget()
-	// i+3 is the index of nodeA:Configure()
-	// i+4 is the index of nodeA:PostConfigureSource()
-	// i+5 is the index of nodeA:PostConfigureTarget()
-	// i+6 is the index of Start()
-	// i+7 is the index of Stop()
-	// i+8 is the index of Delete()
-
-	// For each nodeSource in the NodeTemplates structure
-	// nodeSource.Id is the column Id (because it is a destination)
-	// for each requirement req.Id is the row.Id
-
 	*toscaStructure = tempStruct
 	return nil
 
