@@ -23,9 +23,7 @@ digraph WorkflowStart {
 }
 ```
 
-Which leads to this graph:
-
-![workflow](workflow_interfaces_configure.svg "workflow")
+Which leads to this graph: ![workflow](./workflow_interfaces_configure.svg)
 
 otherwise the workflow is:
 ```dot
