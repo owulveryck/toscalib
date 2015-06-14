@@ -32,16 +32,17 @@ const NodeGap int = 8
 //   digraph WorkflowStart {
 //     nodeB:Create() -> nodeB:Configure() -> nodeB:Start() -> nodeA:Create() -> nodeA:Configure() -> nodeA:Start()
 //   }
-// let i be the index of nodeA in the adjacency matrix
-// i+i is the index of nodeA:Create()
-// i+2 is the index of nodeA:PreConfigureSource()
-// i+2 is the index of nodeA:PreConfigureTarget()
-// i+3 is the index of nodeA:Configure()
-// i+4 is the index of nodeA:PostConfigureSource()
-// i+5 is the index of nodeA:PostConfigureTarget()
-// i+6 is the index of Start()
-// i+7 is the index of Stop()
-// i+8 is the index of Delete()
+// Elements of the Matrix
+// Let i be the index of nodeA in the adjacency matrix
+//   i+i is the index of nodeA:Create()
+//   i+2 is the index of nodeA:PreConfigureSource()
+//   i+2 is the index of nodeA:PreConfigureTarget()
+//   i+3 is the index of nodeA:Configure()
+//   i+4 is the index of nodeA:PostConfigureSource()
+//   i+5 is the index of nodeA:PostConfigureTarget()
+//   i+6 is the index of Start()
+//   i+7 is the index of Stop()
+//   i+8 is the index of Delete()
 func (toscaStructure *ToscaDefinition) FIllAdjacencyMatrix() error {
 
 	return nil
