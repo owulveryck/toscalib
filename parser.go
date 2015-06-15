@@ -33,9 +33,9 @@ func (toscaStructure *ToscaDefinition) GetNodeTemplate(nodeName string) *NodeTem
 	return nil
 }
 
-// FIllAdjacencyMatrix fills the adjacency matrix AdjacencyMatrix in the current ToscaDefinition structure
+// FillAdjacencyMatrix fills the adjacency matrix AdjacencyMatrix in the current ToscaDefinition structure
 // for more information, see doc/node_instanciation_lifecycle.md
-func (toscaStructure *ToscaDefinition) FIllAdjacencyMatrix() (*mat64.Dense, error) {
+func (toscaStructure *ToscaDefinition) FillAdjacencyMatrix() error {
 	// Get the number of nodes
 	numberOfNodes := len(toscaStructure.TopologyTemplate.NodeTemplates)
 	// Initialize the AdjacencyMatrix
@@ -106,7 +106,8 @@ func (toscaStructure *ToscaDefinition) FIllAdjacencyMatrix() (*mat64.Dense, erro
 		}
 		index = index + nodeGap
 	}
-	return adjacencyMatrix, nil
+	toscaStructure.AdjacencyMatrix = *adjacencyMatrix
+	return nil
 }
 
 // Parse a TOSCA document and fill in the structure
@@ -150,6 +151,10 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 	*/
 	// TODO: deal with the import files
 	*toscaStructure = tempStruct
+	err = toscaStructure.FillAdjacencyMatrix()
+	if err != nil {
+		return err
+	}
 	return nil
 
 }
