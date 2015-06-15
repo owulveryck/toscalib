@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"fmt"
+	"math"
 	"os"
 
 	"gopkg.in/yaml.v2"
@@ -51,7 +52,7 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
-	adjacencyMatrix, _, err := toscaStructure.FIllAdjacencyMatrix()
+	adjacencyMatrix, err := toscaStructure.FIllAdjacencyMatrix()
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
@@ -64,27 +65,32 @@ func TestParse(t *testing.T) {
 	t.Logf("%s\n\n", string(d))
 
 	// Test adjacencyMatrix
-	w := os.Stdout
+	w := os.Stderr
 	fmt.Fprintln(w, "digraph G {")
+	fmt.Fprintln(w, "\trankdir = LR")
 	// Writing node definition
 	for nodeName, nodeDetail := range toscaStructure.TopologyTemplate.NodeTemplates {
-		fmt.Fprintf(w, "\t\"%v\" [\n", nodeName)
+		fmt.Fprintf(w, "\t\"%v\" [\n", nodeDetail.Id)
 		fmt.Fprintf(w, "\t\tid = \"%v\"\n", nodeDetail.Id)
 		//		if task.Module == "meta" {
 		//			fmt.Fprintln(w, "\t\tshape=diamond")
 		//			fmt.Fprintf(w, "\t\tlabel=\"%v\"", task.Name)
 		//		} else {
-		fmt.Fprintf(w, "\t\tlabel = \"<Initial>%v|<Create>%v|<PreConfigureSource>%v|<PreConfigureTarget>%v|<Configure>%v|<PostConfigureSource>%v|<PostConfigureTarget>%v|<Start>%v|<Stop>%v|<Delete>%v\"\n", nodeDetail.Id, nodeDetail.Id+1, nodeDetail.Id+2, nodeDetail.Id+3, nodeDetail.Id+4, nodeDetail.Id+5, nodeDetail.Id+6, nodeDetail.Id+7, nodeDetail.Id+8, nodeDetail.Id+9)
+		fmt.Fprintf(w, "\t\tlabel = \"%v|<%v>Initial|<%v>Create|<%v>PreConfigureSource|<%v>PreConfigureTarget|<%v>Configure|<%v>PostConfigureSource|<%v>PostConfigureTarget|<%v>Start|<%v>Stop|<%v>Delete\"\n", nodeName, nodeDetail.Id, nodeDetail.Id+1, nodeDetail.Id+2, nodeDetail.Id+3, nodeDetail.Id+4, nodeDetail.Id+5, nodeDetail.Id+6, nodeDetail.Id+7, nodeDetail.Id+8, nodeDetail.Id+9)
 
 		fmt.Fprintf(w, "\t\tshape = \"record\"\n")
 		//		}
 		fmt.Fprintf(w, "\t];\n")
 	}
 	row, col := adjacencyMatrix.Dims()
-	for r := 0; r < row; r++ {
-		for c := 0; c < col; c++ {
+	for r := 1; r < row; r++ {
+		for c := 1; c < col; c++ {
 			if adjacencyMatrix.At(r, c) == 1 {
-				fmt.Fprintf(w, "\t%v -> %v\n", r, c)
+				sourceNodeId, _ := math.Modf(float64(r / 10))
+				sourceNodeId = sourceNodeId*10 + 1
+				destNodeId, _ := math.Modf(float64(c / 10))
+				destNodeId = destNodeId*10 + 1
+				fmt.Fprintf(w, "\t%v:%v -> %v:%v\n", sourceNodeId, r, destNodeId, c)
 			}
 		}
 	}

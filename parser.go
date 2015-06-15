@@ -1,7 +1,6 @@
 package toscalib
 
 import (
-	"fmt"
 	"github.com/gonum/matrix/mat64"
 	"gopkg.in/yaml.v2"
 	"io"
@@ -36,27 +35,16 @@ func (toscaStructure *ToscaDefinition) GetNodeTemplate(nodeName string) *NodeTem
 
 // FIllAdjacencyMatrix fills the adjacency matrix AdjacencyMatrix in the current ToscaDefinition structure
 // for more information, see doc/node_instanciation_lifecycle.md
-func (toscaStructure *ToscaDefinition) FIllAdjacencyMatrix() (*mat64.Dense, *map[int]string, error) {
+func (toscaStructure *ToscaDefinition) FIllAdjacencyMatrix() (*mat64.Dense, error) {
 	// Get the number of nodes
 	numberOfNodes := len(toscaStructure.TopologyTemplate.NodeTemplates)
 	// Initialize the AdjacencyMatrix
 	adjacencyMatrix := mat64.NewDense(numberOfNodes*nodeGap, numberOfNodes*nodeGap, nil)
 	index := 1
-	// First, assign an Id to all nodes...
-	var references = make(map[int]string, numberOfNodes*nodeGap)
-	for nodeName, nodeDetail := range toscaStructure.TopologyTemplate.NodeTemplates {
+	for i, nodeDetail := range toscaStructure.TopologyTemplate.NodeTemplates {
 		// Set the Id of the node
 		nodeDetail.Id = index
-		references[index] = nodeName
-		references[index+1] = fmt.Sprintf("%v_Create", nodeName)
-		references[index+2] = fmt.Sprintf("%v_PreConfigureSource", nodeName)
-		references[index+3] = fmt.Sprintf("%v_PreConfigureTarget", nodeName)
-		references[index+4] = fmt.Sprintf("%v_Configure", nodeName)
-		references[index+5] = fmt.Sprintf("%v_PostConfigureSource", nodeName)
-		references[index+6] = fmt.Sprintf("%v_PostConfigureTarget", nodeName)
-		references[index+7] = fmt.Sprintf("%v_Start", nodeName)
-		references[index+8] = fmt.Sprintf("%v_Stop", nodeName)
-		references[index+9] = fmt.Sprintf("%v_Delete", nodeName)
+		toscaStructure.TopologyTemplate.NodeTemplates[i] = nodeDetail
 		index = index + nodeGap
 	}
 	// Then set the matrix
@@ -118,7 +106,7 @@ func (toscaStructure *ToscaDefinition) FIllAdjacencyMatrix() (*mat64.Dense, *map
 		}
 		index = index + nodeGap
 	}
-	return adjacencyMatrix, &references, nil
+	return adjacencyMatrix, nil
 }
 
 // Parse a TOSCA document and fill in the structure
