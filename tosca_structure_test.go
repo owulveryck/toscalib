@@ -51,7 +51,7 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
-	adjacencyMatrix, references, err := toscaStructure.FIllAdjacencyMatrix()
+	adjacencyMatrix, _, err := toscaStructure.FIllAdjacencyMatrix()
 	if err != nil {
 		t.Errorf("error: %v", err)
 	}
@@ -67,14 +67,15 @@ func TestParse(t *testing.T) {
 	w := os.Stdout
 	fmt.Fprintln(w, "digraph G {")
 	// Writing node definition
-	for index, name := range *references {
-		fmt.Fprintf(w, "\t\"%v\" [\n", index)
-		fmt.Fprintf(w, "\t\tid = \"%v\"\n", index)
+	for nodeName, nodeDetail := range toscaStructure.TopologyTemplate.NodeTemplates {
+		fmt.Fprintf(w, "\t\"%v\" [\n", nodeName)
+		fmt.Fprintf(w, "\t\tid = \"%v\"\n", nodeDetail.Id)
 		//		if task.Module == "meta" {
 		//			fmt.Fprintln(w, "\t\tshape=diamond")
 		//			fmt.Fprintf(w, "\t\tlabel=\"%v\"", task.Name)
 		//		} else {
-		fmt.Fprintf(w, "\t\tlabel = \"<name>%v\"\n", name)
+		fmt.Fprintf(w, "\t\tlabel = \"<Initial>%v|<Create>%v|<PreConfigureSource>%v|<PreConfigureTarget>%v|<Configure>%v|<PostConfigureSource>%v|<PostConfigureTarget>%v|<Start>%v|<Stop>%v|<Delete>%v\"\n", nodeDetail.Id, nodeDetail.Id+1, nodeDetail.Id+2, nodeDetail.Id+3, nodeDetail.Id+4, nodeDetail.Id+5, nodeDetail.Id+6, nodeDetail.Id+7, nodeDetail.Id+8, nodeDetail.Id+9)
+
 		fmt.Fprintf(w, "\t\tshape = \"record\"\n")
 		//		}
 		fmt.Fprintf(w, "\t];\n")
