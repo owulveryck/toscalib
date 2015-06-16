@@ -15,13 +15,9 @@ func (toscaStructure *ToscaDefinition) DotExecutionWorkflow(w io.Writer) error {
 	for nodeName, nodeDetail := range toscaStructure.TopologyTemplate.NodeTemplates {
 		fmt.Fprintf(w, "\t\"%v\" [\n", nodeDetail.Id)
 		fmt.Fprintf(w, "\t\tid = \"%v\"\n", nodeDetail.Id)
-		//		if task.Module == "meta" {
-		//			fmt.Fprintln(w, "\t\tshape=diamond")
-		//			fmt.Fprintf(w, "\t\tlabel=\"%v\"", task.Name)
-		//		} else {
 		fmt.Fprintf(w, "\t\tlabel = \"%v|<%v>Initial|<%v>Create|<%v>PreConfigureSource|<%v>PreConfigureTarget|<%v>Configure|<%v>PostConfigureSource|<%v>PostConfigureTarget|<%v>Start|<%v>Stop|<%v>Delete\"\n", nodeName, nodeDetail.Id, nodeDetail.Id+1, nodeDetail.Id+2, nodeDetail.Id+3, nodeDetail.Id+4, nodeDetail.Id+5, nodeDetail.Id+6, nodeDetail.Id+7, nodeDetail.Id+8, nodeDetail.Id+9)
 
-		fmt.Fprintf(w, "\t\tshape = \"record\"\n")
+		fmt.Fprintf(w, "\t\tshape = \"Mrecord\"\n")
 		//		}
 		fmt.Fprintf(w, "\t];\n")
 	}
