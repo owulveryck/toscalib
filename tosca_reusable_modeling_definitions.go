@@ -3,6 +3,7 @@ package toscalib
 import (
 	"errors"
 	"github.com/gonum/matrix/mat64"
+	"gopkg.in/yaml.v2"
 	"strings"
 )
 
@@ -232,4 +233,13 @@ type ToscaDefinition struct {
 	InterfaceTypes     map[string]InterfaceType        `yaml:"interface_types,omitempty"`    // This section contains an optional list of interface type definitions for use in service templates.
 	TopologyTemplate   TopologyTemplateType            `yaml:"topology_template"`            // Defines the topology template of an application or service, consisting of node templates that represent the application’s or service’s components, as well as relationship templates representing relations between the components.
 	AdjacencyMatrix    mat64.Dense                     //The AdjacencyMatrix
+}
+
+func (toscaDefinition *ToscaDefinition) Bytes() []byte {
+	d, _ := yaml.Marshal(toscaDefinition)
+	return d
+}
+func (toscaDefinition *ToscaDefinition) String() string {
+	d, _ := yaml.Marshal(toscaDefinition)
+	return string(d)
 }
