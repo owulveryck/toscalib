@@ -69,9 +69,9 @@ type PropertyDefinition struct {
 	EntrySchema string            `yaml:"entry_schema,omitempty"`
 }
 
-// PropertyAssignement is a structure describing the property assignmenet in the node template
+// AttributeDefinition is a structure describing the property assignmenet in the node template
 // This notion is described in appendix 5.9 of the document
-type PropertyAssignement struct {
+type AttributeDefinition struct {
 	Type        string      `yaml:"type"`                   //    The required data type for the attribute.
 	Description string      `yaml:"description,omitempty"`  // The optional description for the attribute.
 	Default     interface{} `yaml:"default,omitempty"`      //	An optional key that may provide a value to be used as a default if not provided by another means.
@@ -90,12 +90,9 @@ type Input struct {
 
 // Output is the output of the topology
 type Output struct {
-	Value       interface{} `yaml:"value"`
-	Description string      `yaml:"description"`
+	Value       map[string]interface{} `yaml:"value"`
+	Description string                 `yaml:"description"`
 }
-
-// AttributeDefinition TODO: Implement the type as defined in Appendix 5.9
-type AttributeDefinition interface{}
 
 // RequirementDefinition as described in Appendix 6.2
 type RequirementDefinition struct {
@@ -121,6 +118,7 @@ type RequirementAssignment struct {
 	Relationship struct {
 		Type       string                         `yaml:"type"`                 // The optional reserved keyname used to provide the name of the Relationship Type for the requirement assignment’s relationship keyname.
 		Interfaces map[string]InterfaceDefinition `yaml:"interfaces,omitempty"` // The optional reserved keyname used to reference declared (named) interface definitions of the corresponding Relationship Type in order to provide Property assignments for these interfaces or operations of these interfaces.
+		Properties map[string]interface{}         `yaml:"properties"`           // The optional list property definitions that comprise the schema for a complex Data Type in TOSCA.
 
 	} `yaml:"relationship,omitempty"`
 	// It looks like the Relationship type is not always present and from times to time (at least in the ELK example, we find the Interfaces directly)
@@ -169,7 +167,7 @@ type NodeTemplate struct {
 	Type         string                             `yaml:"type"`                   // The required name of the Node Type the Node Template is based upon.
 	Decription   string                             `yaml:"description,omitempty"`  // An optional description for the Node Template.
 	Directives   []string                           `yaml:"directives,omitempty"`   // An optional list of directive values to provide processing instructions to orchestrators and tooling.
-	Properties   map[string]PropertyAssignement     `yaml:"properties,omitempty"`   // An optional list of property value assignments for the Node Template.
+	Properties   map[string]map[string]string       `yaml:"properties,omitempty"`   // An optional list of property value assignments for the Node Template.
 	Attributes   map[string]interface{}             `yaml:"attributes,omitempty"`   // An optional list of attribute value assignments for the Node Template.
 	Requirements []map[string]RequirementAssignment `yaml:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
 	Capabilities map[string]interface{}             `yaml:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
