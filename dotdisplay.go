@@ -43,16 +43,26 @@ func (toscaStructure *ToscaDefinition) DotExecutionWorkflow(w io.Writer) error {
 func (toscaStructure *ToscaDefinition) PrintDot(w io.Writer) {
 	dotCode := fmt.Sprintf("digraph G {\n")
 	dotCode = fmt.Sprintf("%v\tgraph [ rankdir = \"LR\" ];\n", dotCode)
+	dotCode = fmt.Sprintf("%v\tInputs [label=\"Inputs", dotCode)
+	for inputName, inputDetail := range toscaStructure.TopologyTemplate.Inputs {
+		dotCode = fmt.Sprintf("%v |{%v|<%v> %v}", dotCode, inputDetail.Description, inputName, inputName)
+	}
+	dotCode = fmt.Sprintf("%v\" shape=record style=rounded color=orange]\n", dotCode)
+	dotCode = fmt.Sprintf("%v\tOutputs [label=\"Outputs", dotCode)
+	for outputName, outputDetail := range toscaStructure.TopologyTemplate.Outputs {
+		dotCode = fmt.Sprintf("%v |{<%v> %v| %v}", dotCode, outputName, outputName, outputDetail.Description)
+	}
+	dotCode = fmt.Sprintf("%v\" shape=record style=rounded color=green]\n", dotCode)
 	for nodeName, nodeDetail := range toscaStructure.TopologyTemplate.NodeTemplates {
 		// For each node, create a record
 		dotCode = fmt.Sprintf("%v\t%v [label=\"<nodeName> %v|<nodeType> %v", dotCode, nodeName, nodeName, nodeDetail.Type)
 		//Display the properties
 		if nodeDetail.Properties != nil {
-			dotCode = fmt.Sprintf("%v|{Properties|{", dotCode)
+			dotCode = fmt.Sprintf("%v|{{", dotCode)
 			for property := range nodeDetail.Properties {
-				dotCode = fmt.Sprintf("%v%v|", dotCode, property)
+				dotCode = fmt.Sprintf("%v<%v>%v|", dotCode, property, property)
 			}
-			dotCode = fmt.Sprintf("%v}}", dotCode)
+			dotCode = fmt.Sprintf("%v}|Properties}", dotCode)
 		}
 		// Display the requirements
 		if nodeDetail.Requirements != nil {
@@ -71,7 +81,7 @@ func (toscaStructure *ToscaDefinition) PrintDot(w io.Writer) {
 			dotCode = fmt.Sprintf("%v}}", dotCode)
 		}
 		// Display the capabilities
-		dotCode = fmt.Sprintf("%v|{<capabilities>Capabilities|{", dotCode)
+		dotCode = fmt.Sprintf("%v|{{", dotCode)
 		if nodeDetail.Capabilities != nil {
 			i := 1
 			pipe := "|"
@@ -83,7 +93,7 @@ func (toscaStructure *ToscaDefinition) PrintDot(w io.Writer) {
 				dotCode = fmt.Sprintf("%v<%v>%v%v", dotCode, capability, capability, pipe)
 			}
 		}
-		dotCode = fmt.Sprintf("%v}}", dotCode)
+		dotCode = fmt.Sprintf("%v}|<capabilities>Capabilities}", dotCode)
 
 		dotCode = fmt.Sprintf("%v\" shape=record style=rounded color=blue]\n", dotCode)
 		// If requirements are found
@@ -93,12 +103,28 @@ func (toscaStructure *ToscaDefinition) PrintDot(w io.Writer) {
 		if nodeDetail.Requirements != nil {
 			for _, requirementAssignements := range nodeDetail.Requirements {
 				for requirementName, requirementAssignement := range requirementAssignements {
+					if _, ok := toscaStructure.TopologyTemplate.NodeTemplates[requirementAssignement.Node].Capabilities[requirementName]; ok {
+						dotCode = fmt.Sprintf("%v\t%v:%v -> %v:%v [color=brown];\n", dotCode, nodeName, requirementName, requirementAssignement.Node, requirementName)
+					} else {
 
-					dotCode = fmt.Sprintf("%v\t%v:%v -> %v:capabilities [label = %v color=red];\n", dotCode, nodeName, requirementName, requirementAssignement.Node, requirementName)
+						dotCode = fmt.Sprintf("%v\t%v:%v -> %v:capabilities [label = %v color=red];\n", dotCode, nodeName, requirementName, requirementAssignement.Node, requirementName)
+
+					}
 				}
 			}
 		}
+		// Link the input to the properties
+
+		if nodeDetail.Properties != nil {
+			for property, definition := range nodeDetail.Properties {
+				if _, ok := toscaStructure.TopologyTemplate.Inputs[definition["get_input"]]; ok {
+					dotCode = fmt.Sprintf("%v\tInputs:%v -> %v:%v [color = pink]\n", dotCode, definition["get_input"], nodeName, property)
+				}
+			}
+		}
+
 	}
 	dotCode = fmt.Sprintf("%v}\n", dotCode)
+	fmt.Println(dotCode)
 	fmt.Fprintf(w, "%v", dotCode)
 }
