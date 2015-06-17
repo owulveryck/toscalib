@@ -70,7 +70,7 @@ type ToscaRange interface{}
 // The type (for simple entries) or schema (for complex entries) is defined by the entry_schema attribute of the respective property definition, attribute definitions, or input or output parameter definitions.
 type ToscaList []interface{}
 
-// A.2.5 TOSCA map type
+// ToscaMap type as described in appendix A.2.5
 // The map type allows for specifying multiple values for a param eter of property as a map.
 // In contrast to the list type, where each entry can only be addressed by its index in the list, entries in a map are named elements that can be addressed by their keys.i
 // Note that entries in a map for one property or parameter must be of the same type.
@@ -78,7 +78,10 @@ type ToscaList []interface{}
 // the entry_schema attribute of the respective property definition, attribute definition, or input or output parameter definition
 type ToscaMap map[interface{}]interface{}
 
+// Size type as described in appendix A 2.6.4
 type Size int64
+
+// Frequency type as described in appendix A 2.6.6
 type Frequency int64
 
 // Scalar type as defined in Appendis 2.6.
@@ -115,7 +118,7 @@ func (scalar *Scalar) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return nil
 }
 
-// GetValue returns the "go" value for scalar
+// Evaluate returns the "go" value for scalar
 // If type is a Duration, returns a time.Duration type with the associated value
 // If type is Size, returns the size in "byte number"
 // If type is Frequency, returns the frequency in Hz (= one cycle per second)
@@ -177,4 +180,5 @@ func (scalar *Scalar) Evaluate() (interface{}, error) {
 	}
 }
 
+// Regex type used in the constraint definition (Appendix A 5.2.1)
 type Regex interface{}

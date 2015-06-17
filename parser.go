@@ -1,18 +1,24 @@
 package toscalib
 
 import (
-	"github.com/gonum/matrix/mat64"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"regexp"
+
+	"github.com/gonum/matrix/mat64"
+	"gopkg.in/yaml.v2"
 )
 
 // NodeGap is the gap between each node see @FillAdjacencyMatrix for explanation
 const nodeGap int = 10
 
-func (nodeTemplate *NodeTemplate) GetInitialIndex() int             { return nodeTemplate.Id }
-func (nodeTemplate *NodeTemplate) GetCreateIndex() int              { return nodeTemplate.Id + 1 }
+// GetInitialIndex return the index of the initial state of the node in the AdjacencyMatrix
+func (nodeTemplate *NodeTemplate) GetInitialIndex() int { return nodeTemplate.Id }
+
+// GetCreateIndex return the index of the Create state of the node in the AdjacencyMatrix
+func (nodeTemplate *NodeTemplate) GetCreateIndex() int { return nodeTemplate.Id + 1 }
+
+// GetPreConfigureSourceIndex return the index of the pre_configure_source state of the node in the AdjacencyMatrix
 func (nodeTemplate *NodeTemplate) GetPreConfigureSourceIndex() int  { return nodeTemplate.Id + 2 }
 func (nodeTemplate *NodeTemplate) GetPreConfigureTargetIndex() int  { return nodeTemplate.Id + 3 }
 func (nodeTemplate *NodeTemplate) GetConfigureIndex() int           { return nodeTemplate.Id + 4 }
@@ -58,7 +64,7 @@ func (toscaStructure *ToscaDefinition) FillAdjacencyMatrix() error {
 					nodeBName := requirementAssignement.Node
 					// Check if we have a requirement type that is .*Configure of if we have an Interface key that is .*Configure
 					res1, _ = regexp.MatchString(".*Configure", requirementAssignement.Relationship.Type)
-					for inter, _ := range requirementAssignement.Relationship.Interfaces {
+					for inter := range requirementAssignement.Relationship.Interfaces {
 						res2, _ = regexp.MatchString(".*Configure", inter)
 						if res2 == true {
 							break

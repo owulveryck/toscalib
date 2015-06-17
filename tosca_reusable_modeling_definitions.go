@@ -2,9 +2,10 @@ package toscalib
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/gonum/matrix/mat64"
 	"gopkg.in/yaml.v2"
-	"strings"
 )
 
 // Status is used in the PropertyDefinition
@@ -104,7 +105,7 @@ type RequirementDefinition struct {
 	Occurrences  ToscaRange `yaml:"occurences,omitempty"`   // The optional minimum and maximum occurrences for the requirement.  Note: the keyword UNBOUNDED is also supported to represent any positive integer
 }
 
-// RequirementAssignement as described in Appendix 7.2
+// RequirementAssignment as described in Appendix 7.2
 type RequirementAssignment struct {
 	Capability string `yaml:"capability,omitempty"` /* The optional reserved keyname used to provide the name of either a:
 	- Capability definition within a target node template that can fulfill the requirement.
@@ -235,10 +236,13 @@ type ToscaDefinition struct {
 	AdjacencyMatrix    mat64.Dense                     //The AdjacencyMatrix
 }
 
+// Bytes returns the yaml representation of the current definition in bytes
 func (toscaDefinition *ToscaDefinition) Bytes() []byte {
 	d, _ := yaml.Marshal(toscaDefinition)
 	return d
 }
+
+// String returns the yaml representation of the current definition as a string
 func (toscaDefinition *ToscaDefinition) String() string {
 	d, _ := yaml.Marshal(toscaDefinition)
 	return string(d)

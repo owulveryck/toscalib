@@ -25,11 +25,11 @@ func (toscaStructure *ToscaDefinition) DotExecutionWorkflow(w io.Writer) error {
 	for r := 1; r < row; r++ {
 		for c := 1; c < col; c++ {
 			if adjacencyMatrix.At(r, c) == 1 {
-				sourceNodeId, _ := math.Modf(float64(r / 10))
-				sourceNodeId = sourceNodeId*10 + 1
-				destNodeId, _ := math.Modf(float64(c / 10))
-				destNodeId = destNodeId*10 + 1
-				fmt.Fprintf(w, "\t%v:%v -> %v:%v\n", sourceNodeId, r, destNodeId, c)
+				sourceNodeID, _ := math.Modf(float64(r / 10))
+				sourceNodeID = sourceNodeID*10 + 1
+				destNodeID, _ := math.Modf(float64(c / 10))
+				destNodeID = destNodeID*10 + 1
+				fmt.Fprintf(w, "\t%v:%v -> %v:%v\n", sourceNodeID, r, destNodeID, c)
 			}
 		}
 	}
@@ -40,16 +40,16 @@ func (toscaStructure *ToscaDefinition) DotExecutionWorkflow(w io.Writer) error {
 // PrintDot display a dot repreentation of the current tosca structure
 // in order to generate a graph with graphviz
 // This function is mostly used for debugging purpose and may change a lot in the future
-func (topology *ToscaDefinition) PrintDot(w io.Writer) {
+func (toscaStructure *ToscaDefinition) PrintDot(w io.Writer) {
 	dotCode := fmt.Sprintf("digraph G {\n")
 	dotCode = fmt.Sprintf("%v\tgraph [ rankdir = \"LR\" ];\n", dotCode)
-	for nodeName, nodeDetail := range topology.TopologyTemplate.NodeTemplates {
+	for nodeName, nodeDetail := range toscaStructure.TopologyTemplate.NodeTemplates {
 		// For each node, create a record
 		dotCode = fmt.Sprintf("%v\t%v [label=\"<nodeName> %v|<nodeType> %v", dotCode, nodeName, nodeName, nodeDetail.Type)
 		//Display the properties
 		if nodeDetail.Properties != nil {
 			dotCode = fmt.Sprintf("%v|{Properties|{", dotCode)
-			for property, _ := range nodeDetail.Properties {
+			for property := range nodeDetail.Properties {
 				dotCode = fmt.Sprintf("%v%v|", dotCode, property)
 			}
 			dotCode = fmt.Sprintf("%v}}", dotCode)
@@ -60,7 +60,7 @@ func (topology *ToscaDefinition) PrintDot(w io.Writer) {
 			i := 0
 			pipe := "|"
 			for _, requirementAssignements := range nodeDetail.Requirements {
-				for requirement, _ := range requirementAssignements {
+				for requirement := range requirementAssignements {
 					if i == len(requirementAssignements) {
 						pipe = ""
 					}
@@ -75,7 +75,7 @@ func (topology *ToscaDefinition) PrintDot(w io.Writer) {
 		if nodeDetail.Capabilities != nil {
 			i := 1
 			pipe := "|"
-			for capability, _ := range nodeDetail.Capabilities {
+			for capability := range nodeDetail.Capabilities {
 				if i == len(nodeDetail.Capabilities) {
 					pipe = ""
 				}
