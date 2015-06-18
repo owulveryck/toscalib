@@ -55,7 +55,7 @@ func (toscaStructure *ToscaDefinition) PrintDot(w io.Writer) {
 	dotCode = fmt.Sprintf("%v\" shape=record style=rounded color=green]\n", dotCode)
 	for nodeName, nodeDetail := range toscaStructure.TopologyTemplate.NodeTemplates {
 		// For each node, create a record
-		dotCode = fmt.Sprintf("%v\t%v [label=\"<nodeName> %v|<nodeType> %v", dotCode, nodeName, nodeName, nodeDetail.Type)
+		dotCode = fmt.Sprintf("%v\t%v [id=%v label=\"<nodeName> %v|<nodeType> %v", dotCode, nodeName, nodeDetail.Id, nodeName, nodeDetail.Type)
 		//Display the properties
 		if nodeDetail.Properties != nil {
 			dotCode = fmt.Sprintf("%v|{{", dotCode)
