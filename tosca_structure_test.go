@@ -4,9 +4,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"os"
-
+	"encoding/json"
 	"gopkg.in/yaml.v2"
+	"os"
 )
 
 // teststructures does a simple mashalling/unmarshalling of some testfiles
@@ -57,6 +57,15 @@ func TestParse(t *testing.T) {
 	}
 
 	t.Logf("%s\n\n", string(d))
+	// Test the json marshaling
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	d, err = json.MarshalIndent(toscaStructure.TopologyTemplate.NodeTemplates, "", "    ")
+	if err != nil {
+		t.Errorf("error: %v", err)
+	}
+	t.Logf("Json:%v", string(d))
 	// Test adjacencyMatrix
 	toscaStructure.DotExecutionWorkflow(ioutil.Discard)
 	toscaStructure.PrintDot(ioutil.Discard)

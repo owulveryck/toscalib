@@ -164,19 +164,19 @@ type DataType struct {
 // NodeTemplate as described in Appendix 7.3
 // A Node Template specifies the occurrence of a manageable software component as part of an application’s topology model which is defined in a TOSCA Service Template.  A Node template is an instance of a specified Node Type and can provide customized properties, constraints or operations which override the defaults provided by its Node Type and its implementations.
 type NodeTemplate struct {
-	Type         string                             `yaml:"type"`                   // The required name of the Node Type the Node Template is based upon.
-	Decription   string                             `yaml:"description,omitempty"`  // An optional description for the Node Template.
-	Directives   []string                           `yaml:"directives,omitempty"`   // An optional list of directive values to provide processing instructions to orchestrators and tooling.
-	Properties   map[string]map[string]string       `yaml:"properties,omitempty"`   // An optional list of property value assignments for the Node Template.
-	Attributes   map[string]interface{}             `yaml:"attributes,omitempty"`   // An optional list of attribute value assignments for the Node Template.
-	Requirements []map[string]RequirementAssignment `yaml:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
-	Capabilities map[string]interface{}             `yaml:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
-	Interfaces   map[string]InterfaceDefinition     `yaml:"interfaces,omitempty"`   // An optional list of named interface definitions for the Node Template.
-	Artifcats    map[string]ArtifactDefinition      `yaml:"artifcats,omitempty"`    // An optional list of named artifact definitions for the Node Template.
-	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty"`  // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
-	Id           int                                `yaml:"tosca_id,omitempty"`     // From tosca.nodes.Root: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
-	Name         string                             `yaml:"toca_name,omitempty"`    // From tosca.nodes.root This attribute reflects the name of the Node Template as defined in the TOSCA service template.  This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
-	State        int                                // The state (see constants definitions)
+	Type         string                             `yaml:"type"`                            // The required name of the Node Type the Node Template is based upon.
+	Decription   string                             `yaml:"description,omitempty"`           // An optional description for the Node Template.
+	Directives   []string                           `yaml:"directives,omitempty" json:"-"`   // An optional list of directive values to provide processing instructions to orchestrators and tooling.
+	Properties   map[string]map[string]string       `yaml:"properties,omitempty" json:"-"`   // An optional list of property value assignments for the Node Template.
+	Attributes   map[string]interface{}             `yaml:"attributes,omitempty" json:"-"`   // An optional list of attribute value assignments for the Node Template.
+	Requirements []map[string]RequirementAssignment `yaml:"requirements,omitempty" json:"-"` // An optional sequenced list of requirement assignments for the Node Template.
+	Capabilities map[string]interface{}             `yaml:"capabilities,omitempty" json:"-"` // An optional list of capability assignments for the Node Template.
+	Interfaces   map[string]InterfaceDefinition     `yaml:"interfaces,omitempty" json:"-"`   // An optional list of named interface definitions for the Node Template.
+	Artifcats    map[string]ArtifactDefinition      `yaml:"artifcats,omitempty" json:"-"`    // An optional list of named artifact definitions for the Node Template.
+	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty" json:"-"`  // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
+	Id           int                                `yaml:"tosca_id,omitempty" json:"id"`    // From tosca.nodes.Root: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+	Name         string                             `yaml:"toca_name,omitempty" json:"-"`    // From tosca.nodes.root This attribute reflects the name of the Node Template as defined in the TOSCA service template.  This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+	State        int                                `json:"state"`                           // The state (see constants definitions)
 }
 
 // RepositoryDefinition as desribed in Appendix 5.6
@@ -212,7 +212,7 @@ type InterfaceType struct {
 // This section defines the topology template of a cloud application. The main ingredients of the topology template are node templates representing components of the application and relationship templates representing links between the components. These elements are defined in the nested node_templates section and the nested relationship_templates sections, respectively.  Furthermore, a topology template allows for defining input parameters, output parameters as well as grouping of node templates.
 type TopologyTemplateType struct {
 	Inputs        map[string]Input        `yaml:"inputs,omitempty"`
-	NodeTemplates map[string]NodeTemplate `yaml:"node_templates"`
+	NodeTemplates map[string]NodeTemplate `yaml:"node_templates" json:"node_templates"`
 	Outputs       map[string]Output       `yaml:"outputs,omitempty"`
 }
 
@@ -221,16 +221,16 @@ type TopologyTemplateType struct {
 type ToscaDefinition struct {
 	DefinitionsVersion ToscaVersion                    `yaml:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
 	Description        string                          `yaml:"description,omitempty"`
-	Imports            []string                        `yaml:"imports,omitempty"`            // Declares import statements external TOSCA Definitions documents. For example, these may be file location or URIs relative to the service template file within the same TOSCA CSAR file.
-	Repositories       map[string]RepositoryDefinition `yaml:"repositories,omitempty"`       // Declares the list of external repositories which contain artifacts that are referenced in the service template along with their addresses and necessary credential information used to connect to them in order to retrieve the artifacts.
-	DataTypes          map[string]DataType             `yaml:"data_types,omitempty"`         // Declares a list of optional TOSCA Data Type definitions.
-	NodeTypes          map[string]NodeType             `yaml:"node_types,omitempty"`         // This section contains a set of node type definitions for use in service templates.
-	RelationshipTypes  map[string]RelationshipType     `yaml:"relationship_types,omitempty"` // This section contains a set of relationship type definitions for use in service templates.
-	CapabilityTypes    map[string]CapabilityType       `yaml:"capability_types,omitempty"`   // This section contains an optional list of capability type definitions for use in service templates.
-	ArtifactTypes      map[string]ArtifactType         `yaml:"artifact_types,omitempty"`     // This section contains an optional list of artifact type definitions for use in service templates
-	DlsDefinitions     interface{}                     `yaml:"dsl_definitions,omitempty"`    // Declares optional DSL-specific definitions and conventions.  For example, in YAML, this allows defining reusable YAML macros (i.e., YAML alias anchors) for use throughout the TOSCA Service Template.
-	InterfaceTypes     map[string]InterfaceType        `yaml:"interface_types,omitempty"`    // This section contains an optional list of interface type definitions for use in service templates.
-	TopologyTemplate   TopologyTemplateType            `yaml:"topology_template"`            // Defines the topology template of an application or service, consisting of node templates that represent the application’s or service’s components, as well as relationship templates representing relations between the components.
+	Imports            []string                        `yaml:"imports,omitempty"`                          // Declares import statements external TOSCA Definitions documents. For example, these may be file location or URIs relative to the service template file within the same TOSCA CSAR file.
+	Repositories       map[string]RepositoryDefinition `yaml:"repositories,omitempty"`                     // Declares the list of external repositories which contain artifacts that are referenced in the service template along with their addresses and necessary credential information used to connect to them in order to retrieve the artifacts.
+	DataTypes          map[string]DataType             `yaml:"data_types,omitempty"`                       // Declares a list of optional TOSCA Data Type definitions.
+	NodeTypes          map[string]NodeType             `yaml:"node_types,omitempty"`                       // This section contains a set of node type definitions for use in service templates.
+	RelationshipTypes  map[string]RelationshipType     `yaml:"relationship_types,omitempty"`               // This section contains a set of relationship type definitions for use in service templates.
+	CapabilityTypes    map[string]CapabilityType       `yaml:"capability_types,omitempty"`                 // This section contains an optional list of capability type definitions for use in service templates.
+	ArtifactTypes      map[string]ArtifactType         `yaml:"artifact_types,omitempty"`                   // This section contains an optional list of artifact type definitions for use in service templates
+	DlsDefinitions     interface{}                     `yaml:"dsl_definitions,omitempty"`                  // Declares optional DSL-specific definitions and conventions.  For example, in YAML, this allows defining reusable YAML macros (i.e., YAML alias anchors) for use throughout the TOSCA Service Template.
+	InterfaceTypes     map[string]InterfaceType        `yaml:"interface_types,omitempty"`                  // This section contains an optional list of interface type definitions for use in service templates.
+	TopologyTemplate   TopologyTemplateType            `yaml:"topology_template" json:"topology_template"` // Defines the topology template of an application or service, consisting of node templates that represent the application’s or service’s components, as well as relationship templates representing relations between the components.
 	AdjacencyMatrix    mat64.Dense                     //The AdjacencyMatrix
 }
 

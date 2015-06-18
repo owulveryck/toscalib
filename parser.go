@@ -130,6 +130,10 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 	if err != nil {
 		return err
 	}
+	// Sets the initial state
+	for _, nodeTemplate := range tempStruct.TopologyTemplate.NodeTemplates {
+		nodeTemplate.State = StateInitial
+	}
 	/*
 		// for each node, add its corresponding notetype definition to the structure
 		// if not present yet
