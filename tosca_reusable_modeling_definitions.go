@@ -177,6 +177,7 @@ type NodeTemplate struct {
 	Id           int                                `yaml:"tosca_id,omitempty" json:"id"`    // From tosca.nodes.Root: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
 	Name         string                             `yaml:"toca_name,omitempty" json:"-"`    // From tosca.nodes.root This attribute reflects the name of the Node Template as defined in the TOSCA service template.  This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
 	State        int                                `json:"state"`                           // The state (see constants definitions)
+	RunChan      chan int                           `yaml:"-" json:"-"` // A channel used for the runtime execution. The node will get the desired state in the pipe. If a "-ing" state is posted, the node will run the corresponding lifecycle artifact (ex: configuring -> configure)
 }
 
 // RepositoryDefinition as desribed in Appendix 5.6

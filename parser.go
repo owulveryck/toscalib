@@ -132,6 +132,7 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 	}
 	// Sets the initial state
 	for _, nodeTemplate := range tempStruct.TopologyTemplate.NodeTemplates {
+		nodeTemplate.RunChan = make(chan int)
 		nodeTemplate.State = StateInitial
 	}
 	/*
