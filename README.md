@@ -31,7 +31,7 @@ log.Printf("%s\n\n", string(d))
 and then simply `go get github.com/owulveryck/toscalib`
 
 # Test
-I try as much as possible to develop some tests that may be run with `go test`
+I try as much as possible to develop some tests that may be run with `go test`.
  
 # API
 [![GoDoc](https://godoc.org/github.com/owulveryck/toscalib?status.svg)](https://godoc.org/github.com/owulveryck/toscalib)
@@ -41,3 +41,4 @@ This library may be used to:
 - create a TOSCA orchestrator
 - create a view tool that display the dependency diagram of a TOSCA file
 - implement a plugin for well known orchestrators such as [openstack](https://www.openstack.org/) or [cloudify](http://getcloudify.org/)
+
