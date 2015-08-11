@@ -41,7 +41,7 @@ func (toscaStructure *ToscaDefinition) DotExecutionWorkflow(w io.Writer) error {
 // in order to generate a graph with graphviz
 // This function is mostly used for debugging purpose and may change a lot in the future
 func (toscaStructure *ToscaDefinition) PrintDot(w io.Writer) {
-	dotCode := fmt.Sprintf("digraph G {\n")
+	dotCode := fmt.Sprintf("digraph \"%v\" {\n", toscaStructure.Description)
 	dotCode = fmt.Sprintf("%v\tgraph [ rankdir = \"LR\" ];\n", dotCode)
 	dotCode = fmt.Sprintf("%v\tInputs [label=\"Inputs", dotCode)
 	for inputName, inputDetail := range toscaStructure.TopologyTemplate.Inputs {
