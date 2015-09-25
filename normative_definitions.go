@@ -40,12 +40,12 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"strings"
-	"os"
-	"time"
 	"io/ioutil"
+	"os"
 	"path"
 	"path/filepath"
+	"strings"
+	"time"
 )
 
 func bindataRead(data []byte, name string) ([]byte, error) {
@@ -74,9 +74,9 @@ type asset struct {
 }
 
 type bindataFileInfo struct {
-	name string
-	size int64
-	mode os.FileMode
+	name    string
+	size    int64
+	mode    os.FileMode
 	modTime time.Time
 }
 
@@ -115,7 +115,7 @@ func toscaCapabilitiesAttachement() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.Attachement", size: 71, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -135,7 +135,7 @@ func toscaCapabilitiesContainer() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.Container", size: 554, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -155,7 +155,7 @@ func toscaCapabilitiesEndpoint() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.Endpoint", size: 741, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -175,7 +175,7 @@ func toscaCapabilitiesEndpointAdmin() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.Endpoint.Admin", size: 181, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -195,7 +195,7 @@ func toscaCapabilitiesEndpointDatabase() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.Endpoint.Database", size: 86, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -215,7 +215,7 @@ func toscaCapabilitiesEndpointPublic() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.Endpoint.Public", size: 569, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -235,7 +235,7 @@ func toscaCapabilitiesNetworkBindable() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.Network.Bindable", size: 77, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -255,7 +255,7 @@ func toscaCapabilitiesNode() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.Node", size: 65, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -275,7 +275,7 @@ func toscaCapabilitiesOperatingsystem() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.OperatingSystem", size: 314, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -295,7 +295,7 @@ func toscaCapabilitiesRoot() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.Root", size: 121, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -315,7 +315,7 @@ func toscaCapabilitiesScalable() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.capabilities.Scalable", size: 238, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -335,7 +335,7 @@ func toscaInterfacesNodeLifecycleStandard() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.interfaces.node.lifecycle.Standard", size: 362, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -355,7 +355,7 @@ func toscaInterfacesRelationshipConfigure() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.interfaces.relationship.Configure", size: 842, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -375,7 +375,7 @@ func toscaNodesBlockstorage() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.BlockStorage", size: 352, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -395,7 +395,7 @@ func toscaNodesCompute() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.Compute", size: 912, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -415,7 +415,7 @@ func toscaNodesContainerApplication() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.Container.Application", size: 232, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -435,7 +435,7 @@ func toscaNodesContainerRuntime() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.Container.Runtime", size: 198, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -455,7 +455,7 @@ func toscaNodesDbms() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.DBMS", size: 460, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -475,7 +475,7 @@ func toscaNodesDatabase() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.Database", size: 754, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -495,7 +495,7 @@ func toscaNodesLoadbalancer() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.LoadBalancer", size: 606, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -515,7 +515,7 @@ func toscaNodesObjectstorage() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.ObjectStorage", size: 381, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -535,7 +535,7 @@ func toscaNodesRoot() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.Root", size: 572, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -555,7 +555,7 @@ func toscaNodesSoftwarecomponent() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.SoftwareComponent", size: 437, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -575,7 +575,7 @@ func toscaNodesWebapplication() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.WebApplication", size: 350, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -595,7 +595,7 @@ func toscaNodesWebserver() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.nodes.WebServer", size: 327, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -615,7 +615,7 @@ func toscaRelationshipsAttachesto() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.relationships.AttachesTo", size: 272, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -635,7 +635,7 @@ func toscaRelationshipsConnectsto() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.relationships.ConnectsTo", size: 218, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -655,7 +655,7 @@ func toscaRelationshipsDependson() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.relationships.DependsOn", size: 122, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -675,7 +675,7 @@ func toscaRelationshipsHostedon() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.relationships.HostedOn", size: 126, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -695,7 +695,7 @@ func toscaRelationshipsRoot() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.relationships.Root", size: 289, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -715,7 +715,7 @@ func toscaRelationshipsRoutesto() (*asset, error) {
 	}
 
 	info := bindataFileInfo{name: "tosca.relationships.RoutesTo", size: 131, mode: os.FileMode(438), modTime: time.Unix(1433921141, 0)}
-	a := &asset{bytes: bytes, info:  info}
+	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
@@ -738,7 +738,7 @@ func Asset(name string) ([]byte, error) {
 // It simplifies safe initialization of global variables.
 func MustAsset(name string) []byte {
 	a, err := Asset(name)
-	if (err != nil) {
+	if err != nil {
 		panic("asset: Asset(" + name + "): " + err.Error())
 	}
 
@@ -771,37 +771,37 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"tosca.capabilities.Attachement": toscaCapabilitiesAttachement,
-	"tosca.capabilities.Container": toscaCapabilitiesContainer,
-	"tosca.capabilities.Endpoint": toscaCapabilitiesEndpoint,
-	"tosca.capabilities.Endpoint.Admin": toscaCapabilitiesEndpointAdmin,
-	"tosca.capabilities.Endpoint.Database": toscaCapabilitiesEndpointDatabase,
-	"tosca.capabilities.Endpoint.Public": toscaCapabilitiesEndpointPublic,
-	"tosca.capabilities.Network.Bindable": toscaCapabilitiesNetworkBindable,
-	"tosca.capabilities.Node": toscaCapabilitiesNode,
-	"tosca.capabilities.OperatingSystem": toscaCapabilitiesOperatingsystem,
-	"tosca.capabilities.Root": toscaCapabilitiesRoot,
-	"tosca.capabilities.Scalable": toscaCapabilitiesScalable,
+	"tosca.capabilities.Attachement":           toscaCapabilitiesAttachement,
+	"tosca.capabilities.Container":             toscaCapabilitiesContainer,
+	"tosca.capabilities.Endpoint":              toscaCapabilitiesEndpoint,
+	"tosca.capabilities.Endpoint.Admin":        toscaCapabilitiesEndpointAdmin,
+	"tosca.capabilities.Endpoint.Database":     toscaCapabilitiesEndpointDatabase,
+	"tosca.capabilities.Endpoint.Public":       toscaCapabilitiesEndpointPublic,
+	"tosca.capabilities.Network.Bindable":      toscaCapabilitiesNetworkBindable,
+	"tosca.capabilities.Node":                  toscaCapabilitiesNode,
+	"tosca.capabilities.OperatingSystem":       toscaCapabilitiesOperatingsystem,
+	"tosca.capabilities.Root":                  toscaCapabilitiesRoot,
+	"tosca.capabilities.Scalable":              toscaCapabilitiesScalable,
 	"tosca.interfaces.node.lifecycle.Standard": toscaInterfacesNodeLifecycleStandard,
-	"tosca.interfaces.relationship.Configure": toscaInterfacesRelationshipConfigure,
-	"tosca.nodes.BlockStorage": toscaNodesBlockstorage,
-	"tosca.nodes.Compute": toscaNodesCompute,
-	"tosca.nodes.Container.Application": toscaNodesContainerApplication,
-	"tosca.nodes.Container.Runtime": toscaNodesContainerRuntime,
-	"tosca.nodes.DBMS": toscaNodesDbms,
-	"tosca.nodes.Database": toscaNodesDatabase,
-	"tosca.nodes.LoadBalancer": toscaNodesLoadbalancer,
-	"tosca.nodes.ObjectStorage": toscaNodesObjectstorage,
-	"tosca.nodes.Root": toscaNodesRoot,
-	"tosca.nodes.SoftwareComponent": toscaNodesSoftwarecomponent,
-	"tosca.nodes.WebApplication": toscaNodesWebapplication,
-	"tosca.nodes.WebServer": toscaNodesWebserver,
-	"tosca.relationships.AttachesTo": toscaRelationshipsAttachesto,
-	"tosca.relationships.ConnectsTo": toscaRelationshipsConnectsto,
-	"tosca.relationships.DependsOn": toscaRelationshipsDependson,
-	"tosca.relationships.HostedOn": toscaRelationshipsHostedon,
-	"tosca.relationships.Root": toscaRelationshipsRoot,
-	"tosca.relationships.RoutesTo": toscaRelationshipsRoutesto,
+	"tosca.interfaces.relationship.Configure":  toscaInterfacesRelationshipConfigure,
+	"tosca.nodes.BlockStorage":                 toscaNodesBlockstorage,
+	"tosca.nodes.Compute":                      toscaNodesCompute,
+	"tosca.nodes.Container.Application":        toscaNodesContainerApplication,
+	"tosca.nodes.Container.Runtime":            toscaNodesContainerRuntime,
+	"tosca.nodes.DBMS":                         toscaNodesDbms,
+	"tosca.nodes.Database":                     toscaNodesDatabase,
+	"tosca.nodes.LoadBalancer":                 toscaNodesLoadbalancer,
+	"tosca.nodes.ObjectStorage":                toscaNodesObjectstorage,
+	"tosca.nodes.Root":                         toscaNodesRoot,
+	"tosca.nodes.SoftwareComponent":            toscaNodesSoftwarecomponent,
+	"tosca.nodes.WebApplication":               toscaNodesWebapplication,
+	"tosca.nodes.WebServer":                    toscaNodesWebserver,
+	"tosca.relationships.AttachesTo":           toscaRelationshipsAttachesto,
+	"tosca.relationships.ConnectsTo":           toscaRelationshipsConnectsto,
+	"tosca.relationships.DependsOn":            toscaRelationshipsDependson,
+	"tosca.relationships.HostedOn":             toscaRelationshipsHostedon,
+	"tosca.relationships.Root":                 toscaRelationshipsRoot,
+	"tosca.relationships.RoutesTo":             toscaRelationshipsRoutesto,
 }
 
 // AssetDir returns the file names below a certain
@@ -840,118 +840,87 @@ func AssetDir(name string) ([]string, error) {
 }
 
 type bintree struct {
-	Func func() (*asset, error)
+	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
-	"tosca.capabilities.Attachement": &bintree{toscaCapabilitiesAttachement, map[string]*bintree{
-	}},
-	"tosca.capabilities.Container": &bintree{toscaCapabilitiesContainer, map[string]*bintree{
-	}},
-	"tosca.capabilities.Endpoint": &bintree{toscaCapabilitiesEndpoint, map[string]*bintree{
-	}},
-	"tosca.capabilities.Endpoint.Admin": &bintree{toscaCapabilitiesEndpointAdmin, map[string]*bintree{
-	}},
-	"tosca.capabilities.Endpoint.Database": &bintree{toscaCapabilitiesEndpointDatabase, map[string]*bintree{
-	}},
-	"tosca.capabilities.Endpoint.Public": &bintree{toscaCapabilitiesEndpointPublic, map[string]*bintree{
-	}},
-	"tosca.capabilities.Network.Bindable": &bintree{toscaCapabilitiesNetworkBindable, map[string]*bintree{
-	}},
-	"tosca.capabilities.Node": &bintree{toscaCapabilitiesNode, map[string]*bintree{
-	}},
-	"tosca.capabilities.OperatingSystem": &bintree{toscaCapabilitiesOperatingsystem, map[string]*bintree{
-	}},
-	"tosca.capabilities.Root": &bintree{toscaCapabilitiesRoot, map[string]*bintree{
-	}},
-	"tosca.capabilities.Scalable": &bintree{toscaCapabilitiesScalable, map[string]*bintree{
-	}},
-	"tosca.interfaces.node.lifecycle.Standard": &bintree{toscaInterfacesNodeLifecycleStandard, map[string]*bintree{
-	}},
-	"tosca.interfaces.relationship.Configure": &bintree{toscaInterfacesRelationshipConfigure, map[string]*bintree{
-	}},
-	"tosca.nodes.BlockStorage": &bintree{toscaNodesBlockstorage, map[string]*bintree{
-	}},
-	"tosca.nodes.Compute": &bintree{toscaNodesCompute, map[string]*bintree{
-	}},
-	"tosca.nodes.Container.Application": &bintree{toscaNodesContainerApplication, map[string]*bintree{
-	}},
-	"tosca.nodes.Container.Runtime": &bintree{toscaNodesContainerRuntime, map[string]*bintree{
-	}},
-	"tosca.nodes.DBMS": &bintree{toscaNodesDbms, map[string]*bintree{
-	}},
-	"tosca.nodes.Database": &bintree{toscaNodesDatabase, map[string]*bintree{
-	}},
-	"tosca.nodes.LoadBalancer": &bintree{toscaNodesLoadbalancer, map[string]*bintree{
-	}},
-	"tosca.nodes.ObjectStorage": &bintree{toscaNodesObjectstorage, map[string]*bintree{
-	}},
-	"tosca.nodes.Root": &bintree{toscaNodesRoot, map[string]*bintree{
-	}},
-	"tosca.nodes.SoftwareComponent": &bintree{toscaNodesSoftwarecomponent, map[string]*bintree{
-	}},
-	"tosca.nodes.WebApplication": &bintree{toscaNodesWebapplication, map[string]*bintree{
-	}},
-	"tosca.nodes.WebServer": &bintree{toscaNodesWebserver, map[string]*bintree{
-	}},
-	"tosca.relationships.AttachesTo": &bintree{toscaRelationshipsAttachesto, map[string]*bintree{
-	}},
-	"tosca.relationships.ConnectsTo": &bintree{toscaRelationshipsConnectsto, map[string]*bintree{
-	}},
-	"tosca.relationships.DependsOn": &bintree{toscaRelationshipsDependson, map[string]*bintree{
-	}},
-	"tosca.relationships.HostedOn": &bintree{toscaRelationshipsHostedon, map[string]*bintree{
-	}},
-	"tosca.relationships.Root": &bintree{toscaRelationshipsRoot, map[string]*bintree{
-	}},
-	"tosca.relationships.RoutesTo": &bintree{toscaRelationshipsRoutesto, map[string]*bintree{
-	}},
+	"tosca.capabilities.Attachement":           &bintree{toscaCapabilitiesAttachement, map[string]*bintree{}},
+	"tosca.capabilities.Container":             &bintree{toscaCapabilitiesContainer, map[string]*bintree{}},
+	"tosca.capabilities.Endpoint":              &bintree{toscaCapabilitiesEndpoint, map[string]*bintree{}},
+	"tosca.capabilities.Endpoint.Admin":        &bintree{toscaCapabilitiesEndpointAdmin, map[string]*bintree{}},
+	"tosca.capabilities.Endpoint.Database":     &bintree{toscaCapabilitiesEndpointDatabase, map[string]*bintree{}},
+	"tosca.capabilities.Endpoint.Public":       &bintree{toscaCapabilitiesEndpointPublic, map[string]*bintree{}},
+	"tosca.capabilities.Network.Bindable":      &bintree{toscaCapabilitiesNetworkBindable, map[string]*bintree{}},
+	"tosca.capabilities.Node":                  &bintree{toscaCapabilitiesNode, map[string]*bintree{}},
+	"tosca.capabilities.OperatingSystem":       &bintree{toscaCapabilitiesOperatingsystem, map[string]*bintree{}},
+	"tosca.capabilities.Root":                  &bintree{toscaCapabilitiesRoot, map[string]*bintree{}},
+	"tosca.capabilities.Scalable":              &bintree{toscaCapabilitiesScalable, map[string]*bintree{}},
+	"tosca.interfaces.node.lifecycle.Standard": &bintree{toscaInterfacesNodeLifecycleStandard, map[string]*bintree{}},
+	"tosca.interfaces.relationship.Configure":  &bintree{toscaInterfacesRelationshipConfigure, map[string]*bintree{}},
+	"tosca.nodes.BlockStorage":                 &bintree{toscaNodesBlockstorage, map[string]*bintree{}},
+	"tosca.nodes.Compute":                      &bintree{toscaNodesCompute, map[string]*bintree{}},
+	"tosca.nodes.Container.Application":        &bintree{toscaNodesContainerApplication, map[string]*bintree{}},
+	"tosca.nodes.Container.Runtime":            &bintree{toscaNodesContainerRuntime, map[string]*bintree{}},
+	"tosca.nodes.DBMS":                         &bintree{toscaNodesDbms, map[string]*bintree{}},
+	"tosca.nodes.Database":                     &bintree{toscaNodesDatabase, map[string]*bintree{}},
+	"tosca.nodes.LoadBalancer":                 &bintree{toscaNodesLoadbalancer, map[string]*bintree{}},
+	"tosca.nodes.ObjectStorage":                &bintree{toscaNodesObjectstorage, map[string]*bintree{}},
+	"tosca.nodes.Root":                         &bintree{toscaNodesRoot, map[string]*bintree{}},
+	"tosca.nodes.SoftwareComponent":            &bintree{toscaNodesSoftwarecomponent, map[string]*bintree{}},
+	"tosca.nodes.WebApplication":               &bintree{toscaNodesWebapplication, map[string]*bintree{}},
+	"tosca.nodes.WebServer":                    &bintree{toscaNodesWebserver, map[string]*bintree{}},
+	"tosca.relationships.AttachesTo":           &bintree{toscaRelationshipsAttachesto, map[string]*bintree{}},
+	"tosca.relationships.ConnectsTo":           &bintree{toscaRelationshipsConnectsto, map[string]*bintree{}},
+	"tosca.relationships.DependsOn":            &bintree{toscaRelationshipsDependson, map[string]*bintree{}},
+	"tosca.relationships.HostedOn":             &bintree{toscaRelationshipsHostedon, map[string]*bintree{}},
+	"tosca.relationships.Root":                 &bintree{toscaRelationshipsRoot, map[string]*bintree{}},
+	"tosca.relationships.RoutesTo":             &bintree{toscaRelationshipsRoutesto, map[string]*bintree{}},
 }}
 
 // RestoreAsset restores an asset under the given directory
 func RestoreAsset(dir, name string) error {
-        data, err := Asset(name)
-        if err != nil {
-                return err
-        }
-        info, err := AssetInfo(name)
-        if err != nil {
-                return err
-        }
-        err = os.MkdirAll(_filePath(dir, path.Dir(name)), os.FileMode(0755))
-        if err != nil {
-                return err
-        }
-        err = ioutil.WriteFile(_filePath(dir, name), data, info.Mode())
-        if err != nil {
-                return err
-        }
-        err = os.Chtimes(_filePath(dir, name), info.ModTime(), info.ModTime())
-        if err != nil {
-                return err
-        }
-        return nil
+	data, err := Asset(name)
+	if err != nil {
+		return err
+	}
+	info, err := AssetInfo(name)
+	if err != nil {
+		return err
+	}
+	err = os.MkdirAll(_filePath(dir, path.Dir(name)), os.FileMode(0755))
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile(_filePath(dir, name), data, info.Mode())
+	if err != nil {
+		return err
+	}
+	err = os.Chtimes(_filePath(dir, name), info.ModTime(), info.ModTime())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // RestoreAssets restores an asset under the given directory recursively
 func RestoreAssets(dir, name string) error {
-        children, err := AssetDir(name)
-        // File
-        if err != nil {
-                return RestoreAsset(dir, name)
-        }
-        // Dir
-        for _, child := range children {
-                err = RestoreAssets(dir, path.Join(name, child))
-                if err != nil {
-                        return err
-                }
-        }
-        return nil
+	children, err := AssetDir(name)
+	// File
+	if err != nil {
+		return RestoreAsset(dir, name)
+	}
+	// Dir
+	for _, child := range children {
+		err = RestoreAssets(dir, path.Join(name, child))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func _filePath(dir, name string) string {
-        cannonicalName := strings.Replace(name, "\\", "/", -1)
-        return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
+	cannonicalName := strings.Replace(name, "\\", "/", -1)
+	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-
