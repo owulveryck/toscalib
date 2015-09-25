@@ -24,7 +24,9 @@ const (
 // {"equal","greater_than", ...} (see Appendix 5.2) a,s value is an interface
 // for the definition.
 // Example: ConstraintClause may be [ "greater_than": 3 ]
-type ConstraintClause map[string]interface{}
+type ConstraintClause struct {
+	ValidValues []string `yaml:"valid_values,omitempty" json:"valid_values,omitempty"`
+}
 
 // Evaluate the constraint and return a boolean
 func (constraint *ConstraintClause) Evaluate(interface{}) bool { return true }
@@ -60,13 +62,13 @@ func (constraint *ConstraintClause) UnmarshalYAML(unmarshal func(interface{}) er
 // The value of a property can be retrieved using the
 // get_property function within TOSCA Service Templates
 type PropertyDefinition struct {
-	Type        string            `yaml:"type" json:"type"`                                   // The required data type for the property
-	Description string            `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the property.
-	Required    bool              `yaml:"required" json:"required"`                           // An optional key that declares a property as required ( true) or not ( false) Default: true
-	Default     interface{}       `yaml:"default" json:"default"`
-	Status      Status            `yaml:"status" json:"status"`
-	Constraints *ConstraintClause `yaml:"constraints,omitempty" json:"constraints,omitempty"`
-	EntrySchema string            `yaml:"entry_schema,omitempty" json:"entry_schema,omitempty"`
+	Type        string                `yaml:"type" json:"type"`                                   // The required data type for the property
+	Description string                `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the property.
+	Required    bool                  `yaml:"required,omitempty" json:"required,omitempty"`       // An optional key that declares a property as required ( true) or not ( false) Default: true
+	Default     interface{}           `yaml:"default,omitempty" json:"default,omitempty"`
+	Status      Status                `yaml:"status,omitempty" json:"status,omitempty"`
+	Constraints []map[string][]string `yaml:"constraints,omitempty,flow" json:"constraints,omitempty"`
+	EntrySchema string                `yaml:"entry_schema,omitempty" json:"entry_schema,omitempty"`
 }
 
 // AttributeDefinition is a structure describing the property assignmenet in the node template
