@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Toscalib by owulveryck</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Toscalib</h1>
+        <p class="header">A go implementation of the TOSCA Yaml specifications</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/owulveryck/toscalib/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/owulveryck/toscalib/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/owulveryck/toscalib">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/owulveryck">owulveryck</a></p>
+
+
+      </header>
+      <section>
+        <h1>
+<a id="abstract" class="anchor" href="#abstract" aria-hidden="true"><span class="octicon octicon-link"></span></a>Abstract</h1>
+
+<p>This library is an implementation of the TOSCA definition as described in the document written in pure GO
+<a href="http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html">TOSCA Simple Profile in YAML Version 1.0</a></p>
+
+<h1>
+<a id="how-to" class="anchor" href="#how-to" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to</h1>
+
+<p>See the test files for example but most likely what you will do is:</p>
+
+<ul>
+<li>importing the library in your code</li>
+<li>Read a tosca yaml file as a byte array</li>
+<li>unmarshal the yaml document into the structure definied in this library</li>
+<li>play with it:</li>
+</ul>
+
+<div class="highlight highlight-source-go"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">"</span>github.com/owulveryck/toscalib<span class="pl-pds">"</span></span>
+...
+<span class="pl-smi">mystruct</span> <span class="pl-k">:=</span> <span class="pl-v">TopologyTemplateStruct</span>{}
+
+<span class="pl-smi">err</span> <span class="pl-k">:=</span> yaml.<span class="pl-c1">Unmarshal</span>([]<span class="pl-k">byte</span>(topologyExample), &amp;mystruct)
+<span class="pl-k">if</span> err != <span class="pl-c1">nil</span> {
+    t.<span class="pl-c1">Errorf</span>(<span class="pl-s"><span class="pl-pds">"</span>error: <span class="pl-c1">%v</span><span class="pl-pds">"</span></span>, err)
+}
+log.<span class="pl-c1">Printf</span>(<span class="pl-s"><span class="pl-pds">"</span>--- Result of the marshal:<span class="pl-cce">\n</span><span class="pl-c1">%v</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>, mystruct)
+
+<span class="pl-smi">d</span>, <span class="pl-smi">err</span> <span class="pl-k">:=</span> yaml.<span class="pl-c1">Marshal</span>(&amp;mystruct)
+<span class="pl-k">if</span> err != <span class="pl-c1">nil</span> {
+    t.<span class="pl-c1">Errorf</span>(<span class="pl-s"><span class="pl-pds">"</span>error: <span class="pl-c1">%v</span><span class="pl-pds">"</span></span>, err)
+}
+log.<span class="pl-c1">Printf</span>(<span class="pl-s"><span class="pl-pds">"</span><span class="pl-c1">%s</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>, <span class="pl-c1">string</span>(d))
+</pre></div>
+
+<p>and then simply <code>go get github.com/owulveryck/toscalib</code></p>
+
+<h1>
+<a id="test" class="anchor" href="#test" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test</h1>
+
+<p>I try as much as possible to develop some tests that may be run with <code>go test</code>.</p>
+
+<h1>
+<a id="api" class="anchor" href="#api" aria-hidden="true"><span class="octicon octicon-link"></span></a>API</h1>
+
+<p><a href="https://godoc.org/github.com/owulveryck/toscalib"><img src="https://godoc.org/github.com/owulveryck/toscalib?status.svg" alt="GoDoc"></a></p>
+
+<h1>
+<a id="future" class="anchor" href="#future" aria-hidden="true"><span class="octicon octicon-link"></span></a>Future</h1>
+
+<p>This library may be used to:</p>
+
+<ul>
+<li>create a TOSCA orchestrator</li>
+<li>create a view tool that display the dependency diagram of a TOSCA file</li>
+<li>implement a plugin for well known orchestrators such as <a href="https://www.openstack.org/">openstack</a> or <a href="http://getcloudify.org/">cloudify</a>
+</li>
+</ul>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
