@@ -28,6 +28,10 @@ func (nodeTemplate *NodeTemplate) GetStartIndex() int               { return nod
 func (nodeTemplate *NodeTemplate) GetStopIndex() int                { return nodeTemplate.Id + 8 }
 func (nodeTemplate *NodeTemplate) GetDeleteIndex() int              { return nodeTemplate.Id + 9 }
 
+func (nodeTemplate *NodeTemplate) SetName(name string) {
+	nodeTemplate.Name = name
+}
+
 // GetNodeTemplate returns a pointer to a node template given its name
 // its returns nil if not found
 func (toscaStructure *ToscaDefinition) GetNodeTemplate(nodeName string) *NodeTemplate {
@@ -175,6 +179,13 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 	// TODO: deal with the import files
 	*toscaStructure = tempStruct
 	err = toscaStructure.FillAdjacencyMatrix()
+	// Fill in the name of the template inside the template itself
+	for n, _ := range toscaStructure.TopologyTemplate.NodeTemplates {
+		nt := toscaStructure.GetNodeTemplate(n)
+		nt.SetName(n)
+		toscaStructure.TopologyTemplate.NodeTemplates[n] = *nt
+
+	}
 	if err != nil {
 		return err
 	}
