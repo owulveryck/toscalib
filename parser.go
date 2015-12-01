@@ -39,6 +39,19 @@ func (toscaStructure *ToscaDefinition) GetNodeTemplate(nodeName string) *NodeTem
 	return nil
 }
 
+// GetNodeTemplate returns a pointer to a node template given its id
+// the ID may be the initial index or whatever index of the lifecycle operation
+// its returns nil if not found
+func (toscaStructure *ToscaDefinition) GetNodeTemplateFromId(nodeId int) *NodeTemplate {
+	modulo := 10
+	for _, nodeTemplate := range toscaStructure.TopologyTemplate.NodeTemplates {
+		if nodeTemplate.Id == nodeId-(nodeId%modulo) {
+			return &nodeTemplate
+		}
+	}
+	return nil
+}
+
 // FillAdjacencyMatrix fills the adjacency matrix AdjacencyMatrix in the current ToscaDefinition structure
 // for more information, see doc/node_instanciation_lifecycle.md
 func (toscaStructure *ToscaDefinition) FillAdjacencyMatrix() error {
