@@ -43,9 +43,8 @@ func (toscaStructure *ToscaDefinition) GetNodeTemplate(nodeName string) *NodeTem
 // the ID may be the initial index or whatever index of the lifecycle operation
 // its returns nil if not found
 func (toscaStructure *ToscaDefinition) GetNodeTemplateFromId(nodeId int) *NodeTemplate {
-	modulo := 10
 	for _, nodeTemplate := range toscaStructure.TopologyTemplate.NodeTemplates {
-		if nodeTemplate.Id == nodeId-(nodeId%modulo)+1 {
+		if nodeTemplate.Id == nodeId-(nodeId%nodeGap)+1 {
 			return &nodeTemplate
 		}
 	}
