@@ -3,7 +3,7 @@ package toscalib
 import (
 	"io"
 	"io/ioutil"
-	"regexp"
+	//"regexp"
 
 	"github.com/gonum/matrix/mat64"
 	"gopkg.in/yaml.v2"
@@ -79,13 +79,15 @@ func (toscaStructure *ToscaDefinition) FillAdjacencyMatrix() error {
 				for _, requirementAssignement := range requirementAssignements {
 					nodeBName := requirementAssignement.Node
 					// Check if we have a requirement type that is .*Configure of if we have an Interface key that is .*Configure
-					res1, _ = regexp.MatchString(".*Configure", requirementAssignement.Relationship.Type)
-					for inter := range requirementAssignement.Relationship.Interfaces {
-						res2, _ = regexp.MatchString(".*Configure", inter)
-						if res2 == true {
-							break
+					/*
+						res1, _ = regexp.MatchString(".*Configure", requirementAssignement.Relationship.Type)
+						for inter := range requirementAssignement.Relationship.Interfaces {
+							res2, _ = regexp.MatchString(".*Configure", inter)
+							if res2 == true {
+								break
+							}
 						}
-					}
+					*/
 					// We have a Configure relationship
 					if res1 == true || res2 == true {
 						//log.Printf("%v Special workflow with %v", nodeAName, nodeBName)
