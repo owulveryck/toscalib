@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/gonum/matrix/mat64"
 	"gopkg.in/yaml.v2"
-	"log"
 	"strings"
 )
 
@@ -65,7 +64,7 @@ type PropertyDefinition struct {
 	Type        string                `yaml:"type" json:"type"`                                   // The required data type for the property
 	Description string                `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the property.
 	Required    bool                  `yaml:"required,omitempty" json:"required,omitempty"`       // An optional key that declares a property as required ( true) or not ( false) Default: true
-	Default     interface{}           `yaml:"default,omitempty" json:"default,omitempty"`
+	Default     string                `yaml:"default,omitempty" json:"default,omitempty"`
 	Status      Status                `yaml:"status,omitempty" json:"status,omitempty"`
 	Constraints []map[string][]string `yaml:"constraints,omitempty,flow" json:"constraints,omitempty"`
 	EntrySchema string                `yaml:"entry_schema,omitempty" json:"entry_schema,omitempty"`
@@ -140,45 +139,83 @@ type CapabilityDefinition struct {
 	occurences         []string              `yaml:"occurences" json:"occurences"`
 }
 
-// InterfaceDefinition TODO: Appendix 5.12
-//type InterfaceDefinition map[string]interface{}
+// A Property assignment is always a map, but the key may be value
+type PropertyAssignment map[string]string
 
-type InterfaceDefinition map[string]InterfaceDef
-type InterfaceDef struct {
-	Inputs              map[string]interface{} `yaml:"inputs,omitempty"`
-	Implementation      string                 `yaml:"implementation,omitempty"`
-	OperationDefinition map[string]struct {
-		Description    string                 `yaml:"description,omitempty"`
-		Implementation string                 `yaml:"implementation,omitempty"`
-		Inputs         map[string]interface{} `yaml:"inputs,omitempty"`
+func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	*p = make(map[string]string, 1)
+	if err := unmarshal(&s); err == nil {
+		(*p)["value"] = s
+		return nil
 	}
+	var m map[string]string
+	if err := unmarshal(&m); err != nil {
+		return err
+		*p = m
+	}
+	return nil
 }
 
-func (i *InterfaceDef) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	log.Println("LIB... Unmarshaling")
+// InterfaceDefinition is related to a node type
+type InterfaceDefinitionTemplate map[string]InterfaceDefTemplate
+type InterfaceDefTemplate struct {
+	Inputs         map[string]PropertyAssignment `yaml:"inputs,omitempty"`
+	Description    string                        `yaml:"description,omitempty"`
+	Implementation string                        `yaml:"implementation,omitempty"`
+}
+
+func (i *InterfaceDefTemplate) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	if err := unmarshal(&s); err == nil {
-		log.Println("LIB... It is a string", s)
 		i.Implementation = s
 		return nil
 	}
 	var str struct {
-		Inputs              map[string]interface{} `yaml:"inputs,omitempty"`
-		Implementation      string                 `yaml:"implementation,omitempty"`
-		OperationDefinition map[string]struct {
-			Description    string                 `yaml:"description,omitempty"`
-			Implementation string                 `yaml:"implementation,omitempty"`
-			Inputs         map[string]interface{} `yaml:"inputs,omitempty"`
-		}
+		Inputs map[string]PropertyAssignment `yaml:"inputs,omitempty"`
+		//Implementation      string                 `yaml:"implementation,omitempty"`
+		Description    string `yaml:"description,omitempty"`
+		Implementation string `yaml:"implementation,omitempty"`
 	}
 	if err := unmarshal(&str); err != nil {
-		log.Println("LIB... error", err)
 		return err
 	}
-	log.Println("LIB... It is a struct", str)
-	i.Implementation = str.Implementation
 	i.Inputs = str.Inputs
-	i.OperationDefinition = str.OperationDefinition
+	i.Implementation = str.Implementation
+	i.Description = str.Description
+	return nil
+}
+
+//type PropertyDefinition struct { }
+
+// InterfaceDefinition TODO: Appendix 5.12
+
+// InterfaceDefinition is related to a node type
+type InterfaceDefinition map[string]InterfaceDef
+type InterfaceDef struct {
+	Inputs         map[string]Input `yaml:"inputs,omitempty"`
+	Description    string           `yaml:"description,omitempty"`
+	Implementation string           `yaml:"implementation,omitempty"`
+}
+
+func (i *InterfaceDef) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	if err := unmarshal(&s); err == nil {
+		i.Implementation = s
+		return nil
+	}
+	var str struct {
+		Inputs map[string]Input `yaml:"inputs,omitempty"`
+		//Implementation      string                 `yaml:"implementation,omitempty"`
+		Description    string `yaml:"description,omitempty"`
+		Implementation string `yaml:"implementation,omitempty"`
+	}
+	if err := unmarshal(&str); err != nil {
+		return err
+	}
+	i.Inputs = str.Inputs
+	i.Implementation = str.Implementation
+	i.Description = str.Description
 	return nil
 }
 
@@ -194,7 +231,7 @@ type NodeFilter interface{}
 type NodeType struct {
 	DerivedFrom  string                          `yaml:"derived_from,omitempty" json:"derived_from"`           // An optional parent Node Type name this new Node Type derives from
 	Description  string                          `yaml:"description,omitempty" json:"description"`             // An optional description for the Node Type
-	Properties   map[string]PropertyDefinition   `yaml:"properties,omitempty" json:"properties,omitempty"`     // An optional list of property definitions for the Node Type.
+	Properties   map[string]PropertyAssignment   `yaml:"properties,omitempty" json:"properties,omitempty"`     // An optional list of property definitions for the Node Type.
 	Attributes   map[string]AttributeDefinition  `yaml:"attributes,omitempty" json:"attributes,omitempty"`     // An optional list of attribute definitions for the Node Type.
 	Requirements []map[string]interface{}        `yaml:"requirements,omitempty" json:"requirements,omitempty"` // An optional sequenced list of requirement definitions for the Node Type
 	Capabilities map[string]CapabilityDefinition `yaml:"capabilities,omitempty" json:"capabilities,omitempty"` // An optional list of capability definitions for the Node Type
@@ -215,20 +252,20 @@ type DataType struct {
 // NodeTemplate as described in Appendix 7.3
 // A Node Template specifies the occurrence of a manageable software component as part of an application’s topology model which is defined in a TOSCA Service Template.  A Node template is an instance of a specified Node Type and can provide customized properties, constraints or operations which override the defaults provided by its Node Type and its implementations.
 type NodeTemplate struct {
-	Type         string                             `yaml:"type" json:"type"`                                              // The required name of the Node Type the Node Template is based upon.
-	Decription   string                             `yaml:"description,omitempty" json:"description,omitempty"`            // An optional description for the Node Template.
-	Directives   []string                           `yaml:"directives,omitempty" json:"-" json:"directives,omitempty"`     // An optional list of directive values to provide processing instructions to orchestrators and tooling.
-	Properties   map[string]interface{}             `yaml:"properties,omitempty" json:"-" json:"properties,omitempty"`     // An optional list of property value assignments for the Node Template.
-	Attributes   map[string]interface{}             `yaml:"attributes,omitempty" json:"-" json:"attributes,omitempty"`     // An optional list of attribute value assignments for the Node Template.
-	Requirements []map[string]RequirementAssignment `yaml:"requirements,omitempty" json:"-" json:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
-	Capabilities map[string]interface{}             `yaml:"capabilities,omitempty" json:"-" json:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
-	Interfaces   map[string]InterfaceDefinition     `yaml:"interfaces,omitempty" json:"-" json:"interfaces,omitempty"`     // An optional list of named interface definitions for the Node Template.
-	Artifcats    map[string]ArtifactDefinition      `yaml:"artifcats,omitempty" json:"-" json:"artifcats,omitempty"`       // An optional list of named artifact definitions for the Node Template.
-	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty" json:"-" json:"node_filter,omitempty"`   // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
-	Id           int                                `yaml:"tosca_id,omitempty" json:"id" json:"tosca_id,omitempty"`        // From tosca.nodes.Root: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
-	Name         string                             `yaml:"toca_name,omitempty" json:"-" json:"toca_name,omitempty"`       // From tosca.nodes.root This attribute reflects the name of the Node Template as defined in the TOSCA service template.  This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
-	State        int                                `json:"state"`                                                         // The state (see constants definitions)
-	RunChan      chan int                           `yaml:"-" json:"-"`                                                    // A channel used for the runtime execution. The node will get the desired state in the pipe. If a "-ing" json:"-" json:"-"`                      // A channel used for the runtime execution. The node will get the desired state in the pipe. If a "-ing" state is posted, the node will run the corresponding lifecycle artifact (ex: configuring -> configure)
+	Type         string                                 `yaml:"type" json:"type"`                                              // The required name of the Node Type the Node Template is based upon.
+	Decription   string                                 `yaml:"description,omitempty" json:"description,omitempty"`            // An optional description for the Node Template.
+	Directives   []string                               `yaml:"directives,omitempty" json:"-" json:"directives,omitempty"`     // An optional list of directive values to provide processing instructions to orchestrators and tooling.
+	Properties   map[string]PropertyAssignment          `yaml:"properties,omitempty" json:"-" json:"properties,omitempty"`     // An optional list of property value assignments for the Node Template.
+	Attributes   map[string]interface{}                 `yaml:"attributes,omitempty" json:"-" json:"attributes,omitempty"`     // An optional list of attribute value assignments for the Node Template.
+	Requirements []map[string]RequirementAssignment     `yaml:"requirements,omitempty" json:"-" json:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
+	Capabilities map[string]interface{}                 `yaml:"capabilities,omitempty" json:"-" json:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
+	Interfaces   map[string]InterfaceDefinitionTemplate `yaml:"interfaces,omitempty" json:"-" json:"interfaces,omitempty"`     // An optional list of named interface definitions for the Node Template.
+	Artifcats    map[string]ArtifactDefinition          `yaml:"artifcats,omitempty" json:"-" json:"artifcats,omitempty"`       // An optional list of named artifact definitions for the Node Template.
+	NodeFilter   map[string]NodeFilter                  `yaml:"node_filter,omitempty" json:"-" json:"node_filter,omitempty"`   // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
+	Id           int                                    `yaml:"tosca_id,omitempty" json:"id" json:"tosca_id,omitempty"`        // From tosca.nodes.Root: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
+	Name         string                                 `yaml:"toca_name,omitempty" json:"-" json:"toca_name,omitempty"`       // From tosca.nodes.root This attribute reflects the name of the Node Template as defined in the TOSCA service template.  This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+	State        int                                    `json:"state"`                                                         // The state (see constants definitions)
+	RunChan      chan int                               `yaml:"-" json:"-"`                                                    // A channel used for the runtime execution. The node will get the desired state in the pipe. If a "-ing" json:"-" json:"-"`                      // A channel used for the runtime execution. The node will get the desired state in the pipe. If a "-ing" state is posted, the node will run the corresponding lifecycle artifact (ex: configuring -> configure)
 }
 
 // RepositoryDefinition as desribed in Appendix 5.6
@@ -263,9 +300,9 @@ type InterfaceType struct {
 // TopologyTemplateType as described in appendix A 8
 // This section defines the topology template of a cloud application. The main ingredients of the topology template are node templates representing components of the application and relationship templates representing links between the components. These elements are defined in the nested node_templates section and the nested relationship_templates sections, respectively.  Furthermore, a topology template allows for defining input parameters, output parameters as well as grouping of node templates.
 type TopologyTemplateType struct {
-	Inputs        map[string]Input        `yaml:"inputs,omitempty" json:"inputs,omitempty"`
-	NodeTemplates map[string]NodeTemplate `yaml:"node_templates" json:"node_templates"`
-	Outputs       map[string]Output       `yaml:"outputs,omitempty" json:"outputs,omitempty"`
+	Inputs        map[string]PropertyDefinition `yaml:"inputs,omitempty" json:"inputs,omitempty"`
+	NodeTemplates map[string]NodeTemplate       `yaml:"node_templates" json:"node_templates"`
+	Outputs       map[string]Output             `yaml:"outputs,omitempty" json:"outputs,omitempty"`
 }
 
 // ToscaDefinition is the meta structure containing an entire tosca document as described in
