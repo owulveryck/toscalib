@@ -2,10 +2,11 @@ package toscalib
 
 import (
 	"errors"
-	"strings"
-
 	"github.com/gonum/matrix/mat64"
 	"gopkg.in/yaml.v2"
+	"log"
+	"reflect"
+	"strings"
 )
 
 // Status is used in the PropertyDefinition
@@ -142,6 +143,29 @@ type CapabilityDefinition struct {
 
 // InterfaceDefinition TODO: Appendix 5.12
 type InterfaceDefinition map[string]interface{}
+
+type InterfaceDef struct {
+	Inputs              map[string]interface{} `yaml:"inputs,omitempty"`
+	Implementation      string                 `yaml:"implementation,omitempty"`
+	OperationDefinition map[string]struct {
+		Description    string                 `yaml:"description,omitempty"`
+		Implementation string                 `yaml:"implementation,omitempty"`
+		Inputs         map[string]interface{} `yaml:"inputs,omitempty"`
+	}
+}
+
+func (i *InterfaceDefinition) GetImplementation(s string) (string, error) {
+	intf := (*i)[s]
+	// Get the type of intf
+	switch reflect.TypeOf(intf).Kind() {
+	case reflect.String:
+		return reflect.ValueOf(intf).String(), nil
+	case reflect.Map:
+		log.Println("DEBUG LIB:", reflect.ValueOf(intf).MapIndex(reflect.ValueOf("implementation")))
+		return reflect.ValueOf(intf).MapIndex(reflect.ValueOf("implementation")).String(), nil
+	}
+	return "", nil
+}
 
 // ArtifactDefinition TODO: Appendix 5.5
 type ArtifactDefinition interface{}
