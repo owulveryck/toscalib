@@ -5,7 +5,6 @@ import (
 	"github.com/gonum/matrix/mat64"
 	"gopkg.in/yaml.v2"
 	"log"
-	"reflect"
 	"strings"
 )
 
@@ -142,8 +141,9 @@ type CapabilityDefinition struct {
 }
 
 // InterfaceDefinition TODO: Appendix 5.12
-type InterfaceDefinition map[string]interface{}
+//type InterfaceDefinition map[string]interface{}
 
+type InterfaceDefinition map[string]InterfaceDef
 type InterfaceDef struct {
 	Inputs              map[string]interface{} `yaml:"inputs,omitempty"`
 	Implementation      string                 `yaml:"implementation,omitempty"`
@@ -154,6 +154,53 @@ type InterfaceDef struct {
 	}
 }
 
+func (i *InterfaceDef) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	log.Println("LIB... Unmarshaling")
+	var s string
+	if err := unmarshal(&s); err == nil {
+		log.Println("LIB... It is a string", s)
+		i.Implementation = s
+		return nil
+	}
+	var str struct {
+		Inputs              map[string]interface{} `yaml:"inputs,omitempty"`
+		Implementation      string                 `yaml:"implementation,omitempty"`
+		OperationDefinition map[string]struct {
+			Description    string                 `yaml:"description,omitempty"`
+			Implementation string                 `yaml:"implementation,omitempty"`
+			Inputs         map[string]interface{} `yaml:"inputs,omitempty"`
+		}
+	}
+	if err := unmarshal(&str); err != nil {
+		log.Println("LIB... error", err)
+		return err
+	}
+	log.Println("LIB... It is a struct", str)
+	i.Implementation = str.Implementation
+	i.Inputs = str.Inputs
+	i.OperationDefinition = str.OperationDefinition
+	return nil
+}
+
+/*
+func (i *InterfaceDefinition) GetInputs(s string) (map[string]string, error) {
+	intf := (*i)[s]
+	// Get the type of intf
+	switch reflect.TypeOf(intf).Kind() {
+	case reflect.String:
+		return nil, nil
+	case reflect.Map:
+		//reflect.ValueOf(intf).MapIndex(reflect.ValueOf("inputs")) is actually a map[string]interface{}
+		log.Printf("LIB: inputs: %v", reflect.ValueOf(intf).MapIndex(reflect.ValueOf("inputs")))
+		s := reflect.ValueOf(intf).MapIndex(reflect.ValueOf("inputs"))
+		log.Printf("LIB: s if of type %v", s.Kind()) // interface
+		ss := reflect.ValueOf(s)
+		log.Printf("LIB: ss if of type %v", ss.Kind()) // struct
+		log.Println("LIB ss is", ss.Elem())
+	}
+	return nil, nil
+}
+
 func (i *InterfaceDefinition) GetImplementation(s string) (string, error) {
 	intf := (*i)[s]
 	// Get the type of intf
@@ -161,11 +208,11 @@ func (i *InterfaceDefinition) GetImplementation(s string) (string, error) {
 	case reflect.String:
 		return reflect.ValueOf(intf).String(), nil
 	case reflect.Map:
-		log.Println("DEBUG LIB:", reflect.ValueOf(intf).MapIndex(reflect.ValueOf("implementation")))
-		return reflect.ValueOf(intf).MapIndex(reflect.ValueOf("implementation")).String(), nil
+		return fmt.Sprintf("%v", reflect.ValueOf(intf).MapIndex(reflect.ValueOf("implementation"))), nil
 	}
 	return "", nil
 }
+*/
 
 // ArtifactDefinition TODO: Appendix 5.5
 type ArtifactDefinition interface{}
