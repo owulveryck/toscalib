@@ -182,38 +182,6 @@ func (i *InterfaceDef) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	return nil
 }
 
-/*
-func (i *InterfaceDefinition) GetInputs(s string) (map[string]string, error) {
-	intf := (*i)[s]
-	// Get the type of intf
-	switch reflect.TypeOf(intf).Kind() {
-	case reflect.String:
-		return nil, nil
-	case reflect.Map:
-		//reflect.ValueOf(intf).MapIndex(reflect.ValueOf("inputs")) is actually a map[string]interface{}
-		log.Printf("LIB: inputs: %v", reflect.ValueOf(intf).MapIndex(reflect.ValueOf("inputs")))
-		s := reflect.ValueOf(intf).MapIndex(reflect.ValueOf("inputs"))
-		log.Printf("LIB: s if of type %v", s.Kind()) // interface
-		ss := reflect.ValueOf(s)
-		log.Printf("LIB: ss if of type %v", ss.Kind()) // struct
-		log.Println("LIB ss is", ss.Elem())
-	}
-	return nil, nil
-}
-
-func (i *InterfaceDefinition) GetImplementation(s string) (string, error) {
-	intf := (*i)[s]
-	// Get the type of intf
-	switch reflect.TypeOf(intf).Kind() {
-	case reflect.String:
-		return reflect.ValueOf(intf).String(), nil
-	case reflect.Map:
-		return fmt.Sprintf("%v", reflect.ValueOf(intf).MapIndex(reflect.ValueOf("implementation"))), nil
-	}
-	return "", nil
-}
-*/
-
 // ArtifactDefinition TODO: Appendix 5.5
 type ArtifactDefinition interface{}
 
