@@ -136,22 +136,17 @@ func (toscaStructure *ServiceTemplateDefinition) FillAdjacencyMatrix() error {
 
 // Parse a TOSCA document and fill in the structure
 func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
-	var tempStruct ServiceTemplateDefinition
-	tempStruct.NodeTypes = make(map[string]NodeType)
+	var std ServiceTemplateDefinition
+	std.NodeTypes = make(map[string]NodeType)
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
 	}
 
 	// Unmarshal the data in an interface
-	err = yaml.Unmarshal(data, &tempStruct)
+	err = yaml.Unmarshal(data, &std)
 	if err != nil {
 		return err
-	}
-	// Sets the initial state
-	for _, nt := range tempStruct.TopologyTemplate.NodeTemplates {
-		nt.RunChan = make(chan int)
-		nt.State = StateInitial
 	}
 	// Import de normative types by default
 	for _, normType := range []string{"interface_types", "relationship_types", "node_types", "capability_types"} {
@@ -161,14 +156,14 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 			return err
 		}
 		var tt ServiceTemplateDefinition
-		log.Println("Processing", normType)
 		err = yaml.Unmarshal(data, &tt)
 		if err != nil {
 			return err
 		}
+		// Now append all the values
 	}
 
-	*t = tempStruct
+	*t = std
 	err = t.FillAdjacencyMatrix()
 	// Fill in the name of the template inside the template itself
 	for n, _ := range t.TopologyTemplate.NodeTemplates {

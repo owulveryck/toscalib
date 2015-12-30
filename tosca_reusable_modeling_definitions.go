@@ -90,8 +90,6 @@ type NodeTemplate struct {
 	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty" json:"-" json:"node_filter,omitempty"`   // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
 	Id           int                                `yaml:"tosca_id,omitempty" json:"id" json:"tosca_id,omitempty"`        // From tosca.nodes.Root: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
 	Name         string                             `yaml:"toca_name,omitempty" json:"-" json:"toca_name,omitempty"`       // From tosca.nodes.root This attribute reflects the name of the Node Template as defined in the TOSCA service template.  This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
-	State        int                                `json:"state"`                                                         // The state (see constants definitions)
-	RunChan      chan int                           `yaml:"-" json:"-"`                                                    // A channel used for the runtime execution. The node will get the desired state in the pipe. If a "-ing" json:"-" json:"-"`                      // A channel used for the runtime execution. The node will get the desired state in the pipe. If a "-ing" state is posted, the node will run the corresponding lifecycle artifact (ex: configuring -> configure)
 }
 
 // RepositoryDefinition as desribed in Appendix 5.6
@@ -111,11 +109,3 @@ type RelationshipType interface{}
 //An Artifact Type is a reusable entity that defines the type of one or more files which Node Types or Node Templates can have dependent relationships and used during operations such as during installation or deployment.
 // TODO
 type ArtifactType interface{}
-
-// TopologyTemplateType as described in appendix A 8
-// This section defines the topology template of a cloud application. The main ingredients of the topology template are node templates representing components of the application and relationship templates representing links between the components. These elements are defined in the nested node_templates section and the nested relationship_templates sections, respectively.  Furthermore, a topology template allows for defining input parameters, output parameters as well as grouping of node templates.
-type TopologyTemplateType struct {
-	Inputs        map[string]PropertyDefinition `yaml:"inputs,omitempty" json:"inputs,omitempty"`
-	NodeTemplates map[string]NodeTemplate       `yaml:"node_templates" json:"node_templates"`
-	Outputs       map[string]Output             `yaml:"outputs,omitempty" json:"outputs,omitempty"`
-}
