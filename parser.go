@@ -134,10 +134,77 @@ func (toscaStructure *ServiceTemplateDefinition) FillAdjacencyMatrix() error {
 	return nil
 }
 
+// merge copies all the elements of t into s and returns the result
+func merge(s, t ServiceTemplateDefinition) ServiceTemplateDefinition {
+	// Repositories
+	rep := make(map[string]RepositoryDefinition, len(s.Repositories)+len(t.Repositories))
+	for key, val := range t.Repositories {
+		rep[key] = val
+	}
+	for key, val := range s.Repositories {
+		rep[key] = val
+	}
+	s.Repositories = rep
+	// DataTypes
+	dat := make(map[string]DataType, len(s.DataTypes)+len(t.DataTypes))
+	for key, val := range t.DataTypes {
+		dat[key] = val
+	}
+	for key, val := range s.DataTypes {
+		dat[key] = val
+	}
+	s.DataTypes = dat
+	// NodeTypes
+	nt := make(map[string]NodeType, len(s.NodeTypes)+len(t.NodeTypes))
+	for key, val := range t.NodeTypes {
+		nt[key] = val
+	}
+	for key, val := range s.NodeTypes {
+		nt[key] = val
+	}
+	s.NodeTypes = nt
+	// ArtifactType
+	arti := make(map[string]ArtifactType, len(s.ArtifactTypes)+len(t.ArtifactTypes))
+	for key, val := range t.ArtifactTypes {
+		arti[key] = val
+	}
+	for key, val := range s.ArtifactTypes {
+		arti[key] = val
+	}
+	s.ArtifactTypes = arti
+	// RelationshipType
+	rel := make(map[string]RelationshipType, len(s.RelationshipTypes)+len(t.RelationshipTypes))
+	for key, val := range t.RelationshipTypes {
+		rel[key] = val
+	}
+	for key, val := range s.RelationshipTypes {
+		rel[key] = val
+	}
+	s.RelationshipTypes = rel
+	// CapabilityType
+	capa := make(map[string]CapabilityType, len(s.CapabilityTypes)+len(t.CapabilityTypes))
+	for key, val := range t.CapabilityTypes {
+		capa[key] = val
+	}
+	for key, val := range s.CapabilityTypes {
+		capa[key] = val
+	}
+	s.CapabilityTypes = capa
+	// InterfaceType
+	intf := make(map[string]InterfaceType, len(s.InterfaceTypes)+len(t.InterfaceTypes))
+	for key, val := range t.InterfaceTypes {
+		intf[key] = val
+	}
+	for key, val := range s.InterfaceTypes {
+		intf[key] = val
+	}
+	s.InterfaceTypes = intf
+	return s
+}
+
 // Parse a TOSCA document and fill in the structure
 func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 	var std ServiceTemplateDefinition
-	std.NodeTypes = make(map[string]NodeType)
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
@@ -160,6 +227,7 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 		if err != nil {
 			return err
 		}
+		std = merge(std, tt)
 		// Now append all the values
 	}
 
