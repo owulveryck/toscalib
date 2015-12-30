@@ -1,12 +1,11 @@
 package toscalib
 
 import (
+	"github.com/gonum/matrix/mat64"
+	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"log"
-
-	"github.com/gonum/matrix/mat64"
-	"gopkg.in/yaml.v2"
 )
 
 // NodeGap is the gap between each node see @FillAdjacencyMatrix for explanation
@@ -228,9 +227,22 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 			return err
 		}
 		std = merge(std, tt)
-		// Now append all the values
 	}
-
+	for _, im := range std.Imports {
+		var tt ServiceTemplateDefinition
+		log.Println("Importing ", im)
+		r, err := ioutil.ReadFile(im)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = yaml.Unmarshal(r, &tt)
+		if err != nil {
+			log.Fatal(err)
+		}
+		std = merge(std, tt)
+	}
+	// Free the imports
+	std.Imports = []string{}
 	*t = std
 	err = t.FillAdjacencyMatrix()
 	// Fill in the name of the template inside the template itself
