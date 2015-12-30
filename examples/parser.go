@@ -19,7 +19,7 @@ func main() {
 		fmt.Println(nn)
 		for _, intf := range nt.Interfaces {
 			for opn, opp := range intf.Operations {
-				fmt.Printf("%v: %v", opn, opp)
+				fmt.Printf("%v: %v\n", opn, opp.Implementation)
 			}
 		}
 	}
