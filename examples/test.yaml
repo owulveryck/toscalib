@@ -1,0 +1,121 @@
+2015/12/30 22:09:24 tosca_definitions_version: tosca_simple_yaml_1_0_0
+description: |
+  TOSCA simple profile with wordpress, web server and mysql on the same server.
+imports:
+- custom_types/wordpress.yaml
+topology_template:
+  inputs:
+    cpus:
+      type: integer
+      description: Number of CPUs for the server.
+      default: "1"
+      constraints: [{operator: "", values: null}]
+    db_name:
+      type: string
+      description: The name of the database.
+      default: wordpress
+    db_port:
+      type: integer
+      description: Port for the MySQL database.
+      default: "3306"
+    db_pwd:
+      type: string
+      description: The WordPress database admin account password.
+      default: wp_pass
+    db_root_pwd:
+      type: string
+      description: Root password for MySQL.
+    db_user:
+      type: string
+      description: The user name of the DB user.
+      default: wp_user
+  node_templates:
+    mysql_database:
+      type: tosca.nodes.Database
+      properties:
+        db_name: {}
+        db_password: {}
+        db_user: {}
+      requirements:
+      - host:
+          node: mysql_dbms
+      capabilities:
+        database_endpoint:
+          properties:
+            port:
+              get_input: db_port
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+          operations: {}
+          inputs: {}
+      tosca_id: 11
+      toca_name: mysql_database
+      state: 0
+    mysql_dbms:
+      type: tosca.nodes.DBMS
+      properties:
+        dbms_port: {}
+        dbms_root_password: {}
+      requirements:
+      - host:
+          node: server
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+          operations: {}
+          inputs: {}
+      tosca_id: 21
+      toca_name: mysql_dbms
+      state: 0
+    server:
+      type: tosca.nodes.Compute
+      capabilities:
+        host:
+          properties:
+            disk_size: 10 GB
+            mem_size: 4096 MB
+            num_cpus:
+              get_input: cpus
+        os:
+          properties:
+            architecture: x86_64
+            distribution: Ubuntu
+            type: Linux
+            version: 14.04
+      tosca_id: 41
+      toca_name: server
+      state: 0
+    webserver:
+      type: tosca.nodes.WebServer
+      requirements:
+      - host:
+          node: server
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+          operations: {}
+          inputs: {}
+      tosca_id: 31
+      toca_name: webserver
+      state: 0
+    wordpress:
+      type: tosca.nodes.WebApplication.WordPress
+      requirements:
+      - host:
+          node: webserver
+      - database_endpoint:
+          node: mysql_database
+      interfaces:
+        tosca.interfaces.node.lifecycle.Standard:
+          operations: {}
+          inputs: {}
+      tosca_id: 1
+      toca_name: wordpress
+      state: 0
+  outputs:
+    website_url:
+      value:
+        get_attribute:
+        - server
+        - private_address
+      description: URL for Wordpress wiki.
+adjacencymatrix: {}
+

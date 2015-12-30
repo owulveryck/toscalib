@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/owulveryck/toscalib"
 	"gopkg.in/yaml.v2"
 	"log"
@@ -14,6 +13,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(yaml.Marshal(&t))
+	o, err := yaml.Marshal(&t)
+	if err != nil {
+		log.Panic(err)
+	}
+	log.Println(string(o))
 
 }
