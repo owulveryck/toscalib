@@ -3,8 +3,7 @@ package toscalib
 import (
 	"io"
 	"io/ioutil"
-	//"regexp"
-	"os"
+	"log"
 
 	"github.com/gonum/matrix/mat64"
 	"gopkg.in/yaml.v2"
@@ -154,28 +153,19 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 		nt.RunChan = make(chan int)
 		nt.State = StateInitial
 	}
-	// Deal with the imports
-	imports := make([]ServiceTemplateDefinition, 0)
-	for _, im := range tempStruct.Imports {
+	// Import de normative types by default
+	for _, normType := range []string{"interface_types", "relationship_types", "node_types", "capability_types"} {
+		data, err := Asset(normType)
+		if err != nil {
+			log.Println("Normative type not found")
+			return err
+		}
 		var tt ServiceTemplateDefinition
-		r, err := os.Open(im)
+		log.Println("Processing", normType)
+		log.Println(data)
+		err = yaml.Unmarshal(data, &tt)
 		if err != nil {
 			return err
-		}
-		err = tt.Parse(r)
-		r.Close()
-		if err != nil {
-			return err
-		}
-		imports = append(imports, tt)
-	}
-
-	// Now reconstruct the global definition (only the types by now)
-	for _, i := range imports {
-		for key, m := range i.NodeTypes {
-			if _, ok := tempStruct.NodeTypes[key]; !ok {
-				tempStruct.NodeTypes[key] = m
-			}
 		}
 	}
 
