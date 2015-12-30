@@ -12,46 +12,46 @@ import (
 
 // This implements the type defined in Appendix A 2 of the definition file
 
-// ToscaVersion - The version have the following grammar:
+// Version - The version have the following grammar:
 // MajorVersion.MinorVersion[.FixVersion[.Qualifier[-BuildVersion]]]
 // MajorVersion : is a required integer value greater than or equ al to 0 (zero)
 // MinorVersion : is a required integer value greater than or equal to 0 (zero).
 // FixVersion    : is a optional integer value greater than or equal to 0 (zero)
 //Qualifier is an optional string that indicates a named, pre-release version of the associated code that has been derived from the version of the code identified by the combination major_version, minor_version and fix_version numbers
 //BuildVersion is an optional integer value greater than or equal to 0 (zero) that can be used to further qualify different build versions of the code that has the same qualifer_string
-type ToscaVersion string
+type Version string
 
 /*TODO
 // GetMajor returns the major_version number
-func (toscaVersion *ToscaVersion) GetMajor() int {
+func (toscaVersion *Version) GetMajor() int {
 	return 0
 }
 */
 
 /*TODO
 // GetMinor returns the minor_version number
-func (toscaVersion *ToscaVersion) GetMinor() int {
+func (toscaVersion *Version) GetMinor() int {
 	return 0
 }
 */
 
 /*TODO
 // GetFixVersion returns the fix_version integer value
-func (toscaVersion *ToscaVersion) GetFixVersion() int {
+func (toscaVersion *Version) GetFixVersion() int {
 	return 0
 }
 */
 
 /*TODO
 // GetQualifier returns the named, pre-release version of the associated code that has been derived    from the version of the code identified by the combination major_version, minor_version and fix_version numbers
-func (toscaVersion *ToscaVersion) GetQualifier() string {
+func (toscaVersion *Version) GetQualifier() string {
 	return nil
 }
 */
 
 /*TODO
 // GetBuildVersion returns an  integer value greater than or equal to 0 (zero) that can be used to further        qualify different build versions of the code that has the same qualifer_string
-func (toscaVersion *ToscaVersion) GetBuildVersion() int {
+func (toscaVersion *Version) GetBuildVersion() int {
 	return 0
 }
 */

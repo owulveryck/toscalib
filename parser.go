@@ -162,7 +162,7 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 		}
 		var tt ServiceTemplateDefinition
 		log.Println("Processing", normType)
-		log.Println(data)
+		log.Println(string(data))
 		err = yaml.Unmarshal(data, &tt)
 		if err != nil {
 			return err
