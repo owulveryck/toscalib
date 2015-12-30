@@ -1,2 +1,0 @@
-tosca.capabilities.network.Bindable:
-  derived_from: tosca.capabilities.Node

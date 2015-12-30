@@ -1,2 +1,0 @@
-tosca.capabilities.Endpoint.Database:
-      derived_from: tosca.capabilities.Endpoint

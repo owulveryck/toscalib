@@ -1,7 +1,0 @@
-tosca.nodes.Container.Runtime:
-  derived_from: tosca.nodes.SoftwareComponent
-  capabilities:
-    host:
-      type: tosca.capabilities.Container
-    scalable:
-      type: tosca.capabilities.Scalable

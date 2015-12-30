@@ -1,2 +1,0 @@
-tosca.capabilities.Node:
-  derived_from: tosca.capabilities.Root
