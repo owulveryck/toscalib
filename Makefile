@@ -16,6 +16,6 @@ test: *.go
 clean:
 	rm tosca
 
-normative_definitions.go: NormativeTypes/
+normative_definitions.go: NormativeTypes/*
 	$(GOBINDATA) -pkg=toscalib -prefix=NormativeTypes/ -o normative_definitions.go NormativeTypes/
 
