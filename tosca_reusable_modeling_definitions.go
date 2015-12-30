@@ -305,9 +305,9 @@ type TopologyTemplateType struct {
 	Outputs       map[string]Output             `yaml:"outputs,omitempty" json:"outputs,omitempty"`
 }
 
-// ToscaDefinition is the meta structure containing an entire tosca document as described in
+// ServiceTemplateDefinition is the meta structure containing an entire tosca document as described in
 //http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
-type ToscaDefinition struct {
+type ServiceTemplateDefinition struct {
 	DefinitionsVersion ToscaVersion                    `yaml:"tosca_definitions_version" json:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
 	Description        string                          `yaml:"description,omitempty" json:"description,omitempty"`
 	Imports            []string                        `yaml:"imports,omitempty" json:"imports,omitempty"`                       // Declares import statements external TOSCA Definitions documents. For example, these may be file location or URIs relative to the service template file within the same TOSCA CSAR file.
@@ -324,13 +324,13 @@ type ToscaDefinition struct {
 }
 
 // Bytes returns the yaml representation of the current definition in bytes
-func (toscaDefinition *ToscaDefinition) Bytes() []byte {
+func (toscaDefinition *ServiceTemplateDefinition) Bytes() []byte {
 	d, _ := yaml.Marshal(toscaDefinition)
 	return d
 }
 
 // String returns the yaml representation of the current definition as a string
-func (toscaDefinition *ToscaDefinition) String() string {
+func (toscaDefinition *ServiceTemplateDefinition) String() string {
 	d, _ := yaml.Marshal(toscaDefinition)
 	return string(d)
 }

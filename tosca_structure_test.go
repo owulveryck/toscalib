@@ -14,7 +14,7 @@ func TestStructures(t *testing.T) {
 	// this is a map with the structure to be tested and the corresponding example
 	examples := map[string]interface{}{
 		"testFiles/constraintsTest.yaml": ConstraintClause{},
-		"testFiles/topologyTest.yaml":    ToscaDefinition{},
+		"testFiles/topologyTest.yaml":    ServiceTemplateDefinition{},
 		"testFiles/propertyTest.yaml":    map[string]PropertyDefinition{},
 	}
 
@@ -40,7 +40,7 @@ func TestStructures(t *testing.T) {
 }
 
 func TestParse(t *testing.T) {
-	var toscaStructure ToscaDefinition
+	var toscaStructure ServiceTemplateDefinition
 	file, err := os.Open("examples/tosca_elk.yaml")
 
 	if err != nil {
