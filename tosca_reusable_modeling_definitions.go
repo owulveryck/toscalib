@@ -1,16 +1,5 @@
 package toscalib
 
-// Status is used in the PropertyDefinition
-type Status int64
-
-// Valid values for Status as described in Appendix 5.7.3
-const (
-	Supported    Status = 1
-	Unsupported  Status = 2
-	Experimental Status = 3
-	Deprecated   Status = 4
-)
-
 // AttributeDefinition is a structure describing the property assignmenet in the node template
 // This notion is described in appendix 5.9 of the document
 type AttributeDefinition struct {
