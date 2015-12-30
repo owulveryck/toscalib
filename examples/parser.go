@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/owulveryck/toscalib"
-	"gopkg.in/yaml.v2"
+	//"gopkg.in/yaml.v2"
 	"log"
 	"os"
 )
@@ -14,10 +14,21 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	o, err := yaml.Marshal(&t)
-	if err != nil {
-		log.Panic(err)
+
+	for nn, nt := range t.TopologyTemplate.NodeTemplates {
+		fmt.Println(nn)
+		for _, intf := range nt.Interfaces {
+			for opn, opp := range intf.Operations {
+				fmt.Printf("%v: %v", opn, opp)
+			}
+		}
 	}
-	fmt.Println(string(o))
+	/*
+		o, err := yaml.Marshal(&t)
+			if err != nil {
+				log.Panic(err)
+			}
+			fmt.Println(string(o))
+	*/
 
 }

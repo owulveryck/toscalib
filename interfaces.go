@@ -6,7 +6,7 @@ type InterfaceType struct {
 	Description string  `yaml:"description,omitempty"`
 	Version     Version `yaml:"version,omitempty"`
 	Operations  map[string]OperationDefinition
-	Inputs      map[string]PropertyDefinition `yaml:"inputs" json:"inputs"` // The optional list of input parameter definitions.
+	Inputs      map[string]PropertyDefinition `yaml:"inputs,omitempty" json:"inputs"` // The optional list of input parameter definitions.
 }
 
 // InterfaceDefinition is related to a node type

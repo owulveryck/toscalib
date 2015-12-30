@@ -1,11 +1,13 @@
 package toscalib
 
 import (
+	"fmt"
 	"github.com/gonum/matrix/mat64"
 	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"log"
+	"regexp"
 )
 
 // NodeGap is the gap between each node see @FillAdjacencyMatrix for explanation
@@ -29,6 +31,24 @@ func (nodeTemplate *NodeTemplate) GetDeleteIndex() int              { return nod
 
 func (nodeTemplate *NodeTemplate) SetName(name string) {
 	nodeTemplate.Name = name
+}
+
+// FillInterface Completes the interface of the node with any values found in its type
+// All the Operations will be filled
+func (n *NodeTemplate) FillInterface(s ServiceTemplateDefinition) {
+	// Check if an interface is defined in the node template itself
+	for name, value := range n.Interfaces {
+		var re = regexp.MustCompile(fmt.Sprintf("%v$", name))
+		for intfn, intf := range s.InterfaceTypes {
+			if re.MatchString(intfn) {
+				for op, impl := range intf.Operations {
+					if _, ok := value.Operations[op]; !ok {
+						value.Operations[op] = impl
+					}
+				}
+			}
+		}
+	}
 }
 
 // GetNodeTemplate returns a pointer to a node template given its name
@@ -243,6 +263,10 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 	// Free the imports
 	std.Imports = []string{}
 	*t = std
+	for _, node := range t.TopologyTemplate.NodeTemplates {
+		node.FillInterface(*t)
+	}
+
 	err = t.FillAdjacencyMatrix()
 	// Fill in the name of the template inside the template itself
 	for n, _ := range t.TopologyTemplate.NodeTemplates {
