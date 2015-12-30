@@ -4,6 +4,7 @@ import (
 	"io"
 	"io/ioutil"
 	//"regexp"
+	"os"
 
 	"github.com/gonum/matrix/mat64"
 	"gopkg.in/yaml.v2"
@@ -34,7 +35,7 @@ func (nodeTemplate *NodeTemplate) SetName(name string) {
 
 // GetNodeTemplate returns a pointer to a node template given its name
 // its returns nil if not found
-func (toscaStructure *ToscaDefinition) GetNodeTemplate(nodeName string) *NodeTemplate {
+func (toscaStructure *ServiceTemplateDefinition) GetNodeTemplate(nodeName string) *NodeTemplate {
 	for name, nodeTemplate := range toscaStructure.TopologyTemplate.NodeTemplates {
 		if name == nodeName {
 			return &nodeTemplate
@@ -46,7 +47,7 @@ func (toscaStructure *ToscaDefinition) GetNodeTemplate(nodeName string) *NodeTem
 // GetNodeTemplate returns a pointer to a node template given its id
 // the ID may be the initial index or whatever index of the lifecycle operation
 // its returns nil if not found
-func (toscaStructure *ToscaDefinition) GetNodeTemplateFromId(nodeId int) *NodeTemplate {
+func (toscaStructure *ServiceTemplateDefinition) GetNodeTemplateFromId(nodeId int) *NodeTemplate {
 	for _, nodeTemplate := range toscaStructure.TopologyTemplate.NodeTemplates {
 		if nodeTemplate.Id == nodeId-(nodeId%nodeGap)+1 {
 			return &nodeTemplate
@@ -55,9 +56,9 @@ func (toscaStructure *ToscaDefinition) GetNodeTemplateFromId(nodeId int) *NodeTe
 	return nil
 }
 
-// FillAdjacencyMatrix fills the adjacency matrix AdjacencyMatrix in the current ToscaDefinition structure
+// FillAdjacencyMatrix fills the adjacency matrix AdjacencyMatrix in the current ServiceTemplateDefinition structure
 // for more information, see doc/node_instanciation_lifecycle.md
-func (toscaStructure *ToscaDefinition) FillAdjacencyMatrix() error {
+func (toscaStructure *ServiceTemplateDefinition) FillAdjacencyMatrix() error {
 	// Get the number of nodes
 	numberOfNodes := len(toscaStructure.TopologyTemplate.NodeTemplates)
 	// Initialize the AdjacencyMatrix
@@ -135,8 +136,8 @@ func (toscaStructure *ToscaDefinition) FillAdjacencyMatrix() error {
 }
 
 // Parse a TOSCA document and fill in the structure
-func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
-	var tempStruct ToscaDefinition
+func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
+	var tempStruct ServiceTemplateDefinition
 	tempStruct.NodeTypes = make(map[string]NodeType)
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -149,43 +150,42 @@ func (toscaStructure *ToscaDefinition) Parse(r io.Reader) error {
 		return err
 	}
 	// Sets the initial state
-	for _, nodeTemplate := range tempStruct.TopologyTemplate.NodeTemplates {
-		nodeTemplate.RunChan = make(chan int)
-		nodeTemplate.State = StateInitial
+	for _, nt := range tempStruct.TopologyTemplate.NodeTemplates {
+		nt.RunChan = make(chan int)
+		nt.State = StateInitial
 	}
-	/*
-		// for each node, add its corresponding notetype definition to the structure
-		// if not present yet
+	// Deal with the imports
+	imports := make([]ServiceTemplateDefinition, 0)
+	for _, im := range tempStruct.Imports {
+		var tt ServiceTemplateDefinition
+		r, err := os.Open(im)
+		if err != nil {
+			return err
+		}
+		err = tt.Parse(r)
+		r.Close()
+		if err != nil {
+			return err
+		}
+		imports = append(imports, tt)
+	}
 
-		// index is the node name and nodeTemplate is the corresponding NodeTemplate
-		for _, nodeTemplate := range tempStruct.TopologyTemplate.NodeTemplates {
-			// nodeType is he node type of the current NodeTemplate
-			nodeType := nodeTemplate.Type
-			if _, typeIsPresent := tempStruct.NodeTypes[nodeType]; typeIsPresent == false {
-				// Get the corresponding asset and add it to the global structure
-				data, err := Asset(nodeType)
-				if err != nil {
-					//  For debuging purpode
-					log.Printf("Cannot find the NodeType definition for %v", nodeType)
-				}
-				var nt map[string]NodeType
-				// Unmarshal the data in an interface
-				err = yaml.Unmarshal(data, &nt)
-				if err != nil {
-					return errors.New(fmt.Sprintf("cannot unmarshal %v (%v)", nodeType, err))
-				}
-				tempStruct.NodeTypes[nodeType] = nt[nodeType]
+	// Now reconstruct the global definition (only the types by now)
+	for _, i := range imports {
+		for key, m := range i.NodeTypes {
+			if _, ok := tempStruct.NodeTypes[key]; !ok {
+				tempStruct.NodeTypes[key] = m
 			}
 		}
-	*/
-	// TODO: deal with the import files
-	*toscaStructure = tempStruct
-	err = toscaStructure.FillAdjacencyMatrix()
+	}
+
+	*t = tempStruct
+	err = t.FillAdjacencyMatrix()
 	// Fill in the name of the template inside the template itself
-	for n, _ := range toscaStructure.TopologyTemplate.NodeTemplates {
-		nt := toscaStructure.GetNodeTemplate(n)
+	for n, _ := range t.TopologyTemplate.NodeTemplates {
+		nt := t.GetNodeTemplate(n)
 		nt.SetName(n)
-		toscaStructure.TopologyTemplate.NodeTemplates[n] = *nt
+		t.TopologyTemplate.NodeTemplates[n] = *nt
 
 	}
 	if err != nil {
