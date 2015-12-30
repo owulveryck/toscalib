@@ -5,7 +5,7 @@ package toscalib
 type NodeType struct {
 	DerivedFrom  string                          `yaml:"derived_from,omitempty" json:"derived_from"`           // An optional parent Node Type name this new Node Type derives from
 	Description  string                          `yaml:"description,omitempty" json:"description"`             // An optional description for the Node Type
-	Properties   map[string]PropertyAssignment   `yaml:"properties,omitempty" json:"properties,omitempty"`     // An optional list of property definitions for the Node Type.
+	Properties   map[string]PropertyDefinition   `yaml:"properties,omitempty" json:"properties,omitempty"`     // An optional list of property definitions for the Node Type.
 	Attributes   map[string]AttributeDefinition  `yaml:"attributes,omitempty" json:"attributes,omitempty"`     // An optional list of attribute definitions for the Node Type.
 	Requirements []map[string]interface{}        `yaml:"requirements,omitempty" json:"requirements,omitempty"` // An optional sequenced list of requirement definitions for the Node Type
 	Capabilities map[string]CapabilityDefinition `yaml:"capabilities,omitempty" json:"capabilities,omitempty"` // An optional list of capability definitions for the Node Type

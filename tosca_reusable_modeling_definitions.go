@@ -1,10 +1,5 @@
 package toscalib
 
-import (
-	"errors"
-	"strings"
-)
-
 // Status is used in the PropertyDefinition
 type Status int64
 
@@ -15,58 +10,6 @@ const (
 	Experimental Status = 3
 	Deprecated   Status = 4
 )
-
-// ConstraintClause definition as described in Appendix 5.2.
-// This is a map where the index is a string that may have a value in
-// {"equal","greater_than", ...} (see Appendix 5.2) a,s value is an interface
-// for the definition.
-// Example: ConstraintClause may be [ "greater_than": 3 ]
-type ConstraintClause struct {
-	ValidValues []string `yaml:"valid_values,omitempty" json:"valid_values,omitempty"`
-}
-
-// Evaluate the constraint and return a boolean
-func (constraint *ConstraintClause) Evaluate(interface{}) bool { return true }
-
-// UnmarshalYAML TODO: implement the Mashaler YAML interface for the constraint type
-func (constraint *ConstraintClause) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var constraintString string
-	err := unmarshal(&constraintString)
-	if err != nil {
-		return err
-	}
-	// Check if the constraints has at least two fields
-	constraints := strings.Fields(constraintString)
-	if len(constraints) < 2 {
-		return errors.New("Not a TOSCA constraint")
-	}
-	// Check if the constraint is ok
-	switch constraints[0] {
-	case "equal", "greater_than", "greater_or_equal", "less_than", "less_or_equal", "in_range", "valid_values", "length", "min_length", "max_length", "pattern":
-	default:
-		return errors.New("Not a valid constraint")
-	}
-	//*constraint = ConstraintClause(constraintString)
-	return nil
-}
-
-// PropertyDefinition as described in Appendix 5.7:
-// A property definition defines a named, typed value and related data
-// that can be associated with an entity defined in this specification
-// (e.g., Node Types, Relation ship Types, Capability Types, etc.).
-// Properties are used by template authors to provide input values to
-// TOSCA entities which indicate their “desired state” when they are instantiated.
-// The value of a property can be retrieved using the
-// get_property function within TOSCA Service Templates
-type PropertyDefinition struct {
-	Type        string                `yaml:"type" json:"type"`                                   // The required data type for the property
-	Description string                `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the property.
-	Required    bool                  `yaml:"required,omitempty" json:"required,omitempty"`       // An optional key that declares a property as required ( true) or not ( false) Default: true
-	Default     string                `yaml:"default,omitempty" json:"default,omitempty"`
-	Status      Status                `yaml:"status,omitempty" json:"status,omitempty"`
-	Constraints []map[string][]string `yaml:"constraints,omitempty,flow" json:"constraints,omitempty"`
-	EntrySchema string                `yaml:"entry_schema,omitempty" json:"entry_schema,omitempty"`
-}
 
 // AttributeDefinition is a structure describing the property assignmenet in the node template
 // This notion is described in appendix 5.9 of the document
@@ -80,11 +23,11 @@ type AttributeDefinition struct {
 
 // Input corresponds to  `yaml:"inputs,omitempty" json:"inputs,omitempty"`
 type Input struct {
-	Type             string           `yaml:"type" json:"type"`
-	Description      string           `yaml:"description,omitempty" json:"description,omitempty"` // Not required
-	Constraints      ConstraintClause `yaml:"constraints,omitempty,inline" json:"constraints,omitempty,inline"`
-	ValidSourceTypes interface{}      `yaml:"valid_source_types,omitempty" json:"valid_source_types,omitempty"`
-	Occurrences      interface{}      `yaml:"occurrences,omitempty" json:"occurrences,omitempty"`
+	Type             string      `yaml:"type" json:"type"`
+	Description      string      `yaml:"description,omitempty" json:"description,omitempty"` // Not required
+	Constraints      Constraints `yaml:"constraints,omitempty,inline" json:"constraints,omitempty,inline"`
+	ValidSourceTypes interface{} `yaml:"valid_source_types,omitempty" json:"valid_source_types,omitempty"`
+	Occurrences      interface{} `yaml:"occurrences,omitempty" json:"occurrences,omitempty"`
 }
 
 // Output is the output of the topology
@@ -137,24 +80,6 @@ type CapabilityDefinition struct {
 	occurences         []string              `yaml:"occurences" json:"occurences"`
 }
 
-// A Property assignment is always a map, but the key may be value
-type PropertyAssignment map[string]string
-
-func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var s string
-	*p = make(map[string]string, 1)
-	if err := unmarshal(&s); err == nil {
-		(*p)["value"] = s
-		return nil
-	}
-	var m map[string]string
-	if err := unmarshal(&m); err != nil {
-		return err
-		*p = m
-	}
-	return nil
-}
-
 // ArtifactDefinition TODO: Appendix 5.5
 type ArtifactDefinition interface{}
 
@@ -167,7 +92,7 @@ type NodeFilter interface{}
 type DataType struct {
 	DerivedFrom string                        `yaml:"derived_from,omitempty" json:"derived_from,omitempty"` // The optional key used when a datatype is derived from an existing TOSCA Data Type.
 	Description string                        `yaml:"description,omitempty" json:"description,omitempty"`   // The optional description for the Data Type.
-	Constraints []ConstraintClause            `yaml:"constraints" json:"constraints"`                       // The optional list of sequenced constraint clauses for the Data Type.
+	Constraints Constraints                   `yaml:"constraints" json:"constraints"`                       // The optional list of sequenced constraint clauses for the Data Type.
 	Properties  map[string]PropertyDefinition `yaml:"properties" json:"properties"`                         // The optional list property definitions that comprise the schema for a complex Data Type in TOSCA.
 }
 
