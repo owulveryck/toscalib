@@ -124,35 +124,20 @@ node_types:
           occurrences: [0, UNBOUNDED] 
           description: Connection to one or more load balanced applications
   tosca.nodes.ObjectStorage:
-  
     derived_from: tosca.nodes.Root
-  
     properties:
-  
       name:
-  
         type: string
-  
       size:
-  
         type: scalar-unit.size
-  
         constraints:
-  
           - greater_or_equal: 0 GB
-  
       maxsize:
-  
         type: scalar-unit.size
-  
         constraints:
-  
           - greater_or_equal: 0 GB
-  
     capabilities:
-  
       storage_endpoint:
-  
         type: tosca.capabilities.Endpoint
   tosca.nodes.Root:
     description: The TOSCA Node Type all other TOSCA base Node Types derive from
@@ -170,8 +155,8 @@ node_types:
       - dependency:
           capability: tosca.capabilities.Node
           node: tosca.nodes.Root
-                   relationship: tosca.relationships.DependsOn
-                   occurrences: [ 0, UNBOUNDED ]
+          relationship: tosca.relationships.DependsOn
+          occurrences: [ 0, UNBOUNDED ]
     interfaces:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
