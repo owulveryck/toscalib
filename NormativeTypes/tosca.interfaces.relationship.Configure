@@ -11,7 +11,6 @@ tosca.interfaces.relationship.Configure:
     description: Operation to notify the source node of a target node being added via a relationship.
   add_source:
     description: Operation to notify the target node of a source node which is now available via a relationship.
-    description:
   target_changed:
     description: Operation to notify source some property or attribute of the target changed
   remove_target:
