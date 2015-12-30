@@ -1,9 +1,5 @@
 package toscalib
 
-import (
-	"log"
-)
-
 type Value string
 
 //Constraints is an array of ConstraintClause
@@ -29,7 +25,6 @@ func (constraint *ConstraintClause) Evaluate(interface{}) bool { return true }
 
 // UnmarshalYAML TODO: implement the Mashaler YAML interface for the constraint type
 func (constraint *ConstraintClause) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	log.Println("Entering ConstraintClause UnmarshalYAML")
 	var c map[string]interface{}
 	err := unmarshal(&c)
 	if err != nil {
