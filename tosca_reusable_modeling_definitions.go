@@ -59,16 +59,6 @@ type RequirementRelationship struct {
 
 }
 
-// CapabilityDefinition TODO: Appendix 6.1
-type CapabilityDefinition struct {
-	Type               string                `yaml:"type" json:"type"`                                    //  The required name of the Capability Type the capability definition is based upon.
-	Description        string                `yaml:"description,omitempty" jsson:"description,omitempty"` // The optional description of the Capability definition.
-	Properties         []PropertyDefinition  `yaml:"properties,omitempty" json:"properties,omitempty"`    //  An optional list of property definitions for the Capability definition.
-	Attributes         []AttributeDefinition `yaml:"attributes" json:"attributes"`                        // An optional list of attribute definitions for the Capability definition.
-	valid_source_types []string              `yaml:"valid_source_types" json:"valid_source_types"`        // A`n optional list of one or more valid names of Node Types that are supported as valid sources of any relationship established to the declared Capability Type.
-	occurences         []string              `yaml:"occurences" json:"occurences"`
-}
-
 // ArtifactDefinition TODO: Appendix 5.5
 type ArtifactDefinition interface{}
 
@@ -116,11 +106,6 @@ type RepositoryDefinition struct {
 // A Relationship Type is a reusable entity that defines the type of one or more relationships between Node Types or Node Templates.
 // TODO
 type RelationshipType interface{}
-
-// CapabilityType as described in appendix 6.6
-//A Capability Type is a reusable entity that describes a kind of capability that a Node Type can declare to expose.  Requirements (implicit or explicit) that are declared as part of one node can be matched to (i.e., fulfilled by) the Capabilities declared by another node.
-// TODO
-type CapabilityType interface{}
 
 // ArtifactType as described in appendix 6.3
 //An Artifact Type is a reusable entity that defines the type of one or more files which Node Types or Node Templates can have dependent relationships and used during operations such as during installation or deployment.
