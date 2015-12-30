@@ -1,7 +1,5 @@
 package toscalib
 
-import "log"
-
 // InterfaceType as described in Appendix A 6.4
 // An Interface Type is a reusable entity that describes a set of operations that can be used to interact with or manage a node or relationship in a TOSCA topology.
 type InterfaceType struct {
@@ -22,7 +20,6 @@ type OperationDefinition struct {
 }
 
 func (i *OperationDefinition) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	log.Println("Unmarshal")
 	var s string
 	if err := unmarshal(&s); err == nil {
 		i.Implementation = s
