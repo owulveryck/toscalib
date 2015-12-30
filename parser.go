@@ -218,7 +218,7 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 	for _, normType := range []string{"interface_types", "relationship_types", "node_types", "capability_types"} {
 		data, err := Asset(normType)
 		if err != nil {
-			log.Println("Normative type not found")
+			log.Panic("Normative type not found")
 			return err
 		}
 		var tt ServiceTemplateDefinition
@@ -230,7 +230,6 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 	}
 	for _, im := range std.Imports {
 		var tt ServiceTemplateDefinition
-		log.Println("Importing ", im)
 		r, err := ioutil.ReadFile(im)
 		if err != nil {
 			log.Fatal(err)
