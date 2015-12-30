@@ -1,4 +1,6 @@
-relationship_types
+tosca_definitions_version: tosca_simple_yaml_1_0_0
+
+relationship_types:
   tosca.relationships.AttachesTo:
     derived_from: tosca.relationships.Root
     valid_target_types: [ tosca.capabilities.Attachment ]
