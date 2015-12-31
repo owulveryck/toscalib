@@ -15,6 +15,7 @@ func main() {
 
 	e := toscalib.GeneratePlaybook(t)
 	for i, n := range e.Index {
+		log.Println(n)
 		log.Printf("[%v] %v:%v -> %v %v",
 			i,
 			n.NodeTemplate.Name,
