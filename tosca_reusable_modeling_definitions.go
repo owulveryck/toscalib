@@ -10,15 +10,6 @@ type AttributeDefinition struct {
 	EntrySchema interface{} `yaml:"entry_schema,omitempty" json:"-"`                    // The optional key that is used to declare the name of the Datatype definition for entries of set types such as the TOSCA list or map.
 }
 
-// Input corresponds to  `yaml:"inputs,omitempty" json:"inputs,omitempty"`
-type Input struct {
-	Type             string      `yaml:"type" json:"type"`
-	Description      string      `yaml:"description,omitempty" json:"description,omitempty"` // Not required
-	Constraints      Constraints `yaml:"constraints,omitempty" json:"constraints,omitempty"`
-	ValidSourceTypes interface{} `yaml:"valid_source_types,omitempty" json:"valid_source_types,omitempty"`
-	Occurrences      interface{} `yaml:"occurrences,omitempty" json:"occurrences,omitempty"`
-}
-
 // Output is the output of the topology
 type Output struct {
 	Value       map[string]interface{} `yaml:"value" json:"value"`
