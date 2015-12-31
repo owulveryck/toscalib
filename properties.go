@@ -1,5 +1,9 @@
 package toscalib
 
+import (
+	"fmt"
+)
+
 // PropertyDefinition as described in Appendix 5.7:
 // A property definition defines a named, typed value and related data
 // that can be associated with an entity defined in this specification
@@ -19,19 +23,30 @@ type PropertyDefinition struct {
 }
 
 // A Property assignment is always a map, but the key may be value
-type PropertyAssignment map[string]string
+type PropertyAssignment map[string][]string
 
 func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
-	*p = make(map[string]string, 1)
+	*p = make(map[string][]string, 1)
 	if err := unmarshal(&s); err == nil {
-		(*p)["value"] = s
+		(*p)["value"] = append([]string{}, s)
 		return nil
 	}
 	var m map[string]string
 	if err := unmarshal(&m); err != nil {
-		return err
-		*p = m
+		for k, v := range m {
+			(*p)[k] = append([]string{}, v)
+		}
+		return nil
 	}
-	return nil
+	var mm map[string][]string
+	if err := unmarshal(&mm); err != nil {
+		for k, v := range mm {
+			(*p)[k] = v
+		}
+		return nil
+	}
+	var res interface{}
+	unmarshal(&res)
+	return fmt.Errorf("Cannot parse Property %v", res)
 }
