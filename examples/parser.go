@@ -15,6 +15,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	e := toscalib.GeneratePlaybook(t)
+	log.Println(e)
 	for nn, nt := range t.TopologyTemplate.NodeTemplates {
 		fmt.Println(nn)
 		for _, intf := range nt.Interfaces {
@@ -30,5 +32,4 @@ func main() {
 			}
 			fmt.Println(string(o))
 	*/
-
 }
