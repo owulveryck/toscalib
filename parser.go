@@ -6,6 +6,8 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
+	"net/url"
 )
 
 // NodeGap is the gap between each node see @fillAdjacencyMatrix for explanation
@@ -225,11 +227,44 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 		std = merge(std, tt)
 	}
 	for _, im := range std.Imports {
-		var tt ServiceTemplateDefinition
-		r, err := ioutil.ReadFile(im)
+		u, err := url.Parse(im)
 		if err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
+		var r []byte
+		switch u.Scheme {
+		case "http":
+			res, err := http.Get(u.String())
+			if err != nil {
+				log.Fatal(err)
+
+			}
+			r, err = ioutil.ReadAll(res.Body)
+			res.Body.Close()
+			if err != nil {
+				log.Fatal(err)
+
+			}
+		case "https":
+			res, err := http.Get(u.String())
+			if err != nil {
+				log.Fatal(err)
+
+			}
+			r, err = ioutil.ReadAll(res.Body)
+			res.Body.Close()
+			if err != nil {
+				log.Fatal(err)
+
+			}
+		default:
+			r, err = ioutil.ReadFile(im)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		var tt ServiceTemplateDefinition
+
 		err = yaml.Unmarshal(r, &tt)
 		if err != nil {
 			log.Fatal(err)
