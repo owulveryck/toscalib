@@ -1,5 +1,12 @@
 package toscalib
 
 type ExecutionPlan struct {
-	Index map[int]*NodeTemplate
+	AdjacencyMatrix Matrix
+	Index           map[int]*NodeTemplate
+}
+
+func GenerateExecutionPlan(s ServiceTemplateDefinition) ExecutionPlan {
+	var e ExecutionPlan
+
+	return e
 }
