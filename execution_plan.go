@@ -9,6 +9,7 @@ type Playbook struct {
 
 type Play struct {
 	NodeTemplate  NodeTemplate
+	InterfaceName string
 	OperationName string
 }
 
@@ -17,9 +18,9 @@ func GeneratePlaybook(s ServiceTemplateDefinition) Playbook {
 	i := 0
 	index := make(map[int]Play, 0)
 	for _, node := range s.TopologyTemplate.NodeTemplates {
-		for _, intf := range node.Interfaces {
+		for intfn, intf := range node.Interfaces {
 			for op, _ := range intf.Operations {
-				index[i] = Play{node, op}
+				index[i] = Play{node, intfn, op}
 				i += 1
 			}
 		}
