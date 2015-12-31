@@ -1,5 +1,10 @@
 package toscalib
 
+import (
+	"fmt"
+	"regexp"
+)
+
 // NodeTemplate as described in Appendix 7.3
 // A Node Template specifies the occurrence of a manageable software component as part of an application’s topology model which is defined in a TOSCA Service Template.  A Node template is an instance of a specified Node Type and can provide customized properties, constraints or operations which override the defaults provided by its Node Type and its implementations.
 type NodeTemplate struct {
@@ -15,4 +20,45 @@ type NodeTemplate struct {
 	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty" json:"-" json:"node_filter,omitempty"`   // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
 	Id           int                                `yaml:"tosca_id,omitempty" json:"id" json:"tosca_id,omitempty"`        // From tosca.nodes.Root: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
 	Name         string                             `yaml:"toca_name,omitempty" json:"-" json:"toca_name,omitempty"`       // From tosca.nodes.root This attribute reflects the name of the Node Template as defined in the TOSCA service template.  This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+}
+
+func (n *NodeTemplate) getInterface() (string, InterfaceType, error) {
+	for name, value := range n.Interfaces {
+		return name, value, nil
+	}
+	return "", InterfaceType{}, fmt.Errorf("No Interface found")
+}
+
+// fillInterface Completes the interface of the node with any values found in its type
+// All the Operations will be filled
+func (n *NodeTemplate) fillInterface(s ServiceTemplateDefinition) {
+	name, intf, err := n.getInterface()
+	if err != nil {
+		return
+	}
+	nt := s.NodeTypes[n.Type]
+	_, intf2, _ := nt.getInterface()
+	re := regexp.MustCompile(fmt.Sprintf("%v$", name))
+	operations := make(map[string]OperationDefinition, 0)
+	for ifacename, iface := range s.InterfaceTypes {
+		if re.MatchString(ifacename) {
+			for op, _ := range iface.Operations {
+				v, ok := intf.Operations[op]
+				_, ok2 := intf2[op]
+				switch {
+				case !ok && ok2:
+					operations[op] = OperationDefinition{nil, intf2[op].Description, intf2[op].Implementation}
+				case ok:
+					operations[op] = v
+				default:
+				}
+				tmp := InterfaceType{n.Interfaces[name].Description, n.Interfaces[name].Version, operations, n.Interfaces[name].Inputs}
+				n.Interfaces[name] = tmp
+			}
+		}
+	}
+}
+
+func (n *NodeTemplate) SetName(name string) {
+	n.Name = name
 }
