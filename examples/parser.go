@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"github.com/owulveryck/toscalib"
-	//"gopkg.in/yaml.v2"
 	"log"
 	"os"
 )
