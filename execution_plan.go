@@ -17,7 +17,8 @@ func GeneratePlaybook(s ServiceTemplateDefinition) Playbook {
 	var e Playbook
 	i := 0
 	index := make(map[int]Play, 0)
-	for _, node := range s.TopologyTemplate.NodeTemplates {
+	for nn, node := range s.TopologyTemplate.NodeTemplates {
+		node.Name = nn
 		for intfn, intf := range node.Interfaces {
 			for op, _ := range intf.Operations {
 				index[i] = Play{node, intfn, op}
