@@ -274,15 +274,16 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 	// Free the imports
 	std.Imports = []string{}
 	*t = std
-	for _, node := range t.TopologyTemplate.NodeTemplates {
+	for name, node := range t.TopologyTemplate.NodeTemplates {
 		node.fillInterface(*t)
+		node.setRefs(t)
+		node.setName(name)
 	}
 
 	err = t.fillAdjacencyMatrix()
 	// fill in the name of the template inside the template itself
 	for n, _ := range t.TopologyTemplate.NodeTemplates {
 		nt := t.GetNodeTemplate(n)
-		nt.SetName(n)
 		t.TopologyTemplate.NodeTemplates[n] = *nt
 
 	}

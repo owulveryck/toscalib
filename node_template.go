@@ -20,6 +20,27 @@ type NodeTemplate struct {
 	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty" json:"-" json:"node_filter,omitempty"`   // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
 	Id           int                                `yaml:"tosca_id,omitempty" json:"id" json:"tosca_id,omitempty"`        // From tosca.nodes.Root: A unique identifier of the realized instance of a Node Template that derives from any TOSCA normative type.
 	Name         string                             `yaml:"toca_name,omitempty" json:"-" json:"toca_name,omitempty"`       // From tosca.nodes.root This attribute reflects the name of the Node Template as defined in the TOSCA service template.  This name is not unique to the realized instance model of corresponding deployed application as each template in the model can result in one or more instances (e.g., scaled) when orchestrated to a provider environment.
+	Refs         struct {
+		Type       *NodeType        `yaml:"-",json:"-"`
+		Interfaces []*InterfaceType `yaml:"-",json:"-"`
+	} `yaml:"-",json:"-"`
+}
+
+// setRefs fills in the references of the node
+func (n *NodeTemplate) setRefs(s *ServiceTemplateDefinition) {
+	for name, _ := range n.Interfaces {
+		re := regexp.MustCompile(fmt.Sprintf("^%v$", name))
+		for na, v := range s.InterfaceTypes {
+			if re.MatchString(na) {
+				n.Refs.Interfaces = append(n.Refs.Interfaces, &v)
+			}
+		}
+	}
+	for na, v := range s.NodeTypes {
+		if na == n.Type {
+			n.Refs.Type = &v
+		}
+	}
 }
 
 func (n *NodeTemplate) getInterface() (string, InterfaceType, error) {
@@ -59,6 +80,6 @@ func (n *NodeTemplate) fillInterface(s ServiceTemplateDefinition) {
 	}
 }
 
-func (n *NodeTemplate) SetName(name string) {
+func (n *NodeTemplate) setName(name string) {
 	n.Name = name
 }
