@@ -10,7 +10,7 @@ import (
 	"regexp"
 )
 
-// NodeGap is the gap between each node see @FillAdjacencyMatrix for explanation
+// NodeGap is the gap between each node see @fillAdjacencyMatrix for explanation
 const nodeGap int = 10
 
 // GetInitialIndex return the index of the initial state of the node in the AdjacencyMatrix
@@ -47,9 +47,9 @@ func (n *NodeTemplate) getInterface() (string, InterfaceType, error) {
 	return "", InterfaceType{}, fmt.Errorf("No Interface found")
 }
 
-// FillInterface Completes the interface of the node with any values found in its type
+// fillInterface Completes the interface of the node with any values found in its type
 // All the Operations will be filled
-func (n *NodeTemplate) FillInterface(s ServiceTemplateDefinition) {
+func (n *NodeTemplate) fillInterface(s ServiceTemplateDefinition) {
 	name, intf, err := n.getInterface()
 	if err != nil {
 		return
@@ -100,9 +100,9 @@ func (toscaStructure *ServiceTemplateDefinition) GetNodeTemplateFromId(nodeId in
 	return nil
 }
 
-// FillAdjacencyMatrix fills the adjacency matrix AdjacencyMatrix in the current ServiceTemplateDefinition structure
+// fillAdjacencyMatrix fills the adjacency matrix AdjacencyMatrix in the current ServiceTemplateDefinition structure
 // for more information, see doc/node_instanciation_lifecycle.md
-func (toscaStructure *ServiceTemplateDefinition) FillAdjacencyMatrix() error {
+func (toscaStructure *ServiceTemplateDefinition) fillAdjacencyMatrix() error {
 	// Get the number of nodes
 	numberOfNodes := len(toscaStructure.TopologyTemplate.NodeTemplates)
 	// Initialize the AdjacencyMatrix
@@ -290,11 +290,11 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 	std.Imports = []string{}
 	*t = std
 	for _, node := range t.TopologyTemplate.NodeTemplates {
-		node.FillInterface(*t)
+		node.fillInterface(*t)
 	}
 
-	err = t.FillAdjacencyMatrix()
-	// Fill in the name of the template inside the template itself
+	err = t.fillAdjacencyMatrix()
+	// fill in the name of the template inside the template itself
 	for n, _ := range t.TopologyTemplate.NodeTemplates {
 		nt := t.GetNodeTemplate(n)
 		nt.SetName(n)
