@@ -17,9 +17,16 @@ if err != nil {
 }
 ```
 
+## Projects
+
+* [gorchestrator](https://github.com/owulveryck/gorchestrator) is implementing thos toscalib for one of its client.
+
 # Test
 I try as much as possible to develop some tests that may be run with `go test`.
  
 # API
 [![GoDoc](https://godoc.org/github.com/owulveryck/toscalib?status.svg)](https://godoc.org/github.com/owulveryck/toscalib)
 
+# Legacy
+
+This API is in complete rewrite, for the old version, please checkout the "v1" branch
