@@ -12,7 +12,7 @@ Create a `ServiceTemplateDefinition` and call `Parse(r io.Reader)` to fill it wi
 
 ## Example
 
-```golang
+```go
 var t toscalib.ServiceTemplateDefinition
 err := t.Parse(os.Stdin)
 if err != nil {
