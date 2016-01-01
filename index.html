@@ -4,73 +4,104 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Toscalib by owulveryck</title>
-
     <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
     <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
   <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/owulveryck/toscalib">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/owulveryck/toscalib/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/owulveryck/toscalib/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
     <div class="wrapper">
-      <header>
-        <h1 class="header">Toscalib</h1>
-        <p class="header">A go implementation of the TOSCA Yaml specifications</p>
 
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/owulveryck/toscalib/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/owulveryck/toscalib/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/owulveryck/toscalib">View On GitHub</a></li>
-        </ul>
-
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/owulveryck">owulveryck</a></p>
-
-
-      </header>
       <section>
+        <div id="title">
+          <h1>Toscalib</h1>
+          <p>A go implementation of the TOSCA Yaml specifications</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/owulveryck">owulveryck</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
         <h1>
 <a id="abstract" class="anchor" href="#abstract" aria-hidden="true"><span class="octicon octicon-link"></span></a>Abstract</h1>
 
 <p>This library is an implementation of the TOSCA definition as described in the document written in pure GO
 <a href="http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html">TOSCA Simple Profile in YAML Version 1.0</a></p>
 
-<h1>
-<a id="how-to" class="anchor" href="#how-to" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to</h1>
+<h2>
+<a id="normative-types" class="anchor" href="#normative-types" aria-hidden="true"><span class="octicon octicon-link"></span></a>Normative Types</h2>
 
-<p>See the test files for example but most likely what you will do is:</p>
+<p>The normative types definitions are included de facto. The files are embeded using go-bindata.</p>
+
+<h1>
+<a id="howto" class="anchor" href="#howto" aria-hidden="true"><span class="octicon octicon-link"></span></a>Howto</h1>
+
+<p>Create a <code>ServiceTemplateDefinition</code> and call <code>Parse(r io.Reader)</code> to fill it with a YAML definition.</p>
+
+<h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<div class="highlight highlight-source-go"><pre><span class="pl-k">var</span> <span class="pl-smi">t</span> toscalib.<span class="pl-smi">ServiceTemplateDefinition</span>
+<span class="pl-smi">err</span> <span class="pl-k">:=</span> t.<span class="pl-c1">Parse</span>(os.<span class="pl-smi">Stdin</span>)
+<span class="pl-k">if</span> err != <span class="pl-c1">nil</span> {
+    log.<span class="pl-c1">Fatal</span>(err)
+}</pre></div>
+
+<h2>
+<a id="projects" class="anchor" href="#projects" aria-hidden="true"><span class="octicon octicon-link"></span></a>Projects</h2>
 
 <ul>
-<li>importing the library in your code</li>
-<li>Read a tosca yaml file as a byte array</li>
-<li>unmarshal the yaml document into the structure definied in this library</li>
-<li>play with it:</li>
+<li>
+<a href="https://github.com/owulveryck/gorchestrator">gorchestrator</a> is implementing thos toscalib for one of its client.</li>
 </ul>
 
-<div class="highlight highlight-source-go"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">"</span>github.com/owulveryck/toscalib<span class="pl-pds">"</span></span>
-...
-<span class="pl-smi">mystruct</span> <span class="pl-k">:=</span> <span class="pl-v">TopologyTemplateStruct</span>{}
-
-<span class="pl-smi">err</span> <span class="pl-k">:=</span> yaml.<span class="pl-c1">Unmarshal</span>([]<span class="pl-k">byte</span>(topologyExample), &amp;mystruct)
-<span class="pl-k">if</span> err != <span class="pl-c1">nil</span> {
-    t.<span class="pl-c1">Errorf</span>(<span class="pl-s"><span class="pl-pds">"</span>error: <span class="pl-c1">%v</span><span class="pl-pds">"</span></span>, err)
-}
-log.<span class="pl-c1">Printf</span>(<span class="pl-s"><span class="pl-pds">"</span>--- Result of the marshal:<span class="pl-cce">\n</span><span class="pl-c1">%v</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>, mystruct)
-
-<span class="pl-smi">d</span>, <span class="pl-smi">err</span> <span class="pl-k">:=</span> yaml.<span class="pl-c1">Marshal</span>(&amp;mystruct)
-<span class="pl-k">if</span> err != <span class="pl-c1">nil</span> {
-    t.<span class="pl-c1">Errorf</span>(<span class="pl-s"><span class="pl-pds">"</span>error: <span class="pl-c1">%v</span><span class="pl-pds">"</span></span>, err)
-}
-log.<span class="pl-c1">Printf</span>(<span class="pl-s"><span class="pl-pds">"</span><span class="pl-c1">%s</span><span class="pl-cce">\n\n</span><span class="pl-pds">"</span></span>, <span class="pl-c1">string</span>(d))
-</pre></div>
-
-<p>and then simply <code>go get github.com/owulveryck/toscalib</code></p>
-
 <h1>
-<a id="test" class="anchor" href="#test" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test</h1>
+<a id="status" class="anchor" href="#status" aria-hidden="true"><span class="octicon octicon-link"></span></a>Status</h1>
 
-<p>I try as much as possible to develop some tests that may be run with <code>go test</code>.</p>
+<h2>
+<a id="test" class="anchor" href="#test" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test</h2>
+
+<p>The basic tests function are taking all the examples of the standard and try to parse them.
+No verification is done, but by now, I don't have any error in the parsing of any file.</p>
+
+<h3>
+<a id="coverage" class="anchor" href="#coverage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Coverage</h3>
+
+<div class="highlight highlight-source-shell"><pre>github.com/owulveryck/toscalib/capabilities.go:14:              UnmarshalYAML           94.1%
+github.com/owulveryck/toscalib/constraints.go:9:                IsValid                 0.0%
+github.com/owulveryck/toscalib/constraints.go:24:               Evaluate                0.0%
+github.com/owulveryck/toscalib/constraints.go:27:               UnmarshalYAML           90.9%
+github.com/owulveryck/toscalib/interfaces.go:22:                UnmarshalYAML           90.9%
+github.com/owulveryck/toscalib/interfaces.go:55:                UnmarshalYAML           90.9%
+github.com/owulveryck/toscalib/node_template.go:29:             setRefs                 87.5%
+github.com/owulveryck/toscalib/node_template.go:45:             getInterface            100.0%
+github.com/owulveryck/toscalib/node_template.go:54:             fillInterface           94.1%
+github.com/owulveryck/toscalib/node_template.go:82:             setName                 100.0%
+github.com/owulveryck/toscalib/node_type.go:21:                 getInterface            100.0%
+github.com/owulveryck/toscalib/parser.go:14:                    GetNodeTemplate         0.0%
+github.com/owulveryck/toscalib/parser.go:24:                    merge                   86.0%
+github.com/owulveryck/toscalib/parser.go:92:                    Parse                   67.3%
+github.com/owulveryck/toscalib/properties.go:28:                UnmarshalYAML           72.2%
+github.com/owulveryck/toscalib/requirements.go:12:              UnmarshalYAML           93.3%
+github.com/owulveryck/toscalib/service_template.go:27:          Bytes                   0.0%
+github.com/owulveryck/toscalib/service_template.go:33:          String                  0.0%
+github.com/owulveryck/toscalib/tosca_namespace_alias.go:96:     UnmarshalYAML           0.0%</pre></div>
 
 <h1>
 <a id="api" class="anchor" href="#api" aria-hidden="true"><span class="octicon octicon-link"></span></a>API</h1>
@@ -78,22 +109,13 @@ log.<span class="pl-c1">Printf</span>(<span class="pl-s"><span class="pl-pds">"<
 <p><a href="https://godoc.org/github.com/owulveryck/toscalib"><img src="https://godoc.org/github.com/owulveryck/toscalib?status.svg" alt="GoDoc"></a></p>
 
 <h1>
-<a id="future" class="anchor" href="#future" aria-hidden="true"><span class="octicon octicon-link"></span></a>Future</h1>
+<a id="legacy" class="anchor" href="#legacy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Legacy</h1>
 
-<p>This library may be used to:</p>
-
-<ul>
-<li>create a TOSCA orchestrator</li>
-<li>create a view tool that display the dependency diagram of a TOSCA file</li>
-<li>implement a plugin for well known orchestrators such as <a href="https://www.openstack.org/">openstack</a> or <a href="http://getcloudify.org/">cloudify</a>
-</li>
-</ul>
+<p>This API is in complete rewrite, for the old version, please checkout the "v1" branch</p>
       </section>
-      <footer>
-        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
-      </footer>
+
     </div>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+    
   </body>
 </html>
