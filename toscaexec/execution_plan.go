@@ -34,7 +34,7 @@ func (i Index) getID(nodeName, operationName string) (int, error) {
 // OperationTarget is the target of the operation if the operation is relative to a relationship
 // in cas of a normal node operation, target is "self", otherwise it's the node template(s name)
 type Play struct {
-	NodeTemplate    *toscalib.NodeTemplate
+	NodeTemplate    toscalib.NodeTemplate
 	InterfaceName   string `yaml:"interface_name"`
 	OperationName   string `yaml:"operation_name"`
 	OperationTarget string `yaml:"operation_target"`
@@ -50,9 +50,10 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 		// FIXME Forces the node name because of a bug in the toscalib
 		node.Name = nn
 		// Fill in the SELF operations
+		list[node.Name] = append(list[node.Name], "noop")
 		for intfn, intf := range node.Interfaces {
 			for op, _ := range intf.Operations {
-				index[i] = Play{&node, intfn, op, "SELF"}
+				index[i] = Play{node, intfn, op, "SELF"}
 				list[node.Name] = append(list[node.Name], op)
 				i += 1
 			}
@@ -63,7 +64,7 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 				// intfn may be "Configure"
 				for n, it := range req.Relationship.Interfaces {
 					for intfn, _ := range it {
-						index[i] = Play{&node, n, intfn, req.Node}
+						index[i] = Play{node, n, intfn, req.Node}
 						list[node.Name] = append(list[node.Name], intfn)
 						i += 1
 					}
