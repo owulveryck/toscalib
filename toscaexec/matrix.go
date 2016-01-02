@@ -36,6 +36,15 @@ func (m *Matrix) isValid() error {
 	return nil
 }
 
+// New matrix of size s*s zero filled
+func (m *Matrix) New(s int) {
+	l := make([]int64, s*s)
+	for i := 0; i < s*s; i++ {
+		l[i] = 0
+	}
+	*m = Matrix(l)
+}
+
 // Dim returns the dimension of the matrix
 func (m *Matrix) Dim() int {
 	err := m.isValid()
