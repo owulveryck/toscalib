@@ -47,10 +47,10 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 	i := 0
 	index := make(Index, 0)
 	for nn, node := range s.TopologyTemplate.NodeTemplates {
+		list[nn] = make([]string, 0)
 		// FIXME Forces the node name because of a bug in the toscalib
 		node.Name = nn
 		// Fill in the SELF operations
-		list[node.Name] = append(list[node.Name], "noop")
 		for intfn, intf := range node.Interfaces {
 			for op, _ := range intf.Operations {
 				index[i] = Play{node, intfn, op, "SELF"}
@@ -73,7 +73,10 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 		}
 	}
 	// Now sort the operation lists
-	for _, l := range list {
+	for n, l := range list {
+		if len(l) == 0 {
+			list[n] = []string{"noop"}
+		}
 		sort.Sort(Lifecycle(l))
 	}
 	var m Matrix
@@ -85,10 +88,14 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 			for _, req := range p.NodeTemplate.Requirements {
 				for _, requ := range req {
 					src := Lifecycle(list[requ.Node]).getLast()
+					if src == "noop" {
+						// Link it to the its requirement
+					}
 					id, err := index.getID(requ.Node, src)
 					if err != nil {
 						log.Fatalf("1 Cannot find node %v, %v", requ.Node, src)
 					}
+					log.Printf("Linking %v and %v", index[id], index[cur])
 					m.Set(id, cur, 1)
 				}
 			}

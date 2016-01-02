@@ -17,6 +17,7 @@ var order = map[string]int{
 	"target_changed":        10,
 	"stop":                  11,
 	"delete":                12,
+	"noop":                  20,
 }
 
 func (s Lifecycle) Len() int {
