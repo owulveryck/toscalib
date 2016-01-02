@@ -40,11 +40,6 @@ type RepositoryDefinition struct {
 	Credential  CredentialDefinition `yaml:"credential" json:"credential"`                       // The optional Credential used to authorize access to the repository.
 }
 
-// RelationshipType as described in appendix 6.9
-// A Relationship Type is a reusable entity that defines the type of one or more relationships between Node Types or Node Templates.
-// TODO
-type RelationshipType interface{}
-
 // ArtifactType as described in appendix 6.3
 //An Artifact Type is a reusable entity that defines the type of one or more files which Node Types or Node Templates can have dependent relationships and used during operations such as during installation or deployment.
 // TODO
