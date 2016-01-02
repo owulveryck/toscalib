@@ -87,13 +87,14 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 		if l.isFirst(p.OperationName) {
 			for _, req := range p.NodeTemplate.Requirements {
 				for _, requ := range req {
-					src := Lifecycle(list[requ.Node]).getLast()
-					if src == "noop" {
+					node := requ.Node
+					op := Lifecycle(list[requ.Node]).getLast()
+					if op == "noop" {
 						// Link it to the its requirement
 					}
-					id, err := index.getID(requ.Node, src)
+					id, err := index.getID(node, op)
 					if err != nil {
-						log.Fatalf("1 Cannot find node %v, %v", requ.Node, src)
+						log.Fatalf("1 Cannot find node %v, %v", requ.Node, op)
 					}
 					log.Printf("Linking %v and %v", index[id], index[cur])
 					m.Set(id, cur, 1)
