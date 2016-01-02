@@ -18,6 +18,16 @@ type Playbook struct {
 
 type Index map[int]Play
 
+func (i Index) getNodeTemplate(nt string) (toscalib.NodeTemplate, error) {
+	for _, play := range i {
+		log.Printf("Func: %v = %v?", play.NodeTemplate.Name, nt)
+		if play.NodeTemplate.Name == nt {
+			return play.NodeTemplate, nil
+		}
+
+	}
+	return toscalib.NodeTemplate{}, fmt.Errorf("No node found")
+}
 func (i Index) getID(nodeName, operationName string) (int, error) {
 	for id, play := range i {
 		if play.NodeTemplate.Name == nodeName && play.OperationName == operationName {
@@ -85,20 +95,35 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 		l := Lifecycle(list[p.NodeTemplate.Name])
 		// If we are the first operation, link it to the last of the requirements
 		if l.isFirst(p.OperationName) {
-			for _, req := range p.NodeTemplate.Requirements {
-				for _, requ := range req {
-					node := requ.Node
-					op := Lifecycle(list[requ.Node]).getLast()
-					if op == "noop" {
-						// Link it to the its requirement
-					}
-					id, err := index.getID(node, op)
-					if err != nil {
-						log.Fatalf("1 Cannot find node %v, %v", requ.Node, op)
-					}
-					log.Printf("Linking %v and %v", index[id], index[cur])
-					m.Set(id, cur, 1)
+			var op string
+			op = "noop"
+			nt := p.NodeTemplate
+			var node string
+			for op == "noop" {
+				if len(nt.Requirements) == 0 {
+					break
 				}
+				for _, req := range nt.Requirements {
+					for _, requ := range req {
+						node = requ.Node
+						op = Lifecycle(list[requ.Node]).getLast()
+						log.Println(op)
+					}
+				}
+				var err error
+				nt, err = index.getNodeTemplate(node)
+				if err != nil {
+					log.Println(err)
+					break
+				}
+
+			}
+			id, err := index.getID(node, op)
+			if err != nil {
+				log.Println("1 Cannot find node %v, %v", node, op)
+			} else {
+				m.Set(id, cur, 1)
+
 			}
 		}
 		// Find the next operation
