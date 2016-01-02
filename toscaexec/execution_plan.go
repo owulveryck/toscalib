@@ -6,7 +6,7 @@ import (
 
 type Playbook struct {
 	AdjacencyMatrix Matrix
-	Index           map[int]Play
+	Index           map[int]Play `yaml:"plays"`
 	Inputs          map[string]toscalib.PropertyDefinition
 	Outputs         map[string]toscalib.Output
 }
@@ -19,9 +19,9 @@ type Playbook struct {
 // in cas of a normal node operation, target is "self", otherwise it's the node template(s name)
 type Play struct {
 	NodeTemplate    toscalib.NodeTemplate
-	InterfaceName   string
-	OperationName   string
-	OperationTarget string
+	InterfaceName   string `yaml:"interface_name"`
+	OperationName   string `yaml:"operation_name"`
+	OperationTarget string `yaml:"operation_target"`
 }
 
 //GeneratePlaybook generates an execution playbook for the ServiceTemplateDeifinition
@@ -40,15 +40,17 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 			}
 		}
 		// Fill in the configure operations
-		/*
-			for _, r := range node.Requirements {
-				for reqName, req := range r {
-
-
+		for _, r := range node.Requirements {
+			for _, req := range r {
+				// intfn may be "Configure"
+				for _, it := range req.Relationship.Interfaces {
+					for intfn, _ := range it {
+						index[i] = Play{node, "relationship", intfn, req.Node}
+						i += 1
+					}
 				}
-
 			}
-		*/
+		}
 	}
 	e.Index = index
 	e.Inputs = s.TopologyTemplate.Inputs
