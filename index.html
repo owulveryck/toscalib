@@ -1,43 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
     <title>Toscalib by owulveryck</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-dark.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
   </head>
+
   <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/owulveryck/toscalib">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/owulveryck/toscalib/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/owulveryck/toscalib/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
 
-    <div class="wrapper">
+    <header>
+      <div class="container">
+        <h1>Toscalib</h1>
+        <h2>A go implementation of the TOSCA Yaml specifications</h2>
 
-      <section>
-        <div id="title">
-          <h1>Toscalib</h1>
-          <p>A go implementation of the TOSCA Yaml specifications</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/owulveryck">owulveryck</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
-        </div>
+        <section id="downloads">
+          <a href="https://github.com/owulveryck/toscalib/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/owulveryck/toscalib/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/owulveryck/toscalib" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
 
+    <div class="container">
+      <section id="main_content">
         <h1>
 <a id="abstract" class="anchor" href="#abstract" aria-hidden="true"><span class="octicon octicon-link"></span></a>Abstract</h1>
 
@@ -64,7 +54,61 @@
 }</pre></div>
 
 <h2>
-<a id="projects" class="anchor" href="#projects" aria-hidden="true"><span class="octicon octicon-link"></span></a>Projects</h2>
+<a id="subprojects" class="anchor" href="#subprojects" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subprojects</h2>
+
+<h3>
+<a id="toscaexec" class="anchor" href="#toscaexec" aria-hidden="true"><span class="octicon octicon-link"></span></a>toscaexec</h3>
+
+<p>The package <code>github.com/owulveryck/toscalib/toscaexec</code> parses a <code>ServiceTemplateDefinition</code> and generates an execution plan
+that can be used by a TOSCA orchestrator.</p>
+
+<p>The main execution structure is a <a href="https://godoc.org/github.com/owulveryck/toscalib/toscaexec#Playbook">Playbook</a> and
+it is composed of several <a href="https://godoc.org/github.com/owulveryck/toscalib/toscaexec#Play">Play</a> referenced by their <code>ID</code> in
+an <a href="https://godoc.org/github.com/owulveryck/toscalib/toscaexec#Index">Index</a> map.</p>
+
+<p>The execution plan is represented by a directed graph via an adjacency matrix.
+A play can run if its vector col is zero. Otherwise it depends of the execution of all the tasks where a(row,col) =1.</p>
+
+<h4>
+<a id="example-1" class="anchor" href="#example-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>example</h4>
+
+<div class="highlight highlight-source-go"><pre><span class="pl-k">import</span> (
+    <span class="pl-s"><span class="pl-pds">"</span>github.com/owulveryck/toscalib<span class="pl-pds">"</span></span>
+    <span class="pl-s"><span class="pl-pds">"</span>github.com/owulveryck/toscalib/toscaexec<span class="pl-pds">"</span></span>
+)
+
+<span class="pl-k">var</span> <span class="pl-smi">t</span> toscalib.<span class="pl-smi">ServiceTemplateDefinition</span>
+t.<span class="pl-c1">Parse</span>(os.<span class="pl-smi">Stdin</span>)
+<span class="pl-smi">e</span> <span class="pl-k">:=</span> toscaexec.<span class="pl-c1">GeneratePlaybook</span>(t)
+<span class="pl-k">for</span> <span class="pl-smi">i</span>, <span class="pl-smi">n</span> <span class="pl-k">:=</span> <span class="pl-k">range</span> e.<span class="pl-smi">Index</span> {
+    log.<span class="pl-c1">Printf</span>(<span class="pl-s"><span class="pl-pds">"</span>[<span class="pl-c1">%v</span>] <span class="pl-c1">%v</span>:<span class="pl-c1">%v</span> -&gt; <span class="pl-c1">%v</span> <span class="pl-c1">%v</span><span class="pl-pds">"</span></span>,
+        i,
+        n.<span class="pl-smi">NodeTemplate</span>.<span class="pl-smi">Name</span>,
+        n.<span class="pl-smi">OperationName</span>,
+        n.<span class="pl-smi">NodeTemplate</span>.<span class="pl-smi">Interfaces</span>[n.<span class="pl-smi">InterfaceName</span>].<span class="pl-smi">Operations</span>[n.<span class="pl-smi">OperationName</span>].<span class="pl-smi">Implementation</span>,
+        n.<span class="pl-smi">NodeTemplate</span>.<span class="pl-smi">Interfaces</span>[n.<span class="pl-smi">InterfaceName</span>].<span class="pl-smi">Operations</span>[n.<span class="pl-smi">OperationName</span>].<span class="pl-smi">Inputs</span>,
+    )
+}</pre></div>
+
+<h3>
+<a id="tosca2dot" class="anchor" href="#tosca2dot" aria-hidden="true"><span class="octicon octicon-link"></span></a>tosca2dot</h3>
+
+<p>tosca2dot is a package helpful to generate a graphical representation of TOSCA structure and execution plan.</p>
+
+<h4>
+<a id="example-2" class="anchor" href="#example-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>example</h4>
+
+<div class="highlight highlight-source-go"><pre><span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">"</span>github.com/owulveryck/toscalib/tosca2dot<span class="pl-pds">"</span></span>
+...
+<span class="pl-k">var</span> <span class="pl-smi">e</span> toscaexec <span class="pl-v">Playbook</span>
+...
+<span class="pl-smi">s</span> <span class="pl-k">:=</span> tosca2dot.<span class="pl-c1">GetDot</span>(e)
+fmt.<span class="pl-c1">Println</span>(s)</pre></div>
+
+<div class="highlight highlight-source-shell"><pre>cat tosca_elk.yaml <span class="pl-k">|</span> go run example.go <span class="pl-k">|</span> dot -T svg <span class="pl-k">&gt;</span> tosca_elk.svg</pre></div>
+
+<h2>
+<a id="other-projects-related-to-tosca" class="anchor" href="#other-projects-related-to-tosca" aria-hidden="true"><span class="octicon octicon-link"></span></a>Other projects related to TOSCA</h2>
 
 <ul>
 <li>
@@ -113,9 +157,8 @@ github.com/owulveryck/toscalib/tosca_namespace_alias.go:96:     UnmarshalYAML   
 
 <p>This API is in complete rewrite, for the old version, please checkout the "v1" branch</p>
       </section>
-
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
     
   </body>
 </html>
