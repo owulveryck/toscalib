@@ -20,7 +20,62 @@ if err != nil {
 }
 ```
 
-## Projects
+## Subprojects
+
+### toscaexec
+
+The package `github.com/owulveryck/toscalib/toscaexec` parses a `ServiceTemplateDefinition` and generates an execution plan
+that can be used by a TOSCA orchestrator.
+
+The main execution structure is a [Playbook](https://godoc.org/github.com/owulveryck/toscalib/toscaexec#Playbook) and
+it is composed of several [Play](https://godoc.org/github.com/owulveryck/toscalib/toscaexec#Play) referenced by their `ID` in
+an [Index](https://godoc.org/github.com/owulveryck/toscalib/toscaexec#Index) map.
+
+The execution plan is represented by a directed graph via an adjacency matrix.
+A play can run if its vector col is zero. Otherwise it depends of the execution of all the tasks where a(row,col) =1.
+
+#### example
+
+```go
+import (
+    "github.com/owulveryck/toscalib"
+    "github.com/owulveryck/toscalib/toscaexec"
+)
+
+var t toscalib.ServiceTemplateDefinition
+t.Parse(os.Stdin)
+e := toscaexec.GeneratePlaybook(t)
+for i, n := range e.Index {
+    log.Printf("[%v] %v:%v -> %v %v",
+        i,
+        n.NodeTemplate.Name,
+        n.OperationName,
+        n.NodeTemplate.Interfaces[n.InterfaceName].Operations[n.OperationName].Implementation,
+        n.NodeTemplate.Interfaces[n.InterfaceName].Operations[n.OperationName].Inputs,
+    )
+}
+```
+
+### tosca2dot
+
+tosca2dot is a package helpful to generate a graphical representation of TOSCA structure and execution plan.
+
+#### example
+
+```go
+import "github.com/owulveryck/toscalib/tosca2dot"
+...
+var e toscaexec Playbook
+...
+s := tosca2dot.GetDot(e)
+fmt.Println(s)
+```
+
+```shell
+cat tosca_elk.yaml | go run example.go | dot -T svg > tosca_elk.svg
+```
+
+## Other projects related to TOSCA
 
 * [gorchestrator](https://github.com/owulveryck/gorchestrator) is implementing thos toscalib for one of its client.
 
