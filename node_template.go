@@ -52,11 +52,28 @@ func (n *NodeTemplate) getInterface() (string, InterfaceType, error) {
 // fillInterface Completes the interface of the node with any values found in its type
 // All the Operations will be filled
 func (n *NodeTemplate) fillInterface(s ServiceTemplateDefinition) {
+	nt := s.NodeTypes[n.Type]
 	name, intf, err := n.getInterface()
 	if err != nil {
+		// If no interface is found, take the one frome the node type
+		var myInterfaces map[string]InterfaceType
+		myInterfaces = make(map[string]InterfaceType, 1)
+		var intfType InterfaceType
+		for intfname, intftype := range nt.Interfaces {
+			operations := make(map[string]OperationDefinition, 0)
+			for opname, interfacedef := range intftype {
+				var op OperationDefinition
+				op.Description = interfacedef.Description
+				//op.Inputs = interfacedef.Inputs
+				op.Implementation = interfacedef.Implementation
+				operations[opname] = op
+			}
+			intfType.Operations = operations
+			myInterfaces[intfname] = intfType
+		}
+		n.Interfaces = myInterfaces
 		return
 	}
-	nt := s.NodeTypes[n.Type]
 	_, intf2, _ := nt.getInterface()
 	re := regexp.MustCompile(fmt.Sprintf("%v$", name))
 	operations := make(map[string]OperationDefinition, 0)

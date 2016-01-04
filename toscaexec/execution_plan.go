@@ -20,13 +20,12 @@ type Index map[int]Play
 
 func (i Index) getNodeTemplate(nt string) (toscalib.NodeTemplate, error) {
 	for _, play := range i {
-		log.Printf("Func: %v = %v?", play.NodeTemplate.Name, nt)
 		if play.NodeTemplate.Name == nt {
 			return play.NodeTemplate, nil
 		}
 
 	}
-	return toscalib.NodeTemplate{}, fmt.Errorf("No node found")
+	return toscalib.NodeTemplate{}, fmt.Errorf("No such node found (%v)", nt)
 }
 func (i Index) getID(nodeName, operationName string) (int, error) {
 	for id, play := range i {
@@ -107,7 +106,6 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 					for _, requ := range req {
 						node = requ.Node
 						op = Lifecycle(list[requ.Node]).getLast()
-						log.Println(op)
 					}
 				}
 				var err error
@@ -120,7 +118,9 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 			}
 			id, err := index.getID(node, op)
 			if err != nil {
-				log.Println("1 Cannot find node %v, %v", node, op)
+				if op != "noop" {
+					log.Printf("1 Cannot find node %v, %v", node, op)
+				}
 			} else {
 				m.Set(id, cur, 1)
 

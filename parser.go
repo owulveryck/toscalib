@@ -167,6 +167,7 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 		node.fillInterface(*t)
 		node.setRefs(t)
 		node.setName(name)
+		t.TopologyTemplate.NodeTemplates[name] = node
 	}
 
 	return nil
