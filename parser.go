@@ -104,24 +104,20 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 	}
 
 	rc, err := zip.OpenReader(zipfile)
-	defer rc.Close()
 	if err != nil {
-		log.Fatalf("%s: %s\n", zipfile, err)
-
+		return err
 	}
+	defer rc.Close()
 	fs := zipfs.New(rc, zipfile)
 	out, err := vfs.ReadFile(fs, "/TOSCA-Metadata/TOSCA.meta")
 	if err != nil {
-		log.Fatal(err)
-
+		return err
 	}
 	var m meta
 	err = yaml.Unmarshal(out, &m)
 	if err != nil {
-		log.Println("Cannont unmarshal", string(out))
 		return err
 	}
-	log.Println(m.EntryDefinition)
 	dirname := fmt.Sprintf("/%v", filepath.Dir(m.EntryDefinition))
 	base := filepath.Base(m.EntryDefinition)
 	ns := vfs.NameSpace{}
@@ -141,20 +137,17 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 	// Unmarshal the data in an interface
 	err = yaml.Unmarshal(data, &std)
 	if err != nil {
-		log.Println("Cannont unmarshal", string(data))
 		return err
 	}
 	// Import de normative types by default
 	for _, normType := range []string{"interface_types", "relationship_types", "node_types", "capability_types"} {
 		data, err := Asset(normType)
 		if err != nil {
-			log.Panic("Normative type not found")
 			return err
 		}
 		var tt ServiceTemplateDefinition
 		err = yaml.Unmarshal(data, &tt)
 		if err != nil {
-			log.Println("Cannont unmarshal", string(data))
 			return err
 		}
 		std = merge(std, tt)
@@ -174,7 +167,6 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 		// Unmarshal the data in an interface
 		err = yaml.Unmarshal(data, &tt)
 		if err != nil {
-			log.Println("Cannont unmarshal", string(data))
 			return err
 		}
 		std = merge(std, tt)
@@ -229,38 +221,36 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 		case "http":
 			res, err := http.Get(u.String())
 			if err != nil {
-				log.Fatal(err)
+				return err
 
 			}
 			r, err = ioutil.ReadAll(res.Body)
 			res.Body.Close()
 			if err != nil {
-				log.Fatal(err)
-
+				return err
 			}
 		case "https":
 			res, err := http.Get(u.String())
 			if err != nil {
-				log.Fatal(err)
+				return err
 
 			}
 			r, err = ioutil.ReadAll(res.Body)
 			res.Body.Close()
 			if err != nil {
-				log.Fatal(err)
-
+				return err
 			}
 		default:
 			r, err = ioutil.ReadFile(im)
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
 		}
 		var tt ServiceTemplateDefinition
 
 		err = yaml.Unmarshal(r, &tt)
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		std = merge(std, tt)
 	}
