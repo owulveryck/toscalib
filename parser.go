@@ -1,12 +1,17 @@
 package toscalib
 
 import (
+	"archive/zip"
+	"fmt"
+	"golang.org/x/tools/godoc/vfs"
+	"golang.org/x/tools/godoc/vfs/zipfs"
 	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"path/filepath"
 )
 
 // GetNodeTemplate returns a pointer to a node template given its name
@@ -86,6 +91,105 @@ func merge(s, t ServiceTemplateDefinition) ServiceTemplateDefinition {
 	}
 	s.InterfaceTypes = intf
 	return s
+}
+
+// Open and parse the Csar file c
+func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
+
+	type meta struct {
+		Version         string `yaml:"TOSCA-Meta-File-Version"`
+		CsarVersion     string `yaml:"CSAR-Version"`
+		CreatedBy       string `yaml:"Created-By"`
+		EntryDefinition string `yaml:"Entry-Definitions"`
+	}
+
+	rc, err := zip.OpenReader(zipfile)
+	defer rc.Close()
+	if err != nil {
+		log.Fatalf("%s: %s\n", zipfile, err)
+
+	}
+	fs := zipfs.New(rc, zipfile)
+	out, err := vfs.ReadFile(fs, "/TOSCA-Metadata/TOSCA.meta")
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	var m meta
+	err = yaml.Unmarshal(out, &m)
+	if err != nil {
+		log.Println("Cannont unmarshal", string(out))
+		return err
+	}
+	log.Println(m.EntryDefinition)
+	dirname := fmt.Sprintf("/%v", filepath.Dir(m.EntryDefinition))
+	base := filepath.Base(m.EntryDefinition)
+	ns := vfs.NameSpace{}
+	ns.Bind("/", fs, dirname, vfs.BindReplace)
+	// Now read the yaml
+	rsc, err := ns.Open(base)
+	if err != nil {
+		return err
+
+	}
+	var std ServiceTemplateDefinition
+	data, err := ioutil.ReadAll(rsc)
+	if err != nil {
+		return err
+	}
+
+	// Unmarshal the data in an interface
+	err = yaml.Unmarshal(data, &std)
+	if err != nil {
+		log.Println("Cannont unmarshal", string(data))
+		return err
+	}
+	// Import de normative types by default
+	for _, normType := range []string{"interface_types", "relationship_types", "node_types", "capability_types"} {
+		data, err := Asset(normType)
+		if err != nil {
+			log.Panic("Normative type not found")
+			return err
+		}
+		var tt ServiceTemplateDefinition
+		err = yaml.Unmarshal(data, &tt)
+		if err != nil {
+			log.Println("Cannont unmarshal", string(data))
+			return err
+		}
+		std = merge(std, tt)
+	}
+	for _, im := range std.Imports {
+		rsc, err := ns.Open(im)
+		if err != nil {
+			return err
+
+		}
+		var tt ServiceTemplateDefinition
+		data, err := ioutil.ReadAll(rsc)
+		if err != nil {
+			return err
+		}
+
+		// Unmarshal the data in an interface
+		err = yaml.Unmarshal(data, &tt)
+		if err != nil {
+			log.Println("Cannont unmarshal", string(data))
+			return err
+		}
+		std = merge(std, tt)
+	}
+	// Free the imports
+	std.Imports = []string{}
+	*t = std
+	for name, node := range t.TopologyTemplate.NodeTemplates {
+		node.fillInterface(*t)
+		node.setRefs(t)
+		node.setName(name)
+		t.TopologyTemplate.NodeTemplates[name] = node
+	}
+
+	return nil
 }
 
 // Parse a TOSCA document and fill in the structure
