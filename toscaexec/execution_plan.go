@@ -57,8 +57,6 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 	index := make(Index, 0)
 	for nn, node := range s.TopologyTemplate.NodeTemplates {
 		list[nn] = make([]string, 0)
-		// FIXME Forces the node name because of a bug in the toscalib
-		node.Name = nn
 		// Fill in the SELF operations
 		for intfn, intf := range node.Interfaces {
 			for op, _ := range intf.Operations {

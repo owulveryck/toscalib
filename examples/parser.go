@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/awalterschulze/gographviz"
 	"github.com/owulveryck/toscalib"
 	"github.com/owulveryck/toscalib/toscaexec"
-	//"gopkg.in/yaml.v2"
-	"github.com/awalterschulze/gographviz"
+	"gopkg.in/yaml.v2"
 	"log"
 	"os"
 )
@@ -16,6 +16,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	out, err := yaml.Marshal(t)
+	fmt.Println(string(out))
 	// Creates a new graph
 	g := gographviz.NewGraph()
 	g.AddAttr("", "rankdir", "LR")
@@ -41,7 +43,6 @@ func main() {
 		}
 
 	}
-	log.Println("here")
 	s := g.String()
 	fmt.Println(s)
 	/*

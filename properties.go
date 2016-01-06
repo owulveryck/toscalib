@@ -25,6 +25,18 @@ type PropertyDefinition struct {
 // A Property assignment is always a map, but the key may be value
 type PropertyAssignment map[string][]string
 
+func (p *PropertyAssignment) MarshalYAML() (interface{}, error) {
+	for k, v := range *p {
+		if k == "value" {
+			if len(v) != 1 {
+				return nil, fmt.Errorf("too many values")
+			}
+			return v[0], nil
+		}
+	}
+	return p, nil
+}
+
 func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	*p = make(map[string][]string, 1)
