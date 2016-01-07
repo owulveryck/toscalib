@@ -125,4 +125,4 @@ github.com/owulveryck/toscalib/tosca_namespace_alias.go:96:     UnmarshalYAML   
 
 # Legacy
 
-This API is in complete rewrite, for the old version, please checkout the "v1" branch
+This API is in complete rewrite, for the old version, please checkout the "v1" branch.
