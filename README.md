@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/owulveryck/toscalib.svg?branch=master)](https://travis-ci.org/owulveryck/toscalib)
+
 # Abstract
 
 This library is an implementation of the TOSCA definition as described in the document written in pure GO
