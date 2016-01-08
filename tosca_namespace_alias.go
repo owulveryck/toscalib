@@ -126,7 +126,7 @@ func (s *Scalar) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	val, err := strconv.ParseFloat(res[1], 64)
 	if err != nil || len(res) != 3 {
-		return fmt.Errorf("Not a number", res[1])
+		return fmt.Errorf("Not a number %v", res[1])
 	}
 	(*s).Value = val
 	(*s).Unit = res[2]
