@@ -16,6 +16,10 @@ limitations under the License.
 
 package toscalib
 
+import (
+	"fmt"
+)
+
 // AttributeDefinition is a structure describing the property assignmenet in the node template
 // This notion is described in appendix 5.9 of the document
 type AttributeDefinition struct {
@@ -26,4 +30,30 @@ type AttributeDefinition struct {
 	EntrySchema interface{} `yaml:"entry_schema,omitempty" json:"-"`                    // The optional key that is used to declare the name of the Datatype definition for entries of set types such as the TOSCA list or map.
 }
 
-type AttributeAssignment interface{}
+type AttributeAssignment map[string][]string
+
+func (a *AttributeAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	*a = make(map[string][]string, 1)
+	if err := unmarshal(&s); err == nil {
+		(*a)["value"] = append([]string{}, s)
+		return nil
+	}
+	var m map[string]string
+	if err := unmarshal(&m); err == nil {
+		for k, v := range m {
+			(*a)[k] = append([]string{}, v)
+		}
+		return nil
+	}
+	var mm map[string][]string
+	if err := unmarshal(&mm); err == nil {
+		for k, v := range mm {
+			(*a)[k] = v
+		}
+		return nil
+	}
+	var res interface{}
+	unmarshal(&res)
+	return fmt.Errorf("Cannot parse Attribute %v", res)
+}
