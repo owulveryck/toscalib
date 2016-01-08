@@ -35,8 +35,8 @@ type NodeTemplate struct {
 	Artifcats    map[string]ArtifactDefinition      `yaml:"artifcats,omitempty" json:"-" json:"artifcats,omitempty"`       // An optional list of named artifact definitions for the Node Template.
 	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty" json:"-" json:"node_filter,omitempty"`   // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
 	Refs         struct {
-		Type       *NodeType        `yaml:"-",json:"-"`
-		Interfaces []*InterfaceType `yaml:"-",json:"-"`
+		Type       NodeType        `yaml:"-",json:"-"`
+		Interfaces []InterfaceType `yaml:"-",json:"-"`
 	} `yaml:"-",json:"-"`
 }
 
@@ -46,13 +46,13 @@ func (n *NodeTemplate) setRefs(s *ServiceTemplateDefinition) {
 		re := regexp.MustCompile(fmt.Sprintf("^%v$", name))
 		for na, v := range s.InterfaceTypes {
 			if re.MatchString(na) {
-				n.Refs.Interfaces = append(n.Refs.Interfaces, &v)
+				n.Refs.Interfaces = append(n.Refs.Interfaces, v)
 			}
 		}
 	}
-	for na, v := range s.NodeTypes {
+	for na, _ := range s.NodeTypes {
 		if na == n.Type {
-			n.Refs.Type = &v
+			n.Refs.Type = s.NodeTypes[na]
 		}
 	}
 }
