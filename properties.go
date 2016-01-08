@@ -60,14 +60,14 @@ func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) er
 		return nil
 	}
 	var m map[string]string
-	if err := unmarshal(&m); err != nil {
+	if err := unmarshal(&m); err == nil {
 		for k, v := range m {
 			(*p)[k] = append([]string{}, v)
 		}
 		return nil
 	}
 	var mm map[string][]string
-	if err := unmarshal(&mm); err != nil {
+	if err := unmarshal(&mm); err == nil {
 		for k, v := range mm {
 			(*p)[k] = v
 		}
