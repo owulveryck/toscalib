@@ -17,7 +17,6 @@ package toscalib
 
 import (
 	"github.com/gonum/matrix/mat64"
-	"gopkg.in/yaml.v2"
 )
 
 // ServiceTemplateDefinition is the meta structure containing an entire tosca document as described in
@@ -38,14 +37,13 @@ type ServiceTemplateDefinition struct {
 	AdjacencyMatrix    mat64.Dense                     `yaml:"-"`                                                                //The AdjacencyMatrix
 }
 
-// Bytes returns the yaml representation of the current definition in bytes
-func (toscaDefinition *ServiceTemplateDefinition) Bytes() []byte {
-	d, _ := yaml.Marshal(toscaDefinition)
-	return d
-}
-
-// String returns the yaml representation of the current definition as a string
-func (toscaDefinition *ServiceTemplateDefinition) String() string {
-	d, _ := yaml.Marshal(toscaDefinition)
-	return string(d)
+// GetProperty returns the property "prop"'s value for node named node
+func (s *ServiceTemplateDefinition) GetProperty(node, prop string) (PropertyAssignment, error) {
+	var output PropertyAssignment
+	for n, nt := range s.TopologyTemplate.NodeTemplates {
+		if n == node {
+			output = nt.Properties[prop]
+		}
+	}
+	return output, nil
 }

@@ -93,6 +93,12 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 				}
 			}
 		}
+		// If node has no interface
+		if len(list[node.Name]) == 0 {
+			index[i] = Play{node, "noop", "noop", "noop"}
+			list[node.Name] = append(list[node.Name], "noop")
+			i += 1
+		}
 	}
 	// Now sort the operation lists
 	for n, l := range list {
