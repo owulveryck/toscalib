@@ -15,16 +15,6 @@ limitations under the License.
 */
 package toscalib
 
-// AttributeDefinition is a structure describing the property assignmenet in the node template
-// This notion is described in appendix 5.9 of the document
-type AttributeDefinition struct {
-	Type        string      `yaml:"type" json:"type"`                                   //    The required data type for the attribute.
-	Description string      `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the attribute.
-	Default     interface{} `yaml:"default,omitempty" json:"default,omitempty"`         //	An optional key that may provide a value to be used as a default if not provided by another means.
-	Status      string      `yaml:"status,omitempty" json:"status,omitempty"`           // The optional status of the attribute relative to the specification or implementation.
-	EntrySchema interface{} `yaml:"entry_schema,omitempty" json:"-"`                    // The optional key that is used to declare the name of the Datatype definition for entries of set types such as the TOSCA list or map.
-}
-
 // Output is the output of the topology
 type Output struct {
 	Value       map[string]interface{} `yaml:"value" json:"value"`

@@ -16,23 +16,34 @@ limitations under the License.
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/awalterschulze/gographviz"
 	"github.com/owulveryck/toscalib"
 	"github.com/owulveryck/toscalib/toscaexec"
-	"gopkg.in/yaml.v2"
+	//"gopkg.in/yaml.v2"
 	"log"
 	"os"
+	"text/template"
 )
 
 func main() {
+	template, err := template.New("node").Parse(`{{define "NODE"}}<<table border="0" cellspacing="0">
+		<tr ><td colspan="2" port="port1" border="1" bgcolor="lightblue">{{.Name}}</td></tr>
+		<tr ><td colspan="2" port="port2" border="1">{{.Target}}</td></tr>
+		<tr>
+			<td port="port2" border="1">{{.Engine}}</td>
+			<td port="port8" border="1">{{.Artifact}}</td>
+		</tr>
+		<tr ><td colspan="2" port="port2" border="1">{{.Args}}</td></tr>
+		</table>>{{end}}`)
 	var t toscalib.ServiceTemplateDefinition
-	err := t.Parse(os.Stdin)
+	err = t.Parse(os.Stdin)
 	if err != nil {
 		log.Fatal(err)
 	}
-	out, err := yaml.Marshal(t)
-	fmt.Println(string(out))
+	//out, err := yaml.Marshal(t)
+	//fmt.Println(string(out))
 	// Creates a new graph
 	g := gographviz.NewGraph()
 	g.AddAttr("", "rankdir", "LR")
@@ -40,10 +51,13 @@ func main() {
 	g.SetDir(true)
 	e := toscaexec.GeneratePlaybook(t)
 	for i, p := range e.Index {
+		var out bytes.Buffer
+		err = template.ExecuteTemplate(&out, "NODE", p.NodeTemplate)
 		g.AddNode("G", fmt.Sprintf("%v", i),
 			map[string]string{
 				"id":    fmt.Sprintf("\"%v\"", i),
-				"label": fmt.Sprintf("\"%v|%v\"", p.NodeTemplate.Name, p.OperationName),
+				"label": out.String(),
+				//"label": fmt.Sprintf("\"%v|%v\"", p.NodeTemplate.Name, p.OperationName),
 				"shape": "\"record\"",
 			})
 	}
@@ -52,27 +66,10 @@ func main() {
 		for c := 0; c < l; c++ {
 			if e.AdjacencyMatrix.At(r, c) == 1 {
 				g.AddEdge(fmt.Sprintf("%v", r), fmt.Sprintf("%v", c), true, nil)
-
 			}
-
 		}
 
 	}
 	s := g.String()
 	fmt.Println(s)
-	/*
-		d, _ := yaml.Marshal(e)
-		fmt.Println(string(d))
-	*/
-	/*
-		for i, n := range e.Index {
-			log.Printf("[%v] %v:%v -> %v %v",
-				i,
-				n.NodeTemplate.Name,
-				n.OperationName,
-				n.NodeTemplate.Interfaces[n.InterfaceName].Operations[n.OperationName].Implementation,
-				n.NodeTemplate.Interfaces[n.InterfaceName].Operations[n.OperationName].Inputs,
-			)
-		}
-	*/
 }
