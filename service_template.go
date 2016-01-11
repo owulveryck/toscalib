@@ -17,6 +17,7 @@ package toscalib
 
 import (
 	"github.com/gonum/matrix/mat64"
+	"log"
 )
 
 // ServiceTemplateDefinition is the meta structure containing an entire tosca document as described in
@@ -45,5 +46,42 @@ func (s *ServiceTemplateDefinition) GetProperty(node, prop string) (PropertyAssi
 			output = nt.Properties[prop]
 		}
 	}
+	log.Println("Result:", output)
 	return output, nil
+}
+
+func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) ([]string, error) {
+	log.Println("EvaluateStatement", i)
+	if w, ok := i.(map[string]string); ok {
+		for k, v := range w {
+			switch k {
+			case "value":
+				log.Println("EvaluateStatement returns", v)
+				return []string{v}, nil
+			case "get_input":
+				return []string{"TODO", "GET_INPUT"}, nil
+				// Find the inputs and returns it
+			}
+		}
+	}
+	if w, ok := i.(map[string][]string); ok {
+		for k, v := range w {
+			switch k {
+			case "value":
+				log.Println("EvaluateStatement returns", v)
+				return v, nil
+			case "get_input":
+				return []string{"TODO", "GET_INPUT"}, nil
+				// Find the inputs and returns it
+			case "get_property":
+				pa, _ := s.GetProperty(v[0], v[1])
+				st, _ := s.EvaluateStatement(pa)
+				return st, nil
+			case "get_attribute":
+				ret := append([]string{"get_attribute"}, v...)
+				return ret, nil
+			}
+		}
+	}
+	return []string{}, nil
 }
