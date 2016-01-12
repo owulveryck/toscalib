@@ -111,7 +111,7 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 	m.New(len(index))
 	for cur, p := range index {
 		l := Lifecycle(list[p.NodeTemplate.Name])
-		// If we are the first operation, link it to the last of the requirements
+		// If we are the first operation, link it to the start, configure or create of the requirements
 		if l.isFirst(p.OperationName) {
 			var op string
 			op = "noop"
@@ -124,7 +124,15 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 				for _, req := range nt.Requirements {
 					for _, requ := range req {
 						node = requ.Node
-						op = Lifecycle(list[requ.Node]).getLast()
+						var lop string
+						for _, op := range list[requ.Node] {
+							if op == "stop" || op == "delete" {
+								break
+							}
+							lop = op
+						}
+						op = lop
+						//op = Lifecycle(list[requ.Node]).getLast()
 					}
 				}
 				var err error
@@ -150,12 +158,25 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 		if err != nil {
 			continue
 		}
-		// Get the ID of the next operation
-		id, err := index.getID(p.NodeTemplate.Name, next)
-		if err != nil {
-			log.Fatalf("2 Cannot find node %v, %v", p.NodeTemplate.Name, next)
+		if next != "stop" && next != "delete" {
+			// Get the ID of the next operation
+			id, err := index.getID(p.NodeTemplate.Name, next)
+			if err != nil {
+				log.Fatalf("2 Cannot find node %v, %v", p.NodeTemplate.Name, next)
+			}
+			m.Set(cur, id, 1)
+		} else {
+			last := Lifecycle(list[p.NodeTemplate.Name]).getLast()
+			if next != last {
+				id, err := index.getID(p.NodeTemplate.Name, next)
+				if err != nil {
+					log.Fatalf("2 Cannot find node %v, %v", p.NodeTemplate.Name, next)
+				}
+				m.Set(cur, id, 1)
+			} else {
+
+			}
 		}
-		m.Set(cur, id, 1)
 	}
 	e.AdjacencyMatrix = m
 	e.Index = index
