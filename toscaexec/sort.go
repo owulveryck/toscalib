@@ -142,19 +142,19 @@ func (p Plays) Less(i, j int) bool {
 type Lifecycle []string // To implement a custom sort
 
 var order = map[string]int{
-	"create":                0,
-	"pre_configure_source":  1,
-	"pre_configure_target":  2,
-	"configure":             3,
-	"post_configure_source": 4,
-	"post_configure_target": 5,
-	"start":                 6,
-	"add_target":            7,
+	"noop":                  0,
+	"create":                1,
+	"pre_configure_source":  2,
+	"pre_configure_target":  3,
+	"configure":             4,
+	"post_configure_source": 5,
+	"post_configure_target": 6,
+	"start":                 7,
+	"add_target":            8,
 	"remove_target":         9,
 	"target_changed":        10,
 	"stop":                  11,
 	"delete":                12,
-	"noop":                  20,
 }
 
 func (s Lifecycle) Len() int {
