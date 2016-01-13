@@ -31,6 +31,7 @@ func (p Interfaces) Less(i, j int) bool {
 	return !(order[p[j].Method] <= order["start"])
 }
 
+/*
 const source = false
 const node = false
 const relationship = true
@@ -56,3 +57,4 @@ var orderRelationshipConfiguration = map[operation]int{
 	operation{node, "stop"}:                          10,
 	operation{node, "delete"}:                        11,
 }
+*/

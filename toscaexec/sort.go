@@ -17,6 +17,128 @@ package toscaexec
 
 import "fmt"
 
+type Plays []Play
+
+func (p Plays) Len() int {
+	return len(p)
+
+}
+func (p Plays) Swap(i, j int) {
+	p[i], p[j] = p[j], p[i]
+}
+
+func (p Plays) Less(i, j int) bool {
+	if p[i].NodeTemplate.Name == p[j].NodeTemplate.Name {
+		if order[p[i].OperationName] < order[p[j].OperationName] {
+			return true
+		}
+	}
+	// if j is a requirement of i
+	for _, req := range p[i].NodeTemplate.Requirements {
+		for _, req := range req {
+			if req.Node == p[j].NodeTemplate.Name {
+				switch p[j].OperationName {
+				case "create":
+					op := p[i].OperationName
+					if op == "start" || op == "configure" || op == "create" {
+						return false
+					} else {
+						return true
+					}
+				case "configure":
+					op := p[i].OperationName
+					if op == "start" || op == "configure" || op == "create" {
+						return false
+					} else {
+						return true
+					}
+				case "start":
+					op := p[i].OperationName
+					if op == "start" || op == "configure" || op == "create" {
+						return false
+					} else {
+						return true
+					}
+				case "stop":
+					op := p[i].OperationName
+					if op == "stop" || op == "delete" || op == "noop" {
+						return true
+					} else {
+						return false
+					}
+				case "delete":
+					op := p[i].OperationName
+					if op == "stop" || op == "delete" || op == "noop" {
+						return true
+					} else {
+						return false
+					}
+				case "noop":
+					op := p[i].OperationName
+					if op == "stop" || op == "delete" || op == "noop" {
+						return true
+					} else {
+						return false
+					}
+				}
+			}
+		}
+	}
+	// if i is a requirement of j
+	for _, req := range p[j].NodeTemplate.Requirements {
+		for _, req := range req {
+			if req.Node == p[i].NodeTemplate.Name {
+				switch p[i].OperationName {
+				case "create":
+					op := p[j].OperationName
+					if op == "start" || op == "configure" || op == "create" {
+						return false
+					} else {
+						return true
+					}
+				case "configure":
+					op := p[j].OperationName
+					if op == "start" || op == "configure" || op == "create" {
+						return false
+					} else {
+						return true
+					}
+				case "start":
+					op := p[j].OperationName
+					if op == "start" || op == "configure" || op == "create" {
+						return false
+					} else {
+						return true
+					}
+				case "stop":
+					op := p[j].OperationName
+					if op == "stop" || op == "delete" || op == "noop" {
+						return true
+					} else {
+						return false
+					}
+				case "delete":
+					op := p[j].OperationName
+					if op == "stop" || op == "delete" || op == "noop" {
+						return true
+					} else {
+						return false
+					}
+				case "noop":
+					op := p[j].OperationName
+					if op == "stop" || op == "delete" || op == "noop" {
+						return true
+					} else {
+						return false
+					}
+				}
+			}
+
+		}
+	}
+	return false
+}
+
 type Lifecycle []string // To implement a custom sort
 
 var order = map[string]int{
