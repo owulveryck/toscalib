@@ -6,22 +6,25 @@ import (
 )
 
 func TestSort(t *testing.T) {
-	var itf Interfaces
-	itf = []Interface{
-		{"Node", "create", false},
-		{"Node", "start", false},
-		{"Node", "configure", false},
-		{"Node", "stop", false},
-		{"Node", "delete", false},
-		{"Node", "pre_configure_source", false},
-		{"Requirement", "create", true},
-		{"Requirement", "start", true},
-		{"Requirement", "configure", true},
-		{"Requirement", "stop", true},
-		{"Requirement", "delete", true},
-		{"Requirement", "pre_configure_target", true},
+	var basic Interfaces
+	basic = []Interface{
+		{"Node", "create", false, 3},
+		{"Node", "start", false, 5},
+		{"Node", "configure", false, 4},
+		{"Node", "stop", false, 6},
+		{"Node", "delete", false, 7},
+		{"Requirement", "create", true, 0},
+		{"Requirement", "start", true, 2},
+		{"Requirement", "configure", true, 1},
+		{"Requirement", "stop", true, 8},
+		{"Requirement", "delete", true, 9},
 	}
-	sort.Sort(itf)
-	t.Log(itf)
+	sort.Sort(basic)
+	for i, v := range basic {
+		t.Logf("[%v] %v:%v", i, v.NodeName, v.Method)
+		if i != v.ID {
+			t.Fail()
+		}
+	}
 
 }

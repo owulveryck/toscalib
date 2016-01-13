@@ -31,6 +31,7 @@ type Playbook struct {
 	Outputs map[string]toscalib.Output
 }
 
+// Index is a reference of all plays represented by their id
 type Index map[int]Play
 
 func (i Index) getNodeTemplate(nt string) (toscalib.NodeTemplate, error) {
@@ -67,9 +68,12 @@ type Play struct {
 //GeneratePlaybook generates an execution playbook for the ServiceTemplateDeifinition
 func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 	var e Playbook
+	// List is a map where node's name is the key and all operations are present
+	// as a value represented by an array of string
 	list := make(map[string][]string, 0)
 	i := 0
 	index := make(Index, 0)
+	// Fill the index and the list
 	for nn, node := range s.TopologyTemplate.NodeTemplates {
 		list[nn] = make([]string, 0)
 		// Fill in the SELF operations
@@ -100,6 +104,11 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 			i += 1
 		}
 	}
+
+	// *************************
+	// Fill the adjacency matrix
+	// *************************
+
 	// Now sort the operation lists
 	for n, l := range list {
 		if len(l) == 0 {
@@ -109,6 +118,7 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 	}
 	var m Matrix
 	m.New(len(index))
+
 	for cur, p := range index {
 		l := Lifecycle(list[p.NodeTemplate.Name])
 		// If we are the first operation, link it to the last of the requirements
