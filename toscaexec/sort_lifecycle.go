@@ -7,7 +7,6 @@ import (
 type Interfaces []Interface
 
 type Interface struct {
-	NodeName      string
 	Method        string
 	IsRequirement bool // If the node is a requirement or the base role
 	ID            int
