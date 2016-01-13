@@ -18,7 +18,6 @@ package toscaexec
 import (
 	"fmt"
 	"github.com/owulveryck/toscalib"
-	"log"
 	"sort"
 )
 
@@ -65,42 +64,62 @@ type Play struct {
 	OperationTarget string `yaml:"operation_target"`
 }
 
+type operation struct {
+	ID   int
+	name string
+}
+
+// generateMatrix generates and fills an adjacencymatrix based on the Index
+func generateMatrix(allInterfaces map[string][]Interface, s toscalib.ServiceTemplateDefinition) (Matrix, error) {
+	var m Matrix
+	m.New(len(allInterfaces))
+	for node, itfs := range allInterfaces {
+		interfaces := itfs
+		// Find all the node required by current node
+		for _, requirement := range s.TopologyTemplate.NodeTemplates[node].Requirements {
+			for _, requirement := range requirement {
+				for _, itf := range allInterfaces[requirement.Node] {
+					itf.IsRequirement = true
+					interfaces = append(interfaces, itf)
+				}
+			}
+			// Now order the interfaces
+			sort.Sort(Interfaces(interfaces))
+			// And then sets the matrix
+			for i := 0; i < len(interfaces)-1; i++ {
+				m.Set(interfaces[i].ID, interfaces[i+1].ID, 1)
+			}
+		}
+	}
+	return m, nil
+}
+
 //GeneratePlaybook generates an execution playbook for the ServiceTemplateDeifinition
 func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 	var e Playbook
+
+	// allInterfaces is a map where key is a nodename and the value is
+	// and array of interfaces
+	var allInterfaces map[string][]Interface
 	// List is a map where node's name is the key and all operations are present
 	// as a value represented by an array of string
-	list := make(map[string][]string, 0)
 	i := 0
+	allInterfaces = make(map[string][]Interface, len(s.TopologyTemplate.NodeTemplates))
 	index := make(Index, 0)
 	// Fill the index and the list
-	for nn, node := range s.TopologyTemplate.NodeTemplates {
-		list[nn] = make([]string, 0)
+	for _, node := range s.TopologyTemplate.NodeTemplates {
 		// Fill in the SELF operations
 		for intfn, intf := range node.Interfaces {
 			for op, _ := range intf.Operations {
 				index[i] = Play{node, intfn, op, "SELF"}
-				list[node.Name] = append(list[node.Name], op)
+				allInterfaces[node.Name] = append(allInterfaces[node.Name], Interface{Method: op, IsRequirement: false, ID: i})
 				i += 1
 			}
 		}
-		// Fill in the configure operations
-		for _, r := range node.Requirements {
-			for _, req := range r {
-				// intfn may be "Configure"
-				for n, it := range req.Relationship.Interfaces {
-					for intfn, _ := range it {
-						index[i] = Play{node, n, intfn, req.Node}
-						list[node.Name] = append(list[node.Name], intfn)
-						i += 1
-					}
-				}
-			}
-		}
 		// If node has no interface
-		if len(list[node.Name]) == 0 {
+		if len(allInterfaces[node.Name]) == 0 {
 			index[i] = Play{node, "noop", "noop", "noop"}
-			list[node.Name] = append(list[node.Name], "noop")
+			allInterfaces[node.Name] = append(allInterfaces[node.Name], Interface{Method: "noop", IsRequirement: false, ID: i})
 			i += 1
 		}
 	}
@@ -110,63 +129,7 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 	// *************************
 
 	// Now sort the operation lists
-	for n, l := range list {
-		if len(l) == 0 {
-			list[n] = []string{"noop"}
-		}
-		sort.Sort(Lifecycle(l))
-	}
-	var m Matrix
-	m.New(len(index))
-
-	for cur, p := range index {
-		l := Lifecycle(list[p.NodeTemplate.Name])
-		// If we are the first operation, link it to the last of the requirements
-		if l.isFirst(p.OperationName) {
-			var op string
-			op = "noop"
-			nt := p.NodeTemplate
-			var node string
-			for op == "noop" {
-				if len(nt.Requirements) == 0 {
-					break
-				}
-				for _, req := range nt.Requirements {
-					for _, requ := range req {
-						node = requ.Node
-						op = Lifecycle(list[requ.Node]).getLast()
-					}
-				}
-				var err error
-				nt, err = index.getNodeTemplate(node)
-				if err != nil {
-					log.Println(err)
-					break
-				}
-
-			}
-			id, err := index.getID(node, op)
-			if err != nil {
-				if op != "noop" {
-					log.Printf("1 Cannot find node %v, %v", node, op)
-				}
-			} else {
-				m.Set(id, cur, 1)
-
-			}
-		}
-		// Find the next operation
-		next, err := l.getNext(p.OperationName)
-		if err != nil {
-			continue
-		}
-		// Get the ID of the next operation
-		id, err := index.getID(p.NodeTemplate.Name, next)
-		if err != nil {
-			log.Fatalf("2 Cannot find node %v, %v", p.NodeTemplate.Name, next)
-		}
-		m.Set(cur, id, 1)
-	}
+	m, _ := generateMatrix(allInterfaces, s)
 	e.AdjacencyMatrix = m
 	e.Index = index
 	//e.Operations = list
