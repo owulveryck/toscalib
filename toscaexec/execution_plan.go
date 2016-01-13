@@ -72,7 +72,13 @@ type operation struct {
 // generateMatrix generates and fills an adjacencymatrix based on the Index
 func generateMatrix(allInterfaces map[string][]Interface, s toscalib.ServiceTemplateDefinition) (Matrix, error) {
 	var m Matrix
-	m.New(len(allInterfaces))
+	i := 0
+	for _, itf := range allInterfaces {
+		for _, _ = range itf {
+			i += 1
+		}
+	}
+	m.New(i)
 	for node, itfs := range allInterfaces {
 		interfaces := itfs
 		// Find all the node required by current node
@@ -128,7 +134,6 @@ func GeneratePlaybook(s toscalib.ServiceTemplateDefinition) Playbook {
 	// Fill the adjacency matrix
 	// *************************
 
-	// Now sort the operation lists
 	m, _ := generateMatrix(allInterfaces, s)
 	e.AdjacencyMatrix = m
 	e.Index = index

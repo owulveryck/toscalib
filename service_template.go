@@ -17,7 +17,6 @@ package toscalib
 
 import (
 	"github.com/gonum/matrix/mat64"
-	"log"
 )
 
 // ServiceTemplateDefinition is the meta structure containing an entire tosca document as described in
@@ -43,35 +42,26 @@ func (s *ServiceTemplateDefinition) GetProperty(node, prop string) (PropertyAssi
 	var output PropertyAssignment
 	for n, nt := range s.TopologyTemplate.NodeTemplates {
 		if n == node {
-			output = nt.Properties[prop]
-		}
-	}
-	log.Println("Result:", output)
-	return output, nil
-}
-
-func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) ([]string, error) {
-	log.Println("EvaluateStatement", i)
-	if w, ok := i.(map[string]string); ok {
-		for k, v := range w {
-			switch k {
-			case "value":
-				log.Println("EvaluateStatement returns", v)
-				return []string{v}, nil
-			case "get_input":
-				return []string{"TODO", "GET_INPUT"}, nil
-				// Find the inputs and returns it
+			if val, ok := nt.Properties[prop]; ok {
+				output = val
 			}
 		}
 	}
-	if w, ok := i.(map[string][]string); ok {
+	return output, nil
+}
+
+func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) (interface{}, error) {
+	if w, ok := i.(PropertyAssignment); ok {
 		for k, v := range w {
 			switch k {
 			case "value":
-				log.Println("EvaluateStatement returns", v)
-				return v, nil
+				if len(v) == 1 {
+					return v[0], nil
+				} else {
+					return v, nil
+				}
 			case "get_input":
-				return []string{"TODO", "GET_INPUT"}, nil
+				return s.TopologyTemplate.Inputs[v[0]].Value, nil
 				// Find the inputs and returns it
 			case "get_property":
 				pa, _ := s.GetProperty(v[0], v[1])
