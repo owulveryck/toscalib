@@ -16,7 +16,8 @@ limitations under the License.
 package toscalib
 
 import (
-	"github.com/gonum/matrix/mat64"
+	"fmt"
+	"reflect"
 )
 
 // ServiceTemplateDefinition is the meta structure containing an entire tosca document as described in
@@ -34,11 +35,15 @@ type ServiceTemplateDefinition struct {
 	DlsDefinitions     interface{}                     `yaml:"dsl_definitions,omitempty" json:"dsl_definitions,omitempty"`       // Declares optional DSL-specific definitions and conventions.  For example, in YAML, this allows defining reusable YAML macros (i.e., YAML alias anchors) for use throughout the TOSCA Service Template.
 	InterfaceTypes     map[string]InterfaceType        `yaml:"interface_types,omitempty" json:"interface_types,omitempty"`       // This section contains an optional list of interface type definitions for use in service templates.
 	TopologyTemplate   TopologyTemplateType            `yaml:"topology_template" json:"topology_template"`                       // Defines the topology template of an application or service, consisting of node templates that represent the application’s or service’s components, as well as relationship templates representing relations between the components.
-	AdjacencyMatrix    mat64.Dense                     `yaml:"-"`                                                                //The AdjacencyMatrix
+}
+
+type PA struct {
+	PA     PropertyAssignment
+	Origin string
 }
 
 // GetProperty returns the property "prop"'s value for node named node
-func (s *ServiceTemplateDefinition) GetProperty(node, prop string) (PropertyAssignment, error) {
+func (s *ServiceTemplateDefinition) GetProperty(node, prop string) PA {
 	var output PropertyAssignment
 	for n, nt := range s.TopologyTemplate.NodeTemplates {
 		if n == node {
@@ -47,11 +52,12 @@ func (s *ServiceTemplateDefinition) GetProperty(node, prop string) (PropertyAssi
 			}
 		}
 	}
-	return output, nil
+	return PA{PA: output, Origin: node}
 }
 
 func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) (interface{}, error) {
-	if w, ok := i.(PropertyAssignment); ok {
+	if ww, ok := i.(PA); ok {
+		w := ww.PA
 		for k, v := range w {
 			switch k {
 			case "value":
@@ -60,16 +66,49 @@ func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) (interface{
 				} else {
 					return v, nil
 				}
+			case "concat":
+				var output string
+				for _, val := range v {
+					switch reflect.TypeOf(val).Kind() {
+					case reflect.String:
+						output = fmt.Sprintf("%s%s", output, val)
+					case reflect.Int:
+						output = fmt.Sprintf("%s%s", output, val)
+					case reflect.Map:
+						// Convert it to a PropertyAssignment
+						pa := reflect.ValueOf(val).Interface().(map[interface{}]interface{})
+						paa := make(PropertyAssignment, 0)
+						for k, v := range pa {
+							/*
+								var o []string
+								for _, vvv := range reflect.ValueOf(v).Interface().([]interface{}) {
+									o = append(o, vvv.(string))
+								}
+							*/
+							paa[k.(string)] = reflect.ValueOf(v).Interface().([]interface{})
+							if paa[k.(string)][0] == "SELF" {
+								paa[k.(string)][0] = ww.Origin
+							}
+
+						}
+						o, _ := s.EvaluateStatement(PA{PA: paa, Origin: ww.Origin})
+						output = fmt.Sprintf("%s%s", output, o)
+					}
+				}
+				return output, nil
 			case "get_input":
-				return s.TopologyTemplate.Inputs[v[0]].Value, nil
+				return s.TopologyTemplate.Inputs[v[0].(string)].Value, nil
 				// Find the inputs and returns it
 			case "get_property":
-				pa, _ := s.GetProperty(v[0], v[1])
+				node := v[0].(string)
+				pa := s.GetProperty(node, v[1].(string))
 				st, _ := s.EvaluateStatement(pa)
 				return st, nil
-			case "get_attribute":
-				ret := append([]string{"get_attribute"}, v...)
-				return ret, nil
+				/*
+					case "get_attribute":
+						ret := append([]string{"get_attribute"}, v...)
+						return ret, nil
+				*/
 			}
 		}
 	}
