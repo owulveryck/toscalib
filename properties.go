@@ -39,7 +39,7 @@ type PropertyDefinition struct {
 }
 
 // A Property assignment is always a map, but the key may be value
-type PropertyAssignment map[string][]string
+type PropertyAssignment map[string][]interface{}
 
 func (p *PropertyAssignment) MarshalYAML() (interface{}, error) {
 	for k, v := range *p {
@@ -55,22 +55,40 @@ func (p *PropertyAssignment) MarshalYAML() (interface{}, error) {
 
 func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
-	*p = make(map[string][]string, 1)
+	intf := make([]interface{}, 1)
+	*p = make(map[string][]interface{}, 1)
 	if err := unmarshal(&s); err == nil {
-		(*p)["value"] = append([]string{}, s)
+		(*p)["value"] = intf
+		(*p)["value"][0] = s
 		return nil
 	}
 	var m map[string]string
 	if err := unmarshal(&m); err == nil {
 		for k, v := range m {
-			(*p)[k] = append([]string{}, v)
+			(*p)[k] = intf
+			(*p)[k][0] = v
 		}
 		return nil
 	}
 	var mm map[string][]string
 	if err := unmarshal(&mm); err == nil {
 		for k, v := range mm {
-			(*p)[k] = v
+			intf := make([]interface{}, len(v))
+			(*p)[k] = intf
+			for i, vv := range v {
+				(*p)[k][i] = vv
+			}
+		}
+		return nil
+	}
+	var mmm map[string][]interface{}
+	if err := unmarshal(&mmm); err == nil {
+		for k, v := range mmm {
+			intf := make([]interface{}, len(v))
+			(*p)[k] = intf
+			for i, vv := range v {
+				(*p)[k][i] = vv
+			}
 		}
 		return nil
 	}
