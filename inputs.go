@@ -17,10 +17,39 @@ package toscalib
 
 // Input corresponds to  `yaml:"inputs,omitempty" json:"inputs,omitempty"`
 type Input struct {
-	Value            map[string][]string `yaml:"-,inline"`
-	Type             string              `yaml:"type" json:"type"`
-	Description      string              `yaml:"description,omitempty" json:"description,omitempty"` // Not required
-	Constraints      Constraints         `yaml:"constraints,omitempty" json:"constraints,omitempty"`
-	ValidSourceTypes interface{}         `yaml:"valid_source_types,omitempty" json:"valid_source_types,omitempty"`
-	Occurrences      interface{}         `yaml:"occurrences,omitempty" json:"occurrences,omitempty"`
+	Value            string      `json:"value"`
+	Type             string      `yaml:"type" json:"type"`
+	Description      string      `yaml:"description,omitempty" json:"description,omitempty"` // Not required
+	Constraints      Constraints `yaml:"constraints,omitempty" json:"constraints,omitempty"`
+	ValidSourceTypes interface{} `yaml:"valid_source_types,omitempty" json:"valid_source_types,omitempty"`
+	Occurrences      interface{} `yaml:"occurrences,omitempty" json:"occurrences,omitempty"`
+}
+
+func (i *Input) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	if err := unmarshal(&s); err == nil {
+		i.Value = s
+		return nil
+
+	}
+	var str struct {
+		Value            string      `yaml:"value" json:"value"`
+		Type             string      `yaml:"type" json:"type"`
+		Description      string      `yaml:"description,omitempty" json:"description,omitempty"` // Not required
+		Constraints      Constraints `yaml:"constraints,omitempty" json:"constraints,omitempty"`
+		ValidSourceTypes interface{} `yaml:"valid_source_types,omitempty" json:"valid_source_types,omitempty"`
+		Occurrences      interface{} `yaml:"occurrences,omitempty" json:"occurrences,omitempty"`
+	}
+	if err := unmarshal(&str); err != nil {
+		return err
+
+	}
+	i.Value = str.Value
+	i.Type = str.Type
+	i.Description = str.Description
+	i.Constraints = str.Constraints
+	i.ValidSourceTypes = str.ValidSourceTypes
+	i.Occurrences = str.Occurrences
+	return nil
+
 }

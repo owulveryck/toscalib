@@ -17,9 +17,9 @@ package toscalib
 
 // RequirementDefinition as described in Appendix 6.2
 type RequirementDefinition struct {
-	Capability       string `yaml:"capability" json:"capability"`         // The required reserved keyname used that can be used to provide the name of a valid Capability Type that can fulfil the requirement
-	Node             string `yaml:"node,omitempty" json:"node,omitempty"` // The optional reserved keyname used to provide the name of a valid Node Type that contains the capability definition that can be used to fulfil the requirement
-	Relationship     RelationshipType
+	Capability       string           `yaml:"capability" json:"capability"`         // The required reserved keyname used that can be used to provide the name of a valid Capability Type that can fulfil the requirement
+	Node             string           `yaml:"node,omitempty" json:"node,omitempty"` // The optional reserved keyname used to provide the name of a valid Node Type that contains the capability definition that can be used to fulfil the requirement
+	Relationship     RelationshipType `json:"-"`
 	RelationshipName string
 	Occurrences      ToscaRange `yaml:"occurences,omitempty" json:"occurences,omitempty"` // The optional minimum and maximum occurrences for the requirement.  Note: the keyword UNBOUNDED is also supported to represent any positive integer
 }
