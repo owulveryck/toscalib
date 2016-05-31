@@ -258,7 +258,7 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 		default:
 			r, err = ioutil.ReadFile(im)
 			if err != nil {
-				return err
+				//return err
 			}
 		}
 		var tt ServiceTemplateDefinition
