@@ -22,7 +22,7 @@ type Output struct {
 }
 
 // ArtifactDefinition TODO: Appendix 5.5
-type ArtifactDefinition interface{}
+type ArtifactDefinition map[string]interface{}
 
 // NodeFilter TODO Appendix 5.4
 // A node filter definition defines criteria for selection of a TOSCA Node Template based upon the template’s property values, capabilities and capability properties.
