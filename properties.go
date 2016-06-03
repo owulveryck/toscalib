@@ -45,14 +45,14 @@ func (p *PropertyDefinition) UnmarshalYAML(unmarshal func(interface{}) error) er
 		return nil
 	}
 	var test2 struct {
-		Value       string      `yaml:"value,omitempty"`
-		Type        string      `yaml:"type" json:"type"`                                   // The required data type for the property
-		Description string      `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the property.
-		Required    bool        `yaml:"required,omitempty" json:"required,omitempty"`       // An optional key that declares a property as required ( true) or not ( false) Default: true
-		Default     string      `yaml:"default,omitempty" json:"default,omitempty"`
-		Status      Status      `yaml:"status,omitempty" json:"status,omitempty"`
-		Constraints Constraints `yaml:"constraints,omitempty,flow" json:"constraints,omitempty"`
-		EntrySchema interface{} `yaml:"entry_schema,omitempty" json:"entry_schema,omitempty"`
+		Value       string                 `yaml:"value,omitempty"`
+		Type        string                 `yaml:"type" json:"type"`                                   // The required data type for the property
+		Description string                 `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the property.
+		Required    bool                   `yaml:"required,omitempty" json:"required,omitempty"`       // An optional key that declares a property as required ( true) or not ( false) Default: true
+		Default     string                 `yaml:"default,omitempty" json:"default,omitempty"`
+		Status      Status                 `yaml:"status,omitempty" json:"status,omitempty"`
+		Constraints Constraints            `yaml:"constraints,omitempty,flow" json:"constraints,omitempty"`
+		EntrySchema map[string]interface{} `yaml:"entry_schema,omitempty" json:"entry_schema,omitempty"`
 	}
 	err := unmarshal(&test2)
 	if err == nil {
