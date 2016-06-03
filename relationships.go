@@ -19,11 +19,11 @@ package toscalib
 // A Relationship Type is a reusable entity that defines the type of one or more relationships between Node Types or Node Templates.
 // TODO
 type RelationshipType struct {
-	DerivedFrom string                         `yaml:"derived_from,omitempty"`
-	Version     Version                        ` yaml:"version,omitempty"`
-	Description string                         `yaml:"description,omitempty"`
-	Properties  map[string]PropertyDefinition  `yaml:"properties,omitempty"`
-	Attributes  map[string]AttributeDefinition `yaml:"attributes,omitempty"`
-	Interfaces  map[string]InterfaceDefinition `yaml:"interfaces,omitempty"`
-	ValidTarget []string                       `yaml:"valid_target_types,omitempty"`
+	DerivedFrom string                         `yaml:"derived_from,omitempty" json:"derived_from"`
+	Version     Version                        ` yaml:"version,omitempty" json:"version"`
+	Description string                         `yaml:"description,omitempty" json:"description"`
+	Properties  map[string]PropertyDefinition  `yaml:"properties,omitempty" json:"properties"`
+	Attributes  map[string]AttributeDefinition `yaml:"attributes,omitempty" json:"attributes"`
+	Interfaces  map[string]InterfaceDefinition `yaml:"interfaces,omitempty" json:"interfaces"`
+	ValidTarget []string                       `yaml:"valid_target_types,omitempty" json:"valid_target_types"`
 }
