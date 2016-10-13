@@ -1,2 +1,8 @@
 gotosca
-.swp
+*.swp
+
+vendor/
+.glide/
+
+cover/
+*.txt

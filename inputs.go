@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package toscalib
 
 // Input corresponds to  `yaml:"inputs,omitempty" json:"inputs,omitempty"`
@@ -25,6 +26,7 @@ type Input struct {
 	Occurrences      interface{} `yaml:"occurrences,omitempty" json:"occurrences,omitempty"`
 }
 
+// UnmarshalYAML converts YAML text to a type
 func (i *Input) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	if err := unmarshal(&s); err == nil {

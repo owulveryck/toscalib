@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package toscalib
 
 import (
@@ -42,7 +43,7 @@ type NodeTemplate struct {
 
 // setRefs fills in the references of the node
 func (n *NodeTemplate) setRefs(s *ServiceTemplateDefinition) {
-	for name, _ := range n.Interfaces {
+	for name := range n.Interfaces {
 		re := regexp.MustCompile(fmt.Sprintf("^%v$", name))
 		for na, v := range s.InterfaceTypes {
 			if re.MatchString(na) {
@@ -50,7 +51,7 @@ func (n *NodeTemplate) setRefs(s *ServiceTemplateDefinition) {
 			}
 		}
 	}
-	for na, _ := range s.NodeTypes {
+	for na := range s.NodeTypes {
 		if na == n.Type {
 			n.Refs.Type = s.NodeTypes[na]
 		}
@@ -94,7 +95,7 @@ func (n *NodeTemplate) fillInterface(s ServiceTemplateDefinition) {
 	operations := make(map[string]OperationDefinition, 0)
 	for ifacename, iface := range s.InterfaceTypes {
 		if re.MatchString(ifacename) {
-			for op, _ := range iface.Operations {
+			for op := range iface.Operations {
 				v, ok := intf.Operations[op]
 				_, ok2 := intf2[op]
 				switch {

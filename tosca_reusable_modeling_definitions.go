@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package toscalib
 
 // Output is the output of the topology
@@ -41,11 +42,11 @@ type DataType struct {
 // A repository definition defines a named external repository which contains deployment and implementation artifacts that are referenced within the TOSCA Service Template.
 type RepositoryDefinition struct {
 	Description string               `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the repository.
-	Url         string               `yaml:"url" json:"url"`                                     // The required URL or network address used to access the repository.
+	URL         string               `yaml:"url" json:"url"`                                     // The required URL or network address used to access the repository.
 	Credential  CredentialDefinition `yaml:"credential" json:"credential"`                       // The optional Credential used to authorize access to the repository.
 }
 
 // ArtifactType as described in appendix 6.3
-//An Artifact Type is a reusable entity that defines the type of one or more files which Node Types or Node Templates can have dependent relationships and used during operations such as during installation or deployment.
+// An Artifact Type is a reusable entity that defines the type of one or more files which Node Types or Node Templates can have dependent relationships and used during operations such as during installation or deployment.
 // TODO
 type ArtifactType interface{}

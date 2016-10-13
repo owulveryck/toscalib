@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package toscalib
 
 // RelationshipType as described in appendix 6.9
@@ -20,7 +21,7 @@ package toscalib
 // TODO
 type RelationshipType struct {
 	DerivedFrom string                         `yaml:"derived_from,omitempty" json:"derived_from"`
-	Version     Version                        ` yaml:"version,omitempty" json:"version"`
+	Version     Version                        `yaml:"version,omitempty" json:"version"`
 	Description string                         `yaml:"description,omitempty" json:"description"`
 	Properties  map[string]PropertyDefinition  `yaml:"properties,omitempty" json:"properties"`
 	Attributes  map[string]AttributeDefinition `yaml:"attributes,omitempty" json:"attributes"`

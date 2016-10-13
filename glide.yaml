@@ -1,0 +1,7 @@
+package: github.com/CiscoCloud/toscalib
+import:
+- package: golang.org/x/tools
+  subpackages:
+  - godoc/vfs
+  - godoc/vfs/zipfs
+- package: gopkg.in/yaml.v2

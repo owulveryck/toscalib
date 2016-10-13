@@ -13,11 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package toscalib
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // PropertyDefinition as described in Appendix 5.7:
 // A property definition defines a named, typed value and related data
@@ -38,6 +37,7 @@ type PropertyDefinition struct {
 	EntrySchema interface{} `yaml:"entry_schema,omitempty" json:"entry_schema,omitempty"`
 }
 
+// UnmarshalYAML converts YAML text to a type
 func (p *PropertyDefinition) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	if err := unmarshal(&s); err == nil {
@@ -67,13 +67,14 @@ func (p *PropertyDefinition) UnmarshalYAML(unmarshal func(interface{}) error) er
 		return nil
 	}
 	var res interface{}
-	unmarshal(&res)
+	_ = unmarshal(&res)
 	return fmt.Errorf("Cannot parse Property %v", res)
 }
 
-// A Property assignment is always a map, but the key may be value
+// PropertyAssignment is always a map, but the key may be value
 type PropertyAssignment map[string][]interface{}
 
+// MarshalYAML converts a type to YAML text
 func (p *PropertyAssignment) MarshalYAML() (interface{}, error) {
 	for k, v := range *p {
 		if k == "value" {
@@ -86,6 +87,7 @@ func (p *PropertyAssignment) MarshalYAML() (interface{}, error) {
 	return p, nil
 }
 
+// UnmarshalYAML converts YAML text to a type
 func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	intf := make([]interface{}, 1)
@@ -126,6 +128,6 @@ func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) er
 		return nil
 	}
 	var res interface{}
-	unmarshal(&res)
+	_ = unmarshal(&res)
 	return fmt.Errorf("Cannot parse Property %v", res)
 }
