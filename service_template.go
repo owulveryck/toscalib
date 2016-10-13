@@ -23,7 +23,6 @@ import (
 
 // ServiceTemplateDefinition is the meta structure containing an entire tosca document as described in
 // http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
-// Updated (kenjones): Adds policy_types
 type ServiceTemplateDefinition struct {
 	DefinitionsVersion Version                         `yaml:"tosca_definitions_version" json:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
 	Description        string                          `yaml:"description,omitempty" json:"description,omitempty"`
@@ -59,6 +58,21 @@ func (s *ServiceTemplateDefinition) GetProperty(node, prop string) PA {
 	return PA{PA: output, Origin: node}
 }
 
+// GetAttribute returns the attribute of a Node
+func (s *ServiceTemplateDefinition) GetAttribute(node, attr string) PA {
+	var paa PropertyAssignment
+	for n, nt := range s.TopologyTemplate.NodeTemplates {
+		if n == node {
+			if aa, ok := nt.Attributes[attr]; ok {
+				for k, v := range aa {
+					paa[k] = reflect.ValueOf(v).Interface().([]interface{})
+				}
+			}
+		}
+	}
+	return PA{PA: paa, Origin: node}
+}
+
 // EvaluateStatement handles executing a statement for a pre-defined function
 func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) (interface{}, error) {
 	if ww, ok := i.(PA); ok {
@@ -83,12 +97,6 @@ func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) (interface{
 						pa := reflect.ValueOf(val).Interface().(map[interface{}]interface{})
 						paa := make(PropertyAssignment, 0)
 						for k, v := range pa {
-							/*
-							   var o []string
-							   for _, vvv := range reflect.ValueOf(v).Interface().([]interface{}) {
-							           o = append(o, vvv.(string))
-							   }
-							*/
 							paa[k.(string)] = reflect.ValueOf(v).Interface().([]interface{})
 							if paa[k.(string)][0] == "SELF" {
 								paa[k.(string)][0] = ww.Origin
@@ -104,17 +112,76 @@ func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) (interface{
 				return s.TopologyTemplate.Inputs[v[0].(string)].Value, nil
 				// Find the inputs and returns it
 			case "get_property":
+				if len(v) == 1 {
+					pa := s.GetProperty(ww.Origin, v[0].(string))
+					st, _ := s.EvaluateStatement(pa)
+					return st, nil
+				} //else
 				node := v[0].(string)
-				pa := s.GetProperty(node, v[1].(string))
-				st, _ := s.EvaluateStatement(pa)
-				return st, nil
-				/*
-				   case "get_attribute":
-				           ret := append([]string{"get_attribute"}, v...)
-				           return ret, nil
-				*/
+				if v[0].(string) == "SELF" {
+					node = ww.Origin
+				}
+				if len(v) == 2 {
+					//refer to Properties
+					pa := s.GetProperty(node, v[1].(string))
+					st, _ := s.EvaluateStatement(pa)
+					return st, nil
+				}
+				if len(v) == 3 {
+					var st []string
+					//refer to requirements
+					rname := v[1].(string)
+					for _, r := range s.TopologyTemplate.NodeTemplates[node].Requirements {
+						for rn, rr := range r {
+							if rn == rname {
+								pa := s.GetProperty(rr.Node, v[2].(string))
+								vst, _ := s.EvaluateStatement(pa)
+								st = append(st, vst.(string))
+							}
+						}
+					}
+					return st, nil
+				}
+			case "get_attribute":
+				if len(v) == 1 {
+					node := s.TopologyTemplate.NodeTemplates[ww.Origin]
+					st := node.Attributes[v[0].(string)]["value"]
+					return st, nil
+				}
+				node := v[0].(string)
+				if v[0].(string) == "SELF" {
+					node = ww.Origin
+				}
+				if len(v) == 2 {
+					rnode := s.TopologyTemplate.NodeTemplates[node]
+					st := rnode.Attributes[v[1].(string)]["value"]
+					return st, nil
+				}
+				if len(v) == 3 {
+					// refer to node requirements
+					znode := s.TopologyTemplate.NodeTemplates[node]
+					var st []string
+					//refer to requirements
+					rname := v[1].(string)
+					for _, r := range znode.Requirements {
+						for rn, rr := range r {
+							if rn == rname {
+								vst := s.TopologyTemplate.NodeTemplates[rr.Node].Attributes[v[2].(string)]["value"]
+								st = append(st, vst...)
+							}
+						}
+					}
+					return st, nil
+				}
 			}
 		}
 	}
 	return []string{}, nil
+}
+
+// SetInput sets an input value on a Service Template Definition
+func (s *ServiceTemplateDefinition) SetInput(prop string, value string) {
+	var input = s.TopologyTemplate.Inputs[prop]
+	input.Value = value
+	s.TopologyTemplate.Inputs[prop] = input
 }

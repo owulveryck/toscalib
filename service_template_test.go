@@ -44,6 +44,92 @@ func TestParse(t *testing.T) {
 
 	}
 }
+
+func TestParseVerifyNodeTemplate(t *testing.T) {
+	fname := "./tests/example1.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+	if s.TopologyTemplate.NodeTemplates["my_server"].Type != "tosca.nodes.Compute" {
+		t.Log(fname, "missing NodeTemplate `my_server`")
+		t.Fail()
+	}
+}
+
+func TestParseVerifyMultipleNodeTemplate(t *testing.T) {
+	fname := "./tests/example3.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	if s.TopologyTemplate.NodeTemplates["mysql"].Type != "tosca.nodes.DBMS.MySQL" {
+		t.Log(fname, "missing NodeTemplate `mysql`")
+		t.Fail()
+	}
+
+	if s.TopologyTemplate.NodeTemplates["db_server"].Type != "tosca.nodes.Compute" {
+		t.Log(fname, "missing NodeTemplate `db_server`")
+		t.Fail()
+	}
+}
+
+func TestParseVerifyInputOutput(t *testing.T) {
+	fname := "./tests/example2.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	if s.TopologyTemplate.Inputs["cpus"].Type != "integer" {
+		t.Log(fname, "missing Input `cpus`")
+		t.Fail()
+	}
+
+	if s.TopologyTemplate.Outputs["server_ip"].Description != "The private IP address of the provisioned server." {
+		t.Log(fname, "missing Output `server_ip`")
+		t.Fail()
+	}
+}
+
+func TestParseVerifyCustomTypes(t *testing.T) {
+	fname := "./tests/test_host_assignment.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	if s.NodeTypes["tosca.nodes.SoftwareComponent.Collectd"].DerivedFrom != "tosca.nodes.SoftwareComponent" {
+		t.Log(fname, "missing NodeTypes `tosca.nodes.SoftwareComponent.Collectd`")
+		t.Fail()
+	}
+}
+
 func TestParseCsar(t *testing.T) {
 
 	testsko := []string{

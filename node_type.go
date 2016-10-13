@@ -40,3 +40,12 @@ func (n *NodeType) getInterface() (string, InterfaceDefinition, error) {
 	}
 	return "", InterfaceDefinition{}, fmt.Errorf("No Interface found")
 }
+
+func (n *NodeType) getInterfaceByName(iname string) (string, InterfaceDefinition, error) {
+	for name, value := range n.Interfaces {
+		if iname == name {
+			return name, value, nil
+		}
+	}
+	return "", InterfaceDefinition{}, fmt.Errorf("No Interface found")
+}

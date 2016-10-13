@@ -69,8 +69,7 @@ func (n *NodeTemplate) getInterface() (string, InterfaceType, error) {
 // All the Operations will be filled
 func (n *NodeTemplate) fillInterface(s ServiceTemplateDefinition) {
 	nt := s.NodeTypes[n.Type]
-	name, intf, err := n.getInterface()
-	if err != nil {
+	if len(n.Interfaces) == 0 {
 		// If no interface is found, take the one frome the node type
 		var myInterfaces map[string]InterfaceType
 		myInterfaces = make(map[string]InterfaceType, 1)
@@ -90,23 +89,28 @@ func (n *NodeTemplate) fillInterface(s ServiceTemplateDefinition) {
 		n.Interfaces = myInterfaces
 		return
 	}
-	_, intf2, _ := nt.getInterface()
-	re := regexp.MustCompile(fmt.Sprintf("%v$", name))
-	operations := make(map[string]OperationDefinition, 0)
-	for ifacename, iface := range s.InterfaceTypes {
-		if re.MatchString(ifacename) {
-			for op := range iface.Operations {
-				v, ok := intf.Operations[op]
-				_, ok2 := intf2[op]
-				switch {
-				case !ok && ok2:
-					operations[op] = OperationDefinition{nil, intf2[op].Description, intf2[op].Implementation}
-				case ok:
-					operations[op] = v
-				default:
+	for name, intf := range n.Interfaces {
+		_, intf2, _ := nt.getInterfaceByName(name)
+		re := regexp.MustCompile(fmt.Sprintf("%v$", name))
+		operations := make(map[string]OperationDefinition, 0)
+		for ifacename, iface := range s.InterfaceTypes {
+			if re.MatchString(ifacename) {
+				for op := range iface.Operations {
+					v, ok := intf.Operations[op]
+					_, ok2 := intf2[op]
+					switch {
+					case !ok && ok2:
+						operations[op] = OperationDefinition{nil, intf2[op].Description, intf2[op].Implementation}
+					case ok:
+						if v.Implementation == "" {
+							v.Implementation = intf2[op].Implementation
+						}
+						operations[op] = v
+					default:
+					}
+					tmp := InterfaceType{n.Interfaces[name].Description, n.Interfaces[name].Version, operations, n.Interfaces[name].Inputs}
+					n.Interfaces[name] = tmp
 				}
-				tmp := InterfaceType{n.Interfaces[name].Description, n.Interfaces[name].Version, operations, n.Interfaces[name].Inputs}
-				n.Interfaces[name] = tmp
 			}
 		}
 	}
@@ -114,4 +118,22 @@ func (n *NodeTemplate) fillInterface(s ServiceTemplateDefinition) {
 
 func (n *NodeTemplate) setName(name string) {
 	n.Name = name
+}
+
+// SetAttribute provides the ability to set a value to a named attribute
+func (n *NodeTemplate) SetAttribute(prop string, value string) {
+	attrb := n.Attributes[prop]
+	aa := make(map[string][]string, 1)
+	aa["value"] = append([]string{}, value)
+	if len(attrb) != 0 {
+		//found one
+		n.Attributes[prop] = aa
+	} else {
+		attrbs := make(map[string]AttributeAssignment, len(n.Attributes)+1)
+		for key, val := range n.Attributes {
+			attrbs[key] = val
+		}
+		attrbs[prop] = aa
+		n.Attributes = attrbs
+	}
 }

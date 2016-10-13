@@ -107,6 +107,15 @@ func merge(s, t ServiceTemplateDefinition) ServiceTemplateDefinition {
 		intf[key] = val
 	}
 	s.InterfaceTypes = intf
+	// PolicyType
+	pt := make(map[string]PolicyType, len(s.PolicyTypes)+len(t.PolicyTypes))
+	for key, val := range t.PolicyTypes {
+		pt[key] = val
+	}
+	for key, val := range s.PolicyTypes {
+		pt[key] = val
+	}
+	s.PolicyTypes = pt
 	return s
 }
 
