@@ -22,8 +22,6 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
-	"net/http"
-	"net/url"
 	"path/filepath"
 
 	"golang.org/x/tools/godoc/vfs"
@@ -182,7 +180,6 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 		rsc, err := ns.Open(im)
 		if err != nil {
 			return err
-
 		}
 		var tt ServiceTemplateDefinition
 		data, err := ioutil.ReadAll(rsc)
@@ -210,8 +207,9 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 	return nil
 }
 
-// Parse a TOSCA document and fill in the structure
-func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
+// ParseRemote a TOSCA document and fill in the structure using specified Resolver function
+// to retrieve remote imports.
+func (t *ServiceTemplateDefinition) ParseRemote(r io.Reader, resolver Resolver) error {
 	var std ServiceTemplateDefinition
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -238,40 +236,11 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 		std = merge(std, tt)
 	}
 	for _, im := range std.Imports {
-		u, err := url.Parse(im)
+		r, err := resolver(im)
 		if err != nil {
-			log.Panic(err)
+			return err
 		}
-		var r []byte
-		switch u.Scheme {
-		case "http":
-			res, err := http.Get(u.String())
-			if err != nil {
-				return err
 
-			}
-			r, err = ioutil.ReadAll(res.Body)
-			_ = res.Body.Close()
-			if err != nil {
-				return err
-			}
-		case "https":
-			res, err := http.Get(u.String())
-			if err != nil {
-				return err
-
-			}
-			r, err = ioutil.ReadAll(res.Body)
-			_ = res.Body.Close()
-			if err != nil {
-				return err
-			}
-		default:
-			r, err = ioutil.ReadFile(im)
-			if err != nil {
-				//return err
-			}
-		}
 		var tt ServiceTemplateDefinition
 
 		err = yaml.Unmarshal(r, &tt)
@@ -292,4 +261,9 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 
 	return nil
 
+}
+
+// Parse a TOSCA document and fill in the structure
+func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
+	return t.ParseRemote(r, defaultResolver)
 }
