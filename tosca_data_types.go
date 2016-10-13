@@ -19,3 +19,11 @@ package toscalib
 // CredentialDefinition as described in appendix C 2.1
 // The Credential type is a complex TOSCA data Type used when describing authorization credentials used to access network accessible resources.
 type CredentialDefinition interface{}
+
+// TimeInterval Datatype defined in Spec v1.2 section 5.3.3
+// The TimeInterval type is a complex TOSCA data Type used when describing a period of time
+// using the YAML ISO 8601 format to declare the start and end times.
+type TimeInterval struct {
+	StartTime string `yaml:"start_time" json:"start_time"`
+	EndTime   string `yaml:"end_time" json:"end_time"`
+}

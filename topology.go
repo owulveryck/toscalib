@@ -21,5 +21,7 @@ package toscalib
 type TopologyTemplateType struct {
 	Inputs        map[string]PropertyDefinition `yaml:"inputs,omitempty" json:"inputs,omitempty"`
 	NodeTemplates map[string]NodeTemplate       `yaml:"node_templates" json:"node_templates"`
+	Policies      map[string]PolicyDefinition   `yaml:"policies" json:"policies"`
+	Workflows     map[string]WorkflowDefinition `yaml:"workflows,omitempty" json:"workflows,omitempty"`
 	Outputs       map[string]Output             `yaml:"outputs,omitempty" json:"outputs,omitempty"`
 }

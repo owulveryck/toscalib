@@ -127,6 +127,17 @@ func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) er
 		}
 		return nil
 	}
+	// Support for multi-valued attributes
+	var mmmm []interface{}
+	if err := unmarshal(&mmmm); err == nil {
+		intf := make([]interface{}, len(mmmm))
+		(*p)["value"] = intf
+		for i, v := range mmmm {
+			(*p)["value"][i] = v
+		}
+		return nil
+	}
+
 	var res interface{}
 	_ = unmarshal(&res)
 	return fmt.Errorf("Cannot parse Property %v", res)
