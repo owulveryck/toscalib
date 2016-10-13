@@ -4,10 +4,8 @@ rm -f err.txt*
 rm -f vet.txt
 
 for pkg in $(glide nv); do
-    if [[ $pkg != *"/doc/"* ]]; then
-        errcheck $pkg >> err.txt
-        go vet $pkg >> vet.txt 2>&1
-    fi
+    errcheck $pkg >> err.txt 2>&1
+    go vet $pkg >> vet.txt 2>&1
 done
 
 # ignore generated files

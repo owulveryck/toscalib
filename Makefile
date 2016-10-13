@@ -7,13 +7,6 @@ SHELL := /bin/bash
 
 PROJECT = toscalib
 
-BUILD_NUMBER ?=
-ifeq ($(strip $(BUILD_NUMBER)),)
-	COVER_FLAG :=
-else
-	COVER_FLAG := --jenkins
-endif
-
 IMPORT_PATH := github.com/CiscoCloud/${PROJECT}
 
 ROOT ?= /${PROJECT}
@@ -72,7 +65,7 @@ test: check
 cover: check
 	@rm -rf cover/
 	@mkdir -p cover
-	${DOCKERRUN} bash ./scripts/cover.sh ${COVER_FLAG}
+	${DOCKERRUN} bash ./scripts/cover.sh
 
 # ------ Generator
 generate: build/image_build NormativeTypes/*
