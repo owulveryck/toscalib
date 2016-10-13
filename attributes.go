@@ -25,13 +25,15 @@ import (
 type AttributeDefinition struct {
 	Type        string      `yaml:"type" json:"type"`                                   //    The required data type for the attribute.
 	Description string      `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the attribute.
-	Default     interface{} `yaml:"default,omitempty" json:"default,omitempty"`         //	An optional key that may provide a value to be used as a default if not provided by another means.
+	Default     interface{} `yaml:"default,omitempty" json:"default,omitempty"`         //  An optional key that may provide a value to be used as a default if not provided by another means.
 	Status      string      `yaml:"status,omitempty" json:"status,omitempty"`           // The optional status of the attribute relative to the specification or implementation.
 	EntrySchema interface{} `yaml:"entry_schema,omitempty" json:"-"`                    // The optional key that is used to declare the name of the Datatype definition for entries of set types such as the TOSCA list or map.
 }
 
+// AttributeAssignment a map of attributes to be assigned
 type AttributeAssignment map[string][]string
 
+// UnmarshalYAML handles converting an AttributeAssignment from YAML to type
 func (a *AttributeAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	*a = make(map[string][]string, 1)
@@ -54,6 +56,6 @@ func (a *AttributeAssignment) UnmarshalYAML(unmarshal func(interface{}) error) e
 		return nil
 	}
 	var res interface{}
-	unmarshal(&res)
+	_ = unmarshal(&res)
 	return fmt.Errorf("Cannot parse Attribute %v", res)
 }

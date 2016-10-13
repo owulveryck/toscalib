@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package toscalib
 
 // InterfaceType as described in Appendix A 6.4
@@ -34,6 +35,7 @@ type OperationDefinition struct {
 	Implementation string                        `yaml:"implementation,omitempty"`
 }
 
+// UnmarshalYAML converts YAML text to a type
 func (i *OperationDefinition) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	if err := unmarshal(&s); err == nil {
@@ -61,12 +63,15 @@ func (i *OperationDefinition) UnmarshalYAML(unmarshal func(interface{}) error) e
 
 // InterfaceDefinition is related to a node type
 type InterfaceDefinition map[string]InterfaceDef
+
+// InterfaceDef defines the keywords of an Interface
 type InterfaceDef struct {
 	Inputs         map[string]Input `yaml:"inputs,omitempty"`
 	Description    string           `yaml:"description,omitempty"`
 	Implementation string           `yaml:"implementation,omitempty"`
 }
 
+// UnmarshalYAML converts YAML text to a type
 func (i *InterfaceDef) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	if err := unmarshal(&s); err == nil {
@@ -74,10 +79,9 @@ func (i *InterfaceDef) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return nil
 	}
 	var str struct {
-		Inputs map[string]Input `yaml:"inputs,omitempty"`
-		//Implementation      string                 `yaml:"implementation,omitempty"`
-		Description    string `yaml:"description,omitempty"`
-		Implementation string `yaml:"implementation,omitempty"`
+		Inputs         map[string]Input `yaml:"inputs,omitempty"`
+		Description    string           `yaml:"description,omitempty"`
+		Implementation string           `yaml:"implementation,omitempty"`
 	}
 	if err := unmarshal(&str); err != nil {
 		return err

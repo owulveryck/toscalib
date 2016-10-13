@@ -1,0 +1,11 @@
+hash: 7ec055e4a5b3713923c70831cbcebf8442eb92b0cf4ae71db2a2311d8e1b8da0
+updated: 2016-10-13T17:51:16.409957172Z
+imports:
+- name: golang.org/x/tools
+  version: b44548ae6ac7f353d03366d7d115508500b00f0e
+  subpackages:
+  - godoc/vfs
+  - godoc/vfs/zipfs
+- name: gopkg.in/yaml.v2
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
+testImports: []

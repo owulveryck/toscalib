@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package toscalib
 
 import (
@@ -21,7 +22,8 @@ import (
 )
 
 // ServiceTemplateDefinition is the meta structure containing an entire tosca document as described in
-//http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
+// http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
+// Updated (kenjones): Adds policy_types
 type ServiceTemplateDefinition struct {
 	DefinitionsVersion Version                         `yaml:"tosca_definitions_version" json:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
 	Description        string                          `yaml:"description,omitempty" json:"description,omitempty"`
@@ -37,6 +39,7 @@ type ServiceTemplateDefinition struct {
 	TopologyTemplate   TopologyTemplateType            `yaml:"topology_template" json:"topology_template"`                       // Defines the topology template of an application or service, consisting of node templates that represent the application’s or service’s components, as well as relationship templates representing relations between the components.
 }
 
+// PA holds a PropertyAssignment and the original
 type PA struct {
 	PA     PropertyAssignment
 	Origin string
@@ -55,6 +58,7 @@ func (s *ServiceTemplateDefinition) GetProperty(node, prop string) PA {
 	return PA{PA: output, Origin: node}
 }
 
+// EvaluateStatement handles executing a statement for a pre-defined function
 func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) (interface{}, error) {
 	if ww, ok := i.(PA); ok {
 		w := ww.PA
@@ -63,9 +67,8 @@ func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) (interface{
 			case "value":
 				if len(v) == 1 {
 					return v[0], nil
-				} else {
-					return v, nil
 				}
+				return v, nil
 			case "concat":
 				var output string
 				for _, val := range v {
@@ -80,10 +83,10 @@ func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) (interface{
 						paa := make(PropertyAssignment, 0)
 						for k, v := range pa {
 							/*
-								var o []string
-								for _, vvv := range reflect.ValueOf(v).Interface().([]interface{}) {
-									o = append(o, vvv.(string))
-								}
+							   var o []string
+							   for _, vvv := range reflect.ValueOf(v).Interface().([]interface{}) {
+							           o = append(o, vvv.(string))
+							   }
 							*/
 							paa[k.(string)] = reflect.ValueOf(v).Interface().([]interface{})
 							if paa[k.(string)][0] == "SELF" {
@@ -105,9 +108,9 @@ func (s *ServiceTemplateDefinition) EvaluateStatement(i interface{}) (interface{
 				st, _ := s.EvaluateStatement(pa)
 				return st, nil
 				/*
-					case "get_attribute":
-						ret := append([]string{"get_attribute"}, v...)
-						return ret, nil
+				   case "get_attribute":
+				           ret := append([]string{"get_attribute"}, v...)
+				           return ret, nil
 				*/
 			}
 		}

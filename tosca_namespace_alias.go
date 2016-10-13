@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 // Package toscalib implements the TOSCA syntax in its YAML version as described in
 // http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
 package toscalib
@@ -38,39 +39,39 @@ type Version string
 /*TODO
 // GetMajor returns the major_version number
 func (toscaVersion *Version) GetMajor() int {
-	return 0
+        return 0
 }
 */
 
 /*TODO
 // GetMinor returns the minor_version number
 func (toscaVersion *Version) GetMinor() int {
-	return 0
+        return 0
 }
 */
 
 /*TODO
 // GetFixVersion returns the fix_version integer value
 func (toscaVersion *Version) GetFixVersion() int {
-	return 0
+        return 0
 }
 */
 
 /*TODO
 // GetQualifier returns the named, pre-release version of the associated code that has been derived    from the version of the code identified by the combination major_version, minor_version and fix_version numbers
 func (toscaVersion *Version) GetQualifier() string {
-	return nil
+        return nil
 }
 */
 
 /*TODO
 // GetBuildVersion returns an  integer value greater than or equal to 0 (zero) that can be used to further        qualify different build versions of the code that has the same qualifer_string
 func (toscaVersion *Version) GetBuildVersion() int {
-	return 0
+        return 0
 }
 */
 
-// UNBOUNDED: A.2.3 TOCSA range type
+// UNBOUNDED A.2.3 TOCSA range type
 const UNBOUNDED uint64 = 9223372036854775807
 
 // ToscaRange is defined in Appendix 2.3

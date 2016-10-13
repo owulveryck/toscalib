@@ -13,26 +13,28 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 package toscalib
 
 import (
 	"archive/zip"
 	"fmt"
-	"golang.org/x/tools/godoc/vfs"
-	"golang.org/x/tools/godoc/vfs/zipfs"
-	"gopkg.in/yaml.v2"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"path/filepath"
+
+	"golang.org/x/tools/godoc/vfs"
+	"golang.org/x/tools/godoc/vfs/zipfs"
+	"gopkg.in/yaml.v2"
 )
 
 // GetNodeTemplate returns a pointer to a node template given its name
 // its returns nil if not found
-func (toscaStructure *ServiceTemplateDefinition) GetNodeTemplate(nodeName string) *NodeTemplate {
-	for name, nodeTemplate := range toscaStructure.TopologyTemplate.NodeTemplates {
+func (t *ServiceTemplateDefinition) GetNodeTemplate(nodeName string) *NodeTemplate {
+	for name, nodeTemplate := range t.TopologyTemplate.NodeTemplates {
 		if name == nodeName {
 			return &nodeTemplate
 		}
@@ -108,7 +110,7 @@ func merge(s, t ServiceTemplateDefinition) ServiceTemplateDefinition {
 	return s
 }
 
-// Open and parse the Csar file c
+// ParseCsar handles open and parse the CSAR file
 func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 
 	type meta struct {
@@ -240,7 +242,7 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 
 			}
 			r, err = ioutil.ReadAll(res.Body)
-			res.Body.Close()
+			_ = res.Body.Close()
 			if err != nil {
 				return err
 			}
@@ -251,7 +253,7 @@ func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
 
 			}
 			r, err = ioutil.ReadAll(res.Body)
-			res.Body.Close()
+			_ = res.Body.Close()
 			if err != nil {
 				return err
 			}

@@ -12,6 +12,7 @@ interface_types:
       description: Standard lifecycle stop operation.
     delete:
       description: Standard lifecycle delete operation.
+      
   tosca.interfaces.relationship.Configure:
     pre_configure_source:
       description: Operation to pre-configure the source endpoint.
@@ -28,4 +29,4 @@ interface_types:
     target_changed:
       description: Operation to notify source some property or attribute of the target changed
     remove_target:
-      description: Operation to remove a target node. 
+      description: Operation to remove a target node.
