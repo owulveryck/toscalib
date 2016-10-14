@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"path/filepath"
 
 	"golang.org/x/tools/godoc/vfs"
@@ -150,61 +149,22 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 	rsc, err := ns.Open(base)
 	if err != nil {
 		return err
-
-	}
-	var std ServiceTemplateDefinition
-	data, err := ioutil.ReadAll(rsc)
-	if err != nil {
-		return err
 	}
 
-	// Unmarshal the data in an interface
-	err = yaml.Unmarshal(data, &std)
-	if err != nil {
-		return err
-	}
-	// Import de normative types by default
-	for _, normType := range []string{"interface_types", "relationship_types", "node_types", "capability_types"} {
-		data, err := Asset(normType)
+	// pass in a resolver that has the context of the virtual filespace
+	// of the archive file to handle resolving imports
+	return t.ParseRemote(rsc, func(l string) ([]byte, error) {
+		var r []byte
+		rsc, err := ns.Open(l)
 		if err != nil {
-			return err
+			return r, err
 		}
-		var tt ServiceTemplateDefinition
-		err = yaml.Unmarshal(data, &tt)
+		r, err = ioutil.ReadAll(rsc)
 		if err != nil {
-			return err
+			return r, err
 		}
-		std = merge(std, tt)
-	}
-	for _, im := range std.Imports {
-		rsc, err := ns.Open(im)
-		if err != nil {
-			return err
-		}
-		var tt ServiceTemplateDefinition
-		data, err := ioutil.ReadAll(rsc)
-		if err != nil {
-			return err
-		}
-
-		// Unmarshal the data in an interface
-		err = yaml.Unmarshal(data, &tt)
-		if err != nil {
-			return err
-		}
-		std = merge(std, tt)
-	}
-	// Free the imports
-	std.Imports = []string{}
-	*t = std
-	for name, node := range t.TopologyTemplate.NodeTemplates {
-		node.fillInterface(*t)
-		node.setRefs(t)
-		node.setName(name)
-		t.TopologyTemplate.NodeTemplates[name] = node
-	}
-
-	return nil
+		return r, nil
+	})
 }
 
 // ParseRemote a TOSCA document and fill in the structure using specified Resolver function
@@ -221,13 +181,14 @@ func (t *ServiceTemplateDefinition) ParseRemote(r io.Reader, resolver Resolver) 
 	if err != nil {
 		return err
 	}
-	// Import de normative types by default
-	for _, normType := range []string{"interface_types", "relationship_types", "node_types", "capability_types"} {
-		data, err := Asset(normType)
-		if err != nil {
-			log.Panic("Normative type not found")
-			return err
-		}
+
+	// Import the normative types by default
+	for _, normType := range AssetNames() {
+		// the normType comes from the defined list so this will
+		// always be successful, if not then panic is the correct
+		// approach for this kind of parsing.
+		data := MustAsset(normType)
+
 		var tt ServiceTemplateDefinition
 		err = yaml.Unmarshal(data, &tt)
 		if err != nil {
@@ -235,6 +196,7 @@ func (t *ServiceTemplateDefinition) ParseRemote(r io.Reader, resolver Resolver) 
 		}
 		std = merge(std, tt)
 	}
+
 	for _, im := range std.Imports {
 		r, err := resolver(im)
 		if err != nil {
@@ -242,7 +204,6 @@ func (t *ServiceTemplateDefinition) ParseRemote(r io.Reader, resolver Resolver) 
 		}
 
 		var tt ServiceTemplateDefinition
-
 		err = yaml.Unmarshal(r, &tt)
 		if err != nil {
 			return err
@@ -250,8 +211,13 @@ func (t *ServiceTemplateDefinition) ParseRemote(r io.Reader, resolver Resolver) 
 		std = merge(std, tt)
 	}
 	// Free the imports
+	// TODO(kenjones): Does dropping the Imports list really have any impact?
 	std.Imports = []string{}
+
+	// update the initial context with the freshly loaded context
 	*t = std
+
+	// make sure any references are fulfilled
 	for name, node := range t.TopologyTemplate.NodeTemplates {
 		node.fillInterface(*t)
 		node.setRefs(t)
