@@ -28,6 +28,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ParserHooks provide callback functions for handling custom logic at
+// key points within the overall parsing logic.
+type ParserHooks struct {
+	ParsedSTD func(source string, std *ServiceTemplateDefinition) error
+}
+
+func noop(source string, std *ServiceTemplateDefinition) error {
+	return nil
+}
+
 // GetNodeTemplate returns a pointer to a node template given its name
 // its returns nil if not found
 func (t *ServiceTemplateDefinition) GetNodeTemplate(nodeName string) *NodeTemplate {
@@ -159,13 +169,18 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 			return r, err
 		}
 		return r, nil
-	})
+	}, ParserHooks{ParsedSTD: noop}) // TODO(kenjones): Add hooks as method parameter
 }
 
-func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver) error {
+func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver, hooks ParserHooks) error {
 	var std ServiceTemplateDefinition
 	// Unmarshal the data in an interface
 	err := yaml.Unmarshal(data, &std)
+	if err != nil {
+		return err
+	}
+
+	err = hooks.ParsedSTD("", &std)
 	if err != nil {
 		return err
 	}
@@ -182,6 +197,11 @@ func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver) error 
 		if err != nil {
 			return err
 		}
+		err = hooks.ParsedSTD(normType, &tt)
+		if err != nil {
+			return err
+		}
+
 		std = merge(std, tt)
 	}
 
@@ -194,6 +214,10 @@ func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver) error 
 
 		var tt ServiceTemplateDefinition
 		err = yaml.Unmarshal(r, &tt)
+		if err != nil {
+			return err
+		}
+		err = hooks.ParsedSTD(im, &tt)
 		if err != nil {
 			return err
 		}
@@ -219,25 +243,25 @@ func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver) error 
 
 // ParseReader retrieves and parses a TOSCA document and loads into the structure using
 // specified Resolver function to retrieve remote imports.
-func (t *ServiceTemplateDefinition) ParseReader(r io.Reader, resolver Resolver) error {
+func (t *ServiceTemplateDefinition) ParseReader(r io.Reader, resolver Resolver, hooks ParserHooks) error {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
 	}
-	return t.parse(data, resolver)
+	return t.parse(data, resolver, hooks)
 }
 
 // ParseSource retrieves and parses a TOSCA document and loads into the structure using
 // specified Resolver function to retrieve remote source or imports.
-func (t *ServiceTemplateDefinition) ParseSource(source string, resolver Resolver) error {
+func (t *ServiceTemplateDefinition) ParseSource(source string, resolver Resolver, hooks ParserHooks) error {
 	data, err := resolver(source)
 	if err != nil {
 		return err
 	}
-	return t.parse(data, resolver)
+	return t.parse(data, resolver, hooks)
 }
 
 // Parse a TOSCA document and fill in the structure
 func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
-	return t.ParseReader(r, defaultResolver)
+	return t.ParseReader(r, defaultResolver, ParserHooks{ParsedSTD: noop})
 }
