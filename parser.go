@@ -145,15 +145,10 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 	base := filepath.Base(m.EntryDefinition)
 	ns := vfs.NameSpace{}
 	ns.Bind("/", fs, dirname, vfs.BindReplace)
-	// Now read the yaml
-	rsc, err := ns.Open(base)
-	if err != nil {
-		return err
-	}
 
 	// pass in a resolver that has the context of the virtual filespace
 	// of the archive file to handle resolving imports
-	return t.ParseRemote(rsc, func(l string) ([]byte, error) {
+	return t.ParseSource(base, func(l string) ([]byte, error) {
 		var r []byte
 		rsc, err := ns.Open(l)
 		if err != nil {
@@ -167,17 +162,10 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 	})
 }
 
-// ParseRemote a TOSCA document and fill in the structure using specified Resolver function
-// to retrieve remote imports.
-func (t *ServiceTemplateDefinition) ParseRemote(r io.Reader, resolver Resolver) error {
+func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver) error {
 	var std ServiceTemplateDefinition
-	data, err := ioutil.ReadAll(r)
-	if err != nil {
-		return err
-	}
-
 	// Unmarshal the data in an interface
-	err = yaml.Unmarshal(data, &std)
+	err := yaml.Unmarshal(data, &std)
 	if err != nil {
 		return err
 	}
@@ -190,13 +178,14 @@ func (t *ServiceTemplateDefinition) ParseRemote(r io.Reader, resolver Resolver) 
 		data := MustAsset(normType)
 
 		var tt ServiceTemplateDefinition
-		err = yaml.Unmarshal(data, &tt)
+		err := yaml.Unmarshal(data, &tt)
 		if err != nil {
 			return err
 		}
 		std = merge(std, tt)
 	}
 
+	// Load all referenced Imports
 	for _, im := range std.Imports {
 		r, err := resolver(im)
 		if err != nil {
@@ -226,10 +215,29 @@ func (t *ServiceTemplateDefinition) ParseRemote(r io.Reader, resolver Resolver) 
 	}
 
 	return nil
+}
 
+// ParseReader retrieves and parses a TOSCA document and loads into the structure using
+// specified Resolver function to retrieve remote imports.
+func (t *ServiceTemplateDefinition) ParseReader(r io.Reader, resolver Resolver) error {
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		return err
+	}
+	return t.parse(data, resolver)
+}
+
+// ParseSource retrieves and parses a TOSCA document and loads into the structure using
+// specified Resolver function to retrieve remote source or imports.
+func (t *ServiceTemplateDefinition) ParseSource(source string, resolver Resolver) error {
+	data, err := resolver(source)
+	if err != nil {
+		return err
+	}
+	return t.parse(data, resolver)
 }
 
 // Parse a TOSCA document and fill in the structure
 func (t *ServiceTemplateDefinition) Parse(r io.Reader) error {
-	return t.ParseRemote(r, defaultResolver)
+	return t.ParseReader(r, defaultResolver)
 }
