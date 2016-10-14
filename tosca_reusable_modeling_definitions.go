@@ -50,3 +50,7 @@ type RepositoryDefinition struct {
 // An Artifact Type is a reusable entity that defines the type of one or more files which Node Types or Node Templates can have dependent relationships and used during operations such as during installation or deployment.
 // TODO
 type ArtifactType interface{}
+
+// Metadata is provides support for attaching provider specific attributes
+// to different structures.
+type Metadata map[string]string

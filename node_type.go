@@ -23,8 +23,9 @@ import (
 // NodeType as described is Appendix 6.8.
 // A Node Type is a reusable entity that defines the type of one or more Node Templates. As such, a Node Type defines the structure of observable properties via a Properties Definition, the Requirements and Capabilities of the node as well as its supported interfaces.
 type NodeType struct {
-	DerivedFrom  string                             `yaml:"derived_from,omitempty" json:"derived_from"`           // An optional parent Node Type name this new Node Type derives from
-	Description  string                             `yaml:"description,omitempty" json:"description"`             // An optional description for the Node Type
+	DerivedFrom  string                             `yaml:"derived_from,omitempty" json:"derived_from"` // An optional parent Node Type name this new Node Type derives from
+	Description  string                             `yaml:"description,omitempty" json:"description"`   // An optional description for the Node Type
+	Metadata     Metadata                           `yaml:"metadata,omitempty" json:"metadata"`
 	Properties   map[string]PropertyDefinition      `yaml:"properties,omitempty" json:"properties,omitempty"`     // An optional list of property definitions for the Node Type.
 	Attributes   map[string]AttributeDefinition     `yaml:"attributes,omitempty" json:"attributes,omitempty"`     // An optional list of attribute definitions for the Node Type.
 	Requirements []map[string]RequirementDefinition `yaml:"requirements,omitempty" json:"requirements,omitempty"` // An optional sequenced list of requirement definitions for the Node Type
