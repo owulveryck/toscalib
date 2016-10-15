@@ -1,6 +1,8 @@
-hash: 7ec055e4a5b3713923c70831cbcebf8442eb92b0cf4ae71db2a2311d8e1b8da0
-updated: 2016-10-13T17:51:16.409957172Z
+hash: 3d23201b2014a5679457c14849e45e97fbabb9a0e0a6921f18ffd9012c7b24ff
+updated: 2016-10-14T21:42:50.286843925Z
 imports:
+- name: github.com/imdario/mergo
+  version: 3e95a51e0639b4cf372f2ccf74c86749d747fbdc
 - name: golang.org/x/tools
   version: b44548ae6ac7f353d03366d7d115508500b00f0e
   subpackages:
@@ -8,4 +10,8 @@ imports:
   - godoc/vfs/zipfs
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
-testImports: []
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 6cf5744a041a0022271cefed95ba843f6d87fd51
+  subpackages:
+  - spew

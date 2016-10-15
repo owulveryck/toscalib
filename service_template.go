@@ -19,6 +19,8 @@ package toscalib
 import (
 	"fmt"
 	"reflect"
+
+	"github.com/imdario/mergo"
 )
 
 // ServiceTemplateDefinition is the meta structure containing an entire tosca document as described in
@@ -38,6 +40,21 @@ type ServiceTemplateDefinition struct {
 	InterfaceTypes     map[string]InterfaceType        `yaml:"interface_types,omitempty" json:"interface_types,omitempty"`       // This section contains an optional list of interface type definitions for use in service templates.
 	TopologyTemplate   TopologyTemplateType            `yaml:"topology_template" json:"topology_template"`                       // Defines the topology template of an application or service, consisting of node templates that represent the application’s or service’s components, as well as relationship templates representing relations between the components.
 	PolicyTypes        map[string]PolicyType           `yaml:"policy_types" json:"policy_types"`
+}
+
+// Clone creates a deep copy of a Service Template Definition
+func (s *ServiceTemplateDefinition) Clone() ServiceTemplateDefinition {
+	var ns ServiceTemplateDefinition
+	tmp := clone(*s)
+	ns, _ = tmp.(ServiceTemplateDefinition)
+	return ns
+}
+
+// Merge applies the data from one ServiceTemplate to the current ServiceTemplate
+func (s *ServiceTemplateDefinition) Merge(u ServiceTemplateDefinition) ServiceTemplateDefinition {
+	std := s.Clone()
+	_ = mergo.MergeWithOverwrite(&std, u)
+	return std
 }
 
 // PA holds a PropertyAssignment and the original

@@ -20,7 +20,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func TestParse(t *testing.T) {
@@ -161,3 +164,122 @@ func TestParseCsar(t *testing.T) {
 }
 
 func TestEvaluate(t *testing.T) {}
+
+func compare(a, b interface{}) bool {
+	return reflect.DeepEqual(a, b)
+}
+
+func TestClone(t *testing.T) {
+	files, _ := ioutil.ReadDir("./tests")
+	for _, f := range files {
+		if !f.IsDir() {
+			fname := fmt.Sprintf("./tests/%v", f.Name())
+			if filepath.Ext(fname) == ".yaml" {
+				var s ServiceTemplateDefinition
+				o, err := os.Open(fname)
+				if err != nil {
+					t.Fatal(err)
+				}
+				err = s.Parse(o)
+				if err != nil {
+					t.Log("Error in processing", fname)
+					t.Fatal(err)
+				}
+
+				a := s.Clone()
+				if ok := compare(s, a); !ok {
+					t.Log("Cloning ServiceTemplate failed for source:", fname)
+					t.Fatal(spew.Sdump(s), "!=", spew.Sdump(a))
+				}
+			}
+		}
+	}
+}
+
+func getValue(key string, val reflect.Value) interface{} {
+
+	switch val.Kind() {
+	case reflect.Ptr:
+		v := val.Elem()
+		// Check if the pointer is nil
+		if !v.IsValid() {
+			return nil
+		}
+		return getValue(key, v)
+
+	case reflect.Interface:
+		v := val.Elem()
+		if !v.IsValid() {
+			return nil
+		}
+		return getValue(key, v)
+
+	case reflect.Struct:
+		return getValue(key, val.FieldByName(key))
+
+	case reflect.Map:
+		if val.IsNil() {
+			return nil
+		}
+
+		for _, mkey := range val.MapKeys() {
+			mkeyStr := mkey.Interface().(string)
+			if mkeyStr == key {
+				return getValue(key, val.MapIndex(mkey))
+			}
+		}
+	}
+
+	return val.Interface()
+}
+
+func TestMerge(t *testing.T) {
+	fnameA := "./tests/example1.yaml"
+	var a ServiceTemplateDefinition
+	ao, err := os.Open(fnameA)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = a.Parse(ao)
+	if err != nil {
+		t.Log("Error in processing", fnameA)
+		t.Fatal(err)
+	}
+
+	fnameB := "./tests/example2.yaml"
+	var b ServiceTemplateDefinition
+	bo, err := os.Open(fnameB)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = b.Parse(bo)
+	if err != nil {
+		t.Log("Error in processing", fnameB)
+		t.Fatal(err)
+	}
+
+	mc := a.Merge(b)
+	if mc.TopologyTemplate.NodeTemplates["my_server"].Type != "tosca.nodes.Compute" {
+		t.Log("missing NodeTemplate `my_server`")
+		t.Fail()
+	}
+
+	if mc.TopologyTemplate.Inputs["cpus"].Type != "integer" {
+		t.Log("missing Input `cpus`")
+		t.Fail()
+	}
+
+	if mc.TopologyTemplate.Outputs["server_ip"].Description != "The private IP address of the provisioned server." {
+		t.Log("missing Output `server_ip`")
+		t.Fail()
+	}
+
+	h := mc.TopologyTemplate.NodeTemplates["my_server"].Capabilities["host"]
+	properties := getValue("properties", reflect.ValueOf(h))
+	mem := getValue("mem_size", reflect.ValueOf(properties))
+
+	if mem != "4 MB" {
+		t.Fatal("merge failed if mem_size not `4 MB`", mem)
+	}
+
+}
