@@ -46,6 +46,31 @@ type RepositoryDefinition struct {
 	Credential  CredentialDefinition `yaml:"credential" json:"credential"`                       // The optional Credential used to authorize access to the repository.
 }
 
+// UnmarshalYAML is used to match both Simple Notation Example and Full Notation Example
+func (r *RepositoryDefinition) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	// First try the Short notation
+	var u string
+	err := unmarshal(&u)
+	if err == nil {
+		r.URL = u
+		return nil
+	}
+	// If error, try the full struct
+	var test2 struct {
+		Description string               `yaml:"description,omitempty" json:"description,omitempty"`
+		URL         string               `yaml:"url" json:"url"`
+		Credential  CredentialDefinition `yaml:"credential" json:"credential"`
+	}
+	err = unmarshal(&test2)
+	if err != nil {
+		return err
+	}
+	r.URL = test2.URL
+	r.Description = test2.Description
+	r.Credential = test2.Credential
+	return nil
+}
+
 // ArtifactType as described in appendix 6.3
 // An Artifact Type is a reusable entity that defines the type of one or more files which Node Types or Node Templates can have dependent relationships and used during operations such as during installation or deployment.
 // TODO

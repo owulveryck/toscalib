@@ -84,7 +84,7 @@ capability_types:
       dns_name:
         description: The optional name to register with DNS
         type: string
-        required: false   
+        required: false
         status: experimental
   tosca.capabilities.network.Bindable:
     derived_from: tosca.capabilities.Node

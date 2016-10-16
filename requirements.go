@@ -122,7 +122,7 @@ type RequirementAssignment struct {
 	   - Node Type name that the provider will use to select a type-compatible node template to fulfil the requirement at runtime.  */
 	Nodefilter NodeFilter `yaml:"node_filter,omitempty" json:"node_filter,omitempty"` // The optional filter definition that TOSCA orchestrators or providers would use to select a type-compatible target node that can fulfill the associated abstract requirement at runtime.o
 	/* The following is the list of recognized keynames for a TOSCA requirement assignment’s relationship keyname which is used when Property assignments need to be provided to inputs of declared interfaces or their operations:*/
-	Relationship RequirementRelationship
+	Relationship RequirementRelationship `yaml:"relationship,omitempty" json:"relationship,omitempty"`
 }
 
 // UnmarshalYAML is used to match both Simple Notation Example and Full Notation Example

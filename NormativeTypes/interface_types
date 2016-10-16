@@ -12,7 +12,7 @@ interface_types:
       description: Standard lifecycle stop operation.
     delete:
       description: Standard lifecycle delete operation.
-      
+
   tosca.interfaces.relationship.Configure:
     pre_configure_source:
       description: Operation to pre-configure the source endpoint.
