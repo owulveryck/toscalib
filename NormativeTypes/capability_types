@@ -3,9 +3,13 @@ tosca_definitions_version: tosca_simple_yaml_1_0_0
 capability_types:
   tosca.capabilities.Attachment:
     derived_from: tosca.capabilities.Root
-  tosca.capabilities.Container:
+
+  tosca.capabilities.Compute:
     derived_from: tosca.capabilities.Root
     properties:
+      name:
+        type: string
+        required: false
       num_cpus:
         type: integer
         required: false
@@ -26,17 +30,23 @@ capability_types:
         required: false
         constraints:
           - greater_or_equal: 0 MB
+
+  tosca.capabilities.compute.Container:
+    derived_from: tosca.capabilities.Compute
+
   tosca.capabilities.Endpoint:
     derived_from: tosca.capabilities.Root
     properties:
       protocol:
         type: string
+        required: true
         default: tcp
       port:
         type: PortDef
         required: false
       secure:
         type: boolean
+        required: false
         default: false
       url_path:
         type: string
@@ -50,6 +60,7 @@ capability_types:
         default: PRIVATE
       initiator:
         type: string
+        required: false
         default: source
         constraints:
           - valid_values: [ source, target, peer ]
@@ -63,18 +74,29 @@ capability_types:
     attributes:
       ip_address:
         type: string
+
   tosca.capabilities.Endpoint.Admin:
     derived_from: tosca.capabilities.Endpoint
     # Change Endpoint secure indicator to true from its default of false
     properties:
-      secure: true
+      secure:
+        type: boolean
+        default: true
+        constraints:
+          - equal: true
+
   tosca.capabilities.Endpoint.Database:
-        derived_from: tosca.capabilities.Endpoint
+    derived_from: tosca.capabilities.Endpoint
+
   tosca.capabilities.Endpoint.Public:
     derived_from: tosca.capabilities.Endpoint
     properties:
       # Change the default network_name to use the first public network found
-      network_name: PUBLIC
+      network_name:
+        type: string
+        default: PUBLIC
+        constraints:
+          - equal: PUBLIC
       floating:
         description: >
           indicates that the public address should be allocated from a pool of floating IPs that are associated with the network.
@@ -86,10 +108,20 @@ capability_types:
         type: string
         required: false
         status: experimental
+
+  tosca.capabilities.Network:
+    derived_from: tosca.capabilities.Root
+    properties:
+      name:
+        type: string
+        required: false
+
   tosca.capabilities.network.Bindable:
     derived_from: tosca.capabilities.Node
+
   tosca.capabilities.Node:
     derived_from: tosca.capabilities.Root
+
   tosca.capabilities.OperatingSystem:
     derived_from: tosca.capabilities.Root
     properties:
@@ -105,8 +137,10 @@ capability_types:
       version:
         type: version
         required: false
+
   tosca.capabilities.Root:
     description: The TOSCA root Capability Type all other TOSCA base Capability Types derive from
+
   tosca.capabilities.Scalable:
     derived_from: tosca.capabilities.Root
     properties:
@@ -118,3 +152,10 @@ capability_types:
         default: 1
       default_instances:
         type: integer
+
+  tosca.capabilities.Storage:
+    derived_from: tosca.capabilities.Root
+    properties:
+      name:
+        type: string
+        required: false

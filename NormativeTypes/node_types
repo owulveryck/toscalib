@@ -1,7 +1,7 @@
 tosca_definitions_version: tosca_simple_yaml_1_0_0
 
 node_types:
-  tosca.nodes.BlockStorage:
+  tosca.nodes.Storage.BlockStorage:
     derived_from: tosca.nodes.Root
     properties:
       size:
@@ -17,6 +17,7 @@ node_types:
     capabilities:
       attachment:
         type: tosca.capabilities.Attachment
+
   tosca.nodes.Compute:
     derived_from: tosca.nodes.Root
     attributes:
@@ -50,13 +51,19 @@ node_types:
         type: tosca.capabilities.Scalable
       binding:
         type: tosca.capabilities.network.Bindable
+
   tosca.nodes.Container.Application:
     derived_from: tosca.nodes.Root
     requirements:
       - host:
           capability: tosca.capabilities.Container
-          node: tosca.nodes.Container
+          node: tosca.nodes.Container.Runtime
           relationship: tosca.relationships.HostedOn
+      - storage:
+          capability: tosca.capabilities.Storage
+      - network:
+          capability: tosca.capabilities.EndPoint
+
   tosca.nodes.Container.Runtime:
     derived_from: tosca.nodes.SoftwareComponent
     capabilities:
@@ -64,6 +71,7 @@ node_types:
         type: tosca.capabilities.Container
       scalable:
         type: tosca.capabilities.Scalable
+
   tosca.nodes.Database:
     derived_from: tosca.nodes.Root
     properties:
@@ -89,6 +97,7 @@ node_types:
     capabilities:
       database_endpoint:
         type: tosca.capabilities.Endpoint.Database
+
   tosca.nodes.DBMS:
     derived_from: tosca.nodes.SoftwareComponent
     properties:
@@ -104,10 +113,10 @@ node_types:
       host:
         type: tosca.capabilities.Container
         valid_source_types: [ tosca.nodes.Database ]
+
   tosca.nodes.LoadBalancer:
     derived_from: tosca.nodes.Root
     properties:
-      # TBD
       algorithm:
         type: string
         required: false
@@ -123,7 +132,8 @@ node_types:
           relationship: tosca.relationships.RoutesTo
           occurrences: [0, UNBOUNDED]
           description: Connection to one or more load balanced applications
-  tosca.nodes.ObjectStorage:
+
+  tosca.nodes.Storage.ObjectStorage:
     derived_from: tosca.nodes.Root
     properties:
       name:
@@ -139,7 +149,9 @@ node_types:
     capabilities:
       storage_endpoint:
         type: tosca.capabilities.Endpoint
+
   tosca.nodes.Root:
+    derived_from: tosca.entity.Root
     description: The TOSCA Node Type all other TOSCA base Node Types derive from
     attributes:
       tosca_id:
@@ -160,6 +172,7 @@ node_types:
     interfaces:
       Standard:
         type: tosca.interfaces.node.lifecycle.Standard
+
   tosca.nodes.SoftwareComponent:
     derived_from: tosca.nodes.Root
     properties:
@@ -175,6 +188,7 @@ node_types:
           capability: tosca.capabilities.Container
           node: tosca.nodes.Compute
           relationship: tosca.relationships.HostedOn
+
   tosca.nodes.WebApplication:
     derived_from: tosca.nodes.Root
     properties:
@@ -188,6 +202,7 @@ node_types:
           capability: tosca.capabilities.Container
           node: tosca.nodes.WebServer
           relationship: tosca.relationships.HostedOn
+
   tosca.nodes.WebServer:
     derived_from: tosca.nodes.SoftwareComponent
     capabilities:
