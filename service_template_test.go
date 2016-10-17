@@ -133,6 +133,25 @@ func TestParseVerifyCustomTypes(t *testing.T) {
 	}
 }
 
+func TestParseVerifyRelationshipTypes(t *testing.T) {
+	fname := "./tests/tosca_blockstorage_with_attachment_notation1.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	if s.RelationshipTypes["MyAttachTo"].DerivedFrom != "tosca.relationships.AttachesTo" {
+		t.Log(fname, "missing RelationshipTypes `MyAttachTo`")
+		t.Fail()
+	}
+}
+
 func TestParseCsar(t *testing.T) {
 
 	testsko := []string{

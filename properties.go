@@ -41,7 +41,7 @@ type PropertyDefinition struct {
 func (p *PropertyDefinition) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	if err := unmarshal(&s); err == nil {
-		(*p).Value = s
+		p.Value = s
 		return nil
 	}
 	var test2 struct {
@@ -74,24 +74,12 @@ func (p *PropertyDefinition) UnmarshalYAML(unmarshal func(interface{}) error) er
 // PropertyAssignment is always a map, but the key may be value
 type PropertyAssignment map[string][]interface{}
 
-// MarshalYAML converts a type to YAML text
-func (p *PropertyAssignment) MarshalYAML() (interface{}, error) {
-	for k, v := range *p {
-		if k == "value" {
-			if len(v) != 1 {
-				return nil, fmt.Errorf("too many values")
-			}
-			return v[0], nil
-		}
-	}
-	return p, nil
-}
-
 // UnmarshalYAML converts YAML text to a type
 func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var s string
-	intf := make([]interface{}, 1)
 	*p = make(map[string][]interface{}, 1)
+	intf := make([]interface{}, 1)
+
+	var s string
 	if err := unmarshal(&s); err == nil {
 		(*p)["value"] = intf
 		(*p)["value"][0] = s
@@ -108,8 +96,7 @@ func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) er
 	var mm map[string][]string
 	if err := unmarshal(&mm); err == nil {
 		for k, v := range mm {
-			intf := make([]interface{}, len(v))
-			(*p)[k] = intf
+			(*p)[k] = make([]interface{}, len(v))
 			for i, vv := range v {
 				(*p)[k][i] = vv
 			}
@@ -119,8 +106,7 @@ func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) er
 	var mmm map[string][]interface{}
 	if err := unmarshal(&mmm); err == nil {
 		for k, v := range mmm {
-			intf := make([]interface{}, len(v))
-			(*p)[k] = intf
+			(*p)[k] = make([]interface{}, len(v))
 			for i, vv := range v {
 				(*p)[k][i] = vv
 			}
@@ -130,8 +116,7 @@ func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) er
 	// Support for multi-valued attributes
 	var mmmm []interface{}
 	if err := unmarshal(&mmmm); err == nil {
-		intf := make([]interface{}, len(mmmm))
-		(*p)["value"] = intf
+		(*p)["value"] = make([]interface{}, len(mmmm))
 		for i, v := range mmmm {
 			(*p)["value"][i] = v
 		}

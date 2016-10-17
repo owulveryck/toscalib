@@ -1,0 +1,47 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  TOSCA simple profile that shows how the (notification_port) property is reflected as an attribute and can be referenced elsewhere.
+
+node_types:
+  ServerNode:
+    derived_from: SoftwareComponent
+    properties:
+      notification_port:
+        type: integer
+    capabilities:
+      # omitted here for brevity
+
+  ClientNode:
+    derived_from: SoftwareComponent
+    properties:
+      # omitted here for brevity
+    requirements:
+      - server:
+          capability: Endpoint
+          node: ServerNode
+          relationship: ConnectsTo
+
+topology_template:
+  node_templates:
+
+    my_server:
+      type: ServerNode
+      properties:
+        notification_port: 8000
+
+    my_client:
+      type: ClientNode
+      requirements:
+        - server:
+            node: my_server
+            relationship: my_connection
+
+  relationship_templates:
+    my_connection:
+      type: ConnectsTo
+      interfaces:
+        Configure:
+          inputs:
+            targ_notify_port: { get_attribute: [ TARGET, notification_port ] }
+            # other operation definitions omitted here for brevity

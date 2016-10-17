@@ -2,7 +2,6 @@ package toscalib
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 )
@@ -14,12 +13,12 @@ type Resolver func(string) ([]byte, error)
 // DefaultResolver provides a basic implementation for retrieving imports that reference
 // remote locations. The file will be downloaded over HTTP(s) and the contents are returned.
 func defaultResolver(location string) ([]byte, error) {
+	var r []byte
+
 	u, err := url.Parse(location)
 	if err != nil {
-		log.Panic(err)
+		return r, err
 	}
-
-	var r []byte
 
 	switch u.Scheme {
 	case "http", "https":

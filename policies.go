@@ -54,7 +54,7 @@ type TriggerDefinition struct {
 type PolicyType struct {
 	DerivedFrom string                        `yaml:"derived_from,omitempty" json:"derived_from"`
 	Version     Version                       `yaml:"version,omitempty" json:"version"`
-	Metadata    map[string]string             `yaml:"metadata,omitempty" json:"metadata"`
+	Metadata    Metadata                      `yaml:"metadata,omitempty" json:"metadata"`
 	Description string                        `yaml:"description,omitempty" json:"description"`
 	Properties  map[string]PropertyDefinition `yaml:"properties,omitempty" json:"properties"`
 	Targets     []string                      `yaml:"targets" json:"targets"`
@@ -64,8 +64,9 @@ type PolicyType struct {
 // PolicyDefinition provides the structure for an instance of a Policy based on a PolicyType
 type PolicyDefinition struct {
 	Type        string                        `yaml:"type" json:"type"`
-	Metadata    map[string]string             `yaml:"metadata,omitempty" json:"metadata"`
+	Metadata    Metadata                      `yaml:"metadata,omitempty" json:"metadata"`
 	Description string                        `yaml:"description,omitempty" json:"description"`
 	Properties  map[string]PropertyAssignment `yaml:"properties,omitempty" json:"properties"`
 	Targets     []string                      `yaml:"targets" json:"targets"`
+	Triggers    map[string]TriggerDefinition  `yaml:"triggers" json:"triggers"`
 }

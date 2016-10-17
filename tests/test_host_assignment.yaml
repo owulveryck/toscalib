@@ -78,3 +78,13 @@ topology_template:
         host:
           properties: *host_capabilities
 
+relationship_types:
+  mycompany.mytypes.myCustomClientServerType:
+    derived_from: tosca.relationships.HostedOn
+    properties:
+      # more details ...
+
+  mycompany.mytypes.myCustomConnectionType:
+    derived_from: tosca.relationships.ConnectsTo
+    properties:
+      # more details ...

@@ -29,12 +29,19 @@ import (
 
 // Version - The version have the following grammar:
 // MajorVersion.MinorVersion[.FixVersion[.Qualifier[-BuildVersion]]]
-// MajorVersion : is a required integer value greater than or equ al to 0 (zero)
-// MinorVersion : is a required integer value greater than or equal to 0 (zero).
-// FixVersion    : is a optional integer value greater than or equal to 0 (zero)
-//Qualifier is an optional string that indicates a named, pre-release version of the associated code that has been derived from the version of the code identified by the combination major_version, minor_version and fix_version numbers
-//BuildVersion is an optional integer value greater than or equal to 0 (zero) that can be used to further qualify different build versions of the code that has the same qualifer_string
+// 		MajorVersion is a required integer value greater than or equ al to 0 (zero)
+// 		MinorVersion is a required integer value greater than or equal to 0 (zero).
+// 		FixVersion is a optional integer value greater than or equal to 0 (zero)
+// 		Qualifier is an optional string that indicates a named, pre-release version
+// 			of the associated code that has been derived from the version of the code
+// 			identified by the combination major_version, minor_version and fix_version numbers
+// 		BuildVersion is an optional integer value greater than or equal to 0 (zero)
+// 			that can be used to further qualify different build versions of the code
+// 			that has the same qualifer_string
 type Version string
+
+// TODO(kenjones): Leverage https://github.com/blang/semver
+// to provide implementation details.
 
 /*TODO
 // GetMajor returns the major_version number
@@ -122,15 +129,15 @@ func (s *Scalar) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	}
 	re := regexp.MustCompile("^([0-9.]+)[[:blank:]]*(B|kB|KiB|MB|MiB|GB|GiB|TB|TiB|d|h|m|s|ms|us|ns|Hz|kHz|MHz|GHz)$")
 	res := re.FindStringSubmatch(sString)
-	if err != nil || len(res) != 3 {
+	if len(res) != 3 {
 		return fmt.Errorf("Tosca type unkown")
 	}
 	val, err := strconv.ParseFloat(res[1], 64)
-	if err != nil || len(res) != 3 {
+	if err != nil {
 		return fmt.Errorf("Not a number %v", res[1])
 	}
-	(*s).Value = val
-	(*s).Unit = res[2]
+	s.Value = val
+	s.Unit = res[2]
 	return nil
 }
 

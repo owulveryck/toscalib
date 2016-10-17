@@ -11,10 +11,7 @@ topology_template:
       constraints:
         - valid_values: [ 1, 2, 4, 8 ]
       default: 1
-    context_root:
-      type: string
-      description: Context root for installing the application.
-      default: app
+    context_root: app
 
   node_templates:
     web_app:

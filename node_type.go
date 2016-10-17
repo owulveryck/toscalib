@@ -17,7 +17,7 @@ limitations under the License.
 package toscalib
 
 import (
-	"fmt"
+	"errors"
 )
 
 // NodeType as described is Appendix 6.8.
@@ -35,18 +35,11 @@ type NodeType struct {
 	Copy         string                             `yaml:"copy,omitempty" json:"copy,omitempty"`                 // The optional (symbolic) name of another node template to copy into (all keynames and values) and use as a basis for this node template.
 }
 
-func (n *NodeType) getInterface() (string, InterfaceDefinition, error) {
-	for name, value := range n.Interfaces {
-		return name, value, nil
-	}
-	return "", InterfaceDefinition{}, fmt.Errorf("No Interface found")
-}
-
-func (n *NodeType) getInterfaceByName(iname string) (string, InterfaceDefinition, error) {
-	for name, value := range n.Interfaces {
-		if iname == name {
-			return name, value, nil
+func (n *NodeType) getInterfaceByName(name string) (InterfaceDefinition, error) {
+	for k, v := range n.Interfaces {
+		if name == k {
+			return v, nil
 		}
 	}
-	return "", InterfaceDefinition{}, fmt.Errorf("No Interface found")
+	return InterfaceDefinition{}, errors.New("No Interface found")
 }

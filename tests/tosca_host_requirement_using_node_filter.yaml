@@ -1,0 +1,28 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template with requirements against hosting infrastructure.
+
+topology_template:
+  inputs:
+    # omitted here for brevity
+
+  node_templates:
+    mysql:
+      type: tosca.nodes.DBMS.MySQL
+      properties:
+        # omitted here for brevity
+      requirements:
+        - host:
+            node_filter:
+              capabilities:
+                # Constraints for selecting “host” (Container Capability)
+                - host:
+                    properties:
+                      - num_cpus: { in_range: [ 1, 4 ] }
+                      - mem_size: { greater_or_equal: 2 GB }
+                # Constraints for selecting “os” (OperatingSystem Capability)
+                - os:
+                    properties:
+                      - architecture: { equal: x86_64 }
+                      - type: linux
+                      - distribution: ubuntu

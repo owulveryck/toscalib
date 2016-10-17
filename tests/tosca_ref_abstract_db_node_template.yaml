@@ -1,0 +1,30 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+topology_template:
+  description: Template of an application connecting to a database.
+
+  node_templates:
+    web_app:
+      type: tosca.nodes.WebApplication.MyWebApp
+      requirements:
+        - host: web_server
+        - database_endpoint: db
+
+    web_server:
+      type: tosca.nodes.WebServer
+      requirements:
+        - host: server
+
+    server:
+      type: tosca.nodes.Compute
+      # details omitted for brevity
+
+    db:
+      # This node is abstract (no Deploment or Implemenation artifacts on create)
+      # and can be substituted with a topology provided by another template
+      # that exports a Database type’s capabilities.
+      type: tosca.nodes.Database
+      properties:
+        user: my_db_user
+        password: secret
+        name: my_db_name

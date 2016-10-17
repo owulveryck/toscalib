@@ -1,0 +1,32 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template for deploying a two-tier application on two servers.
+
+topology_template:
+  inputs:
+    # omitted here for brevity
+
+  node_templates:
+    wordpress:
+      type: tosca.nodes.WebApplication.WordPress
+      properties:
+        # omitted here for brevity
+      requirements:
+        - host: apache
+        - database_endpoint:
+            node: wordpress_db
+            relationship: my_custom_database_connection
+
+    wordpress_db:
+      type: tosca.nodes.Database.MySQL
+      properties:
+        # omitted here for the brevity
+      requirements:
+        - host: mysql
+
+  relationship_templates:
+    my_custom_database_connection:
+      type: ConnectsTo
+      interfaces:
+        Configure:
+          pre_configure_source: scripts/wp_db_configure.sh

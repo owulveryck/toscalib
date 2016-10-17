@@ -25,9 +25,6 @@ type InterfaceType struct {
 	Inputs      map[string]PropertyDefinition  `yaml:"inputs,omitempty" json:"inputs"` // The optional list of input parameter definitions.
 }
 
-// InterfaceDefinition is related to a node type
-//type InterfaceDefinitionTemplate map[string]OperationDefinition
-
 // OperationDefinition defines a named function or procedure that can be bound to an implementation artifact (e.g., a script).
 type OperationDefinition struct {
 	Inputs         map[string]PropertyAssignment `yaml:"inputs,omitempty"`
@@ -57,18 +54,14 @@ func (i *OperationDefinition) UnmarshalYAML(unmarshal func(interface{}) error) e
 	return nil
 }
 
-//type PropertyDefinition struct { }
-
-// InterfaceDefinition TODO: Appendix 5.12
-
 // InterfaceDefinition is related to a node type
 type InterfaceDefinition map[string]InterfaceDef
 
 // InterfaceDef defines the keywords of an Interface
 type InterfaceDef struct {
-	Inputs         map[string]Input `yaml:"inputs,omitempty"`
-	Description    string           `yaml:"description,omitempty"`
-	Implementation string           `yaml:"implementation,omitempty"`
+	Inputs         map[string]PropertyAssignment `yaml:"inputs,omitempty"`
+	Description    string                        `yaml:"description,omitempty"`
+	Implementation string                        `yaml:"implementation,omitempty"`
 }
 
 // UnmarshalYAML converts YAML text to a type
@@ -79,9 +72,9 @@ func (i *InterfaceDef) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return nil
 	}
 	var str struct {
-		Inputs         map[string]Input `yaml:"inputs,omitempty"`
-		Description    string           `yaml:"description,omitempty"`
-		Implementation string           `yaml:"implementation,omitempty"`
+		Inputs         map[string]PropertyAssignment `yaml:"inputs,omitempty"`
+		Description    string                        `yaml:"description,omitempty"`
+		Implementation string                        `yaml:"implementation,omitempty"`
 	}
 	if err := unmarshal(&str); err != nil {
 		return err

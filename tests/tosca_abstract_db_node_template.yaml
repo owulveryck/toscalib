@@ -1,0 +1,22 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template with a TOSCA Orchestrator selectable database using node template.
+
+topology_template:
+  inputs:
+    # omitted here for brevity
+
+  node_templates:
+    my_app:
+      type: my.types.MyApplication
+      properties:
+        admin_user: { get_input: admin_username }
+        admin_password: { get_input: admin_password }
+        db_endpoint_url: { get_property: [SELF, database_endpoint, url_path ] }
+      requirements:
+        - database_endpoint: my_abstract_database
+
+    my_abstract_database:
+      type: my.types.nodes.MyDatabase
+      properties:
+        db_version: { greater_or_equal: 5.5 }

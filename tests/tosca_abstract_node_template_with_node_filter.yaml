@@ -1,0 +1,30 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template with requirements against hosting infrastructure.
+
+topology_template:
+  inputs:
+    # omitted here for brevity
+
+  node_templates:
+    mysql:
+      type: tosca.nodes.DBMS.MySQL
+      properties:
+        # omitted here for brevity
+      requirements:
+        - host: mysql_compute
+
+    # Abstract node template (placeholder) to be selected by provider
+    mysql_compute:
+      type: Compute
+      node_filter:
+        capabilities:
+          - host:
+              properties:
+                num_cpus: { equal: 2 }
+                mem_size: { greater_or_equal: 2 GB }
+          - os:
+              properties:
+                architecture: { equal: x86_64 }
+                type: linux
+                distribution: ubuntu

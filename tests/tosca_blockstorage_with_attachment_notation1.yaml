@@ -61,7 +61,7 @@ topology_template:
             distribution: Fedora
             version: 18
       requirements:
-        - local_storage: 
+        - local_storage:
             node: my_storage
             relationship: MyAttachTo
             properties:

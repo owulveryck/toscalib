@@ -1,0 +1,24 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template for a scaling web server.
+
+topology_template:
+  inputs:
+    # omitted here for brevity
+
+  node_templates:
+    apache:
+      type: tosca.nodes.WebServer.Apache
+      properties:
+        # Details omitted for brevity
+      requirements:
+        - host: server
+
+    server:
+      type: tosca.nodes.Compute
+        # details omitted for brevity
+
+  groups:
+    webserver_group:
+      type: tosca.groups.Root
+      members: [ apache, server ]

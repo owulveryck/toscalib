@@ -16,14 +16,40 @@ limitations under the License.
 
 package toscalib
 
-// Value defines a type as a string
-type Value string
+import (
+	"errors"
+	"fmt"
+)
 
-//Constraints is an array of ConstraintClause
+// Operators is a list of supported constraint operators
+var Operators = []string{
+	"equal",
+	"greater_than",
+	"greater_or_equal",
+	"less_than",
+	"less_or_equal",
+	"in_range",
+	"valid_values",
+	"length",
+	"min_length",
+	"max_length",
+	"pattern",
+}
+
+func isOperator(op string) bool {
+	for _, v := range Operators {
+		if v == op {
+			return true
+		}
+	}
+	return false
+}
+
+// Constraints is an array of ConstraintClause
 type Constraints []ConstraintClause
 
-// IsValid returns true if the Value is valid against the Constraints
-func (c Constraints) IsValid(v Value) (bool, error) {
+// IsValid returns true if the value is valid against the Constraints
+func (c *Constraints) IsValid(v interface{}) (bool, error) {
 	return true, nil
 }
 
@@ -40,21 +66,27 @@ type ConstraintClause struct {
 // Evaluate the constraint and return a boolean
 func (constraint *ConstraintClause) Evaluate(interface{}) bool { return true }
 
-// UnmarshalYAML TODO: implement the Mashaler YAML interface for the constraint type
+// UnmarshalYAML handles simple and complex format when converting from YAML to types
 func (constraint *ConstraintClause) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var c map[string]interface{}
 	err := unmarshal(&c)
 	if err != nil {
 		return err
 	}
+	if len(c) != 1 {
+		return errors.New("Too Many Operators")
+	}
 	var o string
 	var v interface{}
 	for op, val := range c {
+		if !isOperator(op) {
+			return fmt.Errorf("Unknown Operator: %s", op)
+		}
 		o = op
 		v = val
 
 	}
-	constraint = &ConstraintClause{o, v}
-	//*constraint = ConstraintClause(c)
+	constraint.Operator = o
+	constraint.Values = v
 	return nil
 }

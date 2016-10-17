@@ -38,17 +38,6 @@ func noop(source string, std *ServiceTemplateDefinition) error {
 	return nil
 }
 
-// GetNodeTemplate returns a pointer to a node template given its name
-// its returns nil if not found
-func (t *ServiceTemplateDefinition) GetNodeTemplate(nodeName string) *NodeTemplate {
-	for name, nodeTemplate := range t.TopologyTemplate.NodeTemplates {
-		if name == nodeName {
-			return &nodeTemplate
-		}
-	}
-	return nil
-}
-
 // ParseCsar handles open and parse the CSAR file
 func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 

@@ -60,8 +60,8 @@ func (c *CapabilityDefinition) UnmarshalYAML(unmarshal func(interface{}) error) 
 }
 
 // CapabilityType as described in appendix 6.6
-//A Capability Type is a reusable entity that describes a kind of capability that a Node Type can declare to expose.  Requirements (implicit or explicit) that are declared as part of one node can be matched to (i.e., fulfilled by) the Capabilities declared by another node.
-// TODO
+// A Capability Type is a reusable entity that describes a kind of capability that a Node Type can declare to expose.
+// Requirements (implicit or explicit) that are declared as part of one node can be matched to (i.e., fulfilled by) the Capabilities declared by another node.
 type CapabilityType struct {
 	DerivedFrom  string                         `yaml:"derived_from,omitempty" json:"derived_from"` // An optional parent Node Type name this new Node Type derives from
 	Version      Version                        ` yaml:"version,omitempty" json:"version"`

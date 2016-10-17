@@ -35,8 +35,9 @@ type AttributeAssignment map[string][]string
 
 // UnmarshalYAML handles converting an AttributeAssignment from YAML to type
 func (a *AttributeAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var s string
 	*a = make(map[string][]string, 1)
+
+	var s string
 	if err := unmarshal(&s); err == nil {
 		(*a)["value"] = append([]string{}, s)
 		return nil

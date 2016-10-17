@@ -1,0 +1,67 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: >
+  Custom Policy Types for Application Performance policies and Schedule based
+  capability properites updates.
+
+policy_types:
+  my.policies.types.Performance:
+    derived_from: tosca.policies.Performance
+    description: |
+      The definition that is used to declare the performance requirements
+      of nodes or groups of nodes.
+    properties:
+      metric_name:
+        description: The name of a computed metric of a Node to monitor.
+        type: string
+        required: true
+        status: supported
+    triggers:
+      scale_up:
+        description: |
+          Monitor a node metric attribute to determine if the value exceeds the upper bounded threshold value.
+          When the threshold has been exceeded the Scale Up Workflow will be triggered.
+        event_type: UpperThresholdExceeded
+        action:
+          scale_up:
+            description: Scales the application node up
+            implementation: scale_up_workflow
+      scale_down:
+        description: |
+          Monitor a node metric attribute to determine if the value exceeds the lower bounded threshold value.
+          When the threshold has been exceeded the Scale Down Workflow will be triggered.
+        event_type: LowerThresholdExceeded
+        action:
+          scale_down:
+            description: Scales the application node down
+            implementation: scale_down_workflow
+
+  my.policies.types.UpdateScalingConstraints:
+    derived_from: tosca.policies.Update
+    description: The definition that is used to govern scaling of nodes or groups of nodes.
+    properties:
+      min_instances:
+        type: integer
+        description: Modify Minimum number of instance(s) of the associated target(s).
+        required: false
+        status: supported
+      max_instances:
+        type: integer
+        description: Maximum number of instance(s) of the associated target(s).
+        required: false
+        status: supported
+      default_instances:
+        type: integer
+        description: The initial number of instance(s) at startup of the associated target(s).
+        required: false
+        status: supported
+    triggers:
+      update_node:
+        description: |
+          Update the Scaling attributes of the target nodes with new values. The update can be
+          applied based on a specific schedule.
+        event_type: ScalingPropertiesUpdated
+        action:
+          update_node:
+            description: Update the Scaling properites of a specific node.
+            implementation: update_scale_properties_workflow
