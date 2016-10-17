@@ -61,11 +61,10 @@ func (s *ServiceTemplateDefinition) Merge(u ServiceTemplateDefinition) ServiceTe
 // GetNodeTemplate returns a pointer to a node template given its name
 // its returns nil if not found
 func (s *ServiceTemplateDefinition) GetNodeTemplate(nodeName string) *NodeTemplate {
-	nt, ok := s.TopologyTemplate.NodeTemplates[nodeName]
-	if !ok {
-		return nil
+	if nt, ok := s.TopologyTemplate.NodeTemplates[nodeName]; ok {
+		return &nt
 	}
-	return &nt
+	return nil
 }
 
 // PA holds a PropertyAssignment and the original
@@ -88,6 +87,8 @@ func (s *ServiceTemplateDefinition) GetProperty(node, prop string) PA {
 
 // GetAttribute returns the attribute of a Node
 func (s *ServiceTemplateDefinition) GetAttribute(node, attr string) PA {
+	// FIXME(kenjones): Should be AttributeAssignment or a single type that works for
+	// both Property and Attribute
 	var paa PropertyAssignment
 	nt := s.GetNodeTemplate(node)
 	if nt != nil {

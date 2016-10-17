@@ -152,6 +152,49 @@ func TestParseVerifyRelationshipTypes(t *testing.T) {
 	}
 }
 
+func TestParseVerifyPolicyTypes(t *testing.T) {
+	fname := "./tests/tosca_container_policies.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	pt := s.PolicyTypes["my.policies.types.Performance"]
+
+	if pt.DerivedFrom != "tosca.policies.Performance" {
+		t.Log(fname, "missing PolicyTypes `my.policies.types.Performance`")
+		t.Fail()
+	}
+
+	if pt.Properties["metric_name"].Type != "string" {
+		t.Log(fname, "missing PolicyTypes Property `metric_name`")
+		t.Fail()
+	}
+
+	if len(pt.Triggers) != 2 {
+		t.Log(fname, "missing PolicyTypes Triggers")
+		t.Fail()
+	}
+
+	if pt.Triggers["scale_up"].EventType != "UpperThresholdExceeded" {
+		t.Log(fname, "missing PolicyTypes Trigger `scale_up`")
+		t.Fail()
+	}
+
+	tr := pt.Triggers["scale_up"]
+
+	if tr.Action["scale_up"].Implementation != "scale_up_workflow" {
+		t.Log(fname, "missing PolicyTypes Trigger Action `scale_up`")
+		t.Fail()
+	}
+}
+
 func TestParseCsar(t *testing.T) {
 
 	testsko := []string{

@@ -27,6 +27,7 @@ import "fmt"
 // The value of a property can be retrieved using the
 // get_property function within TOSCA Service Templates
 type PropertyDefinition struct {
+	// FIXME(kenjones): Value is not part of any version of the specs going back to the original in April 2014
 	Value       string      `yaml:"value,omitempty"`
 	Type        string      `yaml:"type" json:"type"`                                   // The required data type for the property
 	Description string      `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the property.

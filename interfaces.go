@@ -40,10 +40,9 @@ func (i *OperationDefinition) UnmarshalYAML(unmarshal func(interface{}) error) e
 		return nil
 	}
 	var str struct {
-		Inputs map[string]PropertyAssignment `yaml:"inputs,omitempty"`
-		//Implementation      string                 `yaml:"implementation,omitempty"`
-		Description    string `yaml:"description,omitempty"`
-		Implementation string `yaml:"implementation,omitempty"`
+		Inputs         map[string]PropertyAssignment `yaml:"inputs,omitempty"`
+		Description    string                        `yaml:"description,omitempty"`
+		Implementation string                        `yaml:"implementation,omitempty"`
 	}
 	if err := unmarshal(&str); err != nil {
 		return err
@@ -62,6 +61,7 @@ type InterfaceDef struct {
 	Inputs         map[string]PropertyAssignment `yaml:"inputs,omitempty"`
 	Description    string                        `yaml:"description,omitempty"`
 	Implementation string                        `yaml:"implementation,omitempty"`
+	// FIXME(kenjones): Missing OperationDefinition here
 }
 
 // UnmarshalYAML converts YAML text to a type

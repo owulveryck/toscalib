@@ -42,12 +42,12 @@ func (t *TriggerCondition) UnmarshalYAML(unmarshal func(interface{}) error) erro
 
 // TriggerDefinition provides the base structure for defining a Trigger for a Policy
 type TriggerDefinition struct {
-	Description  string                `yaml:"description,omitempty" json:"description"`
-	EventType    string                `yaml:"event_type" json:"event_type"`
-	Schedule     TimeInterval          `yaml:"schedule,omitempty" json:"schedule"`
-	TargetFilter EventFilterDefinition `yaml:"target_filter,omitempty" json:"target_filter"`
-	Condition    TriggerCondition      `yaml:"condition,omitempty" json:"condition"`
-	Action       OperationDefinition   `yaml:"action" json:"action"`
+	Description  string                         `yaml:"description,omitempty" json:"description"`
+	EventType    string                         `yaml:"event_type" json:"event_type"`
+	Schedule     TimeInterval                   `yaml:"schedule,omitempty" json:"schedule"`
+	TargetFilter EventFilterDefinition          `yaml:"target_filter,omitempty" json:"target_filter"`
+	Condition    TriggerCondition               `yaml:"condition,omitempty" json:"condition"`
+	Action       map[string]OperationDefinition `yaml:"action" json:"action"`
 }
 
 // PolicyType provides the base structure for defining what a Policy is
