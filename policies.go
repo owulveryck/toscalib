@@ -70,3 +70,15 @@ type PolicyDefinition struct {
 	Targets     []string                      `yaml:"targets" json:"targets"`
 	Triggers    map[string]TriggerDefinition  `yaml:"triggers" json:"triggers"`
 }
+
+func (pd *PolicyDefinition) IsValidTarget(name string) bool {
+	if len(pd.Targets) == 0 {
+		return true
+	}
+	for _, v := range pd.Targets {
+		if v == name {
+			return true
+		}
+	}
+	return false
+}
