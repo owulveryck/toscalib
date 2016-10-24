@@ -161,9 +161,7 @@ func (p *Assignment) Evaluate(std *ServiceTemplateDefinition, ctx string) interf
 		var output string
 		for _, val := range p.Args {
 			switch reflect.TypeOf(val).Kind() {
-			case reflect.String:
-				output = fmt.Sprintf("%s%s", output, val)
-			case reflect.Int:
+			case reflect.String, reflect.Int:
 				output = fmt.Sprintf("%s%s", output, val)
 			case reflect.Map:
 				if pa := newAssignmentFunc(val); pa != nil {
@@ -181,18 +179,17 @@ func (p *Assignment) Evaluate(std *ServiceTemplateDefinition, ctx string) interf
 		}
 
 	case GetPropFunc:
+		nt, rnt := getNTByArgs(std, ctx, p.Args)
+		if nt == nil {
+			break
+		}
+
 		if len(p.Args) == 2 {
-			if nt := std.findNodeTemplate(p.Args[0].(string), ctx); nt != nil {
-				if pa, ok := nt.Properties[p.Args[1].(string)]; ok {
-					return pa.Evaluate(std, nt.Name)
-				}
+			if prop := nt.findProperty(p.Args[1].(string), ""); prop != nil {
+				return prop.evaluate(std, nt.Name, "")
 			}
 		}
 		if len(p.Args) >= 3 {
-			nt, rnt := getNTByArgs(std, ctx, p.Args)
-			if nt == nil {
-				break
-			}
 			if rnt != nil {
 				if prop := rnt.findProperty(p.Args[2].(string), p.Args[1].(string)); prop != nil {
 					return prop.evaluate(std, rnt.Name, get(3, p.Args))
@@ -207,18 +204,17 @@ func (p *Assignment) Evaluate(std *ServiceTemplateDefinition, ctx string) interf
 		}
 
 	case GetAttrFunc:
+		nt, rnt := getNTByArgs(std, ctx, p.Args)
+		if nt == nil {
+			break
+		}
+
 		if len(p.Args) == 2 {
-			if nt := std.findNodeTemplate(p.Args[0].(string), ctx); nt != nil {
-				if pa, ok := nt.Attributes[p.Args[1].(string)]; ok {
-					return pa.Evaluate(std, nt.Name)
-				}
+			if attr := nt.findAttribute(p.Args[1].(string), ""); attr != nil {
+				return attr.evaluate(std, nt.Name, "")
 			}
 		}
 		if len(p.Args) >= 3 {
-			nt, rnt := getNTByArgs(std, ctx, p.Args)
-			if nt == nil {
-				break
-			}
 			if rnt != nil {
 				if attr := rnt.findAttribute(p.Args[2].(string), p.Args[1].(string)); attr != nil {
 					return attr.evaluate(std, rnt.Name, get(3, p.Args))

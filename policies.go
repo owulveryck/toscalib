@@ -71,6 +71,7 @@ type PolicyDefinition struct {
 	Triggers    map[string]TriggerDefinition  `yaml:"triggers" json:"triggers"`
 }
 
+// IsValidTarget checks if a specified target is valid for the Policy
 func (pd *PolicyDefinition) IsValidTarget(name string) bool {
 	if len(pd.Targets) == 0 {
 		return true
