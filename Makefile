@@ -48,7 +48,7 @@ add-dep: build/image_build
 # ----------------------------------------------
 # develop and test
 
-format: vendor
+format:
 	${DOCKERNOVENDOR} bash ./scripts/fmt.sh
 
 lint: format

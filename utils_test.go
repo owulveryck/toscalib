@@ -1,6 +1,7 @@
 package toscalib
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -58,7 +59,7 @@ func create() I {
 func TestNilPointerToStruct(t *testing.T) {
 	var original *B
 	translated := clone(original)
-	if ok := compare(original, translated); !ok {
+	if ok := reflect.DeepEqual(original, translated); !ok {
 		t.Fatal(spew.Sdump(original), "!=", spew.Sdump(translated))
 	}
 }
@@ -66,7 +67,7 @@ func TestNilPointerToStruct(t *testing.T) {
 func TestNilPointerToInterface(t *testing.T) {
 	var original *I
 	translated := clone(original)
-	if ok := compare(original, translated); !ok {
+	if ok := reflect.DeepEqual(original, translated); !ok {
 		t.Fatal(spew.Sdump(original), "!=", spew.Sdump(translated))
 	}
 }
@@ -75,7 +76,7 @@ func TestStructWithNoElements(t *testing.T) {
 	type E struct{}
 	var original E
 	translated := clone(original)
-	if ok := compare(original, translated); !ok {
+	if ok := reflect.DeepEqual(original, translated); !ok {
 		t.Fatal(spew.Sdump(original), "!=", spew.Sdump(translated))
 	}
 }
@@ -83,7 +84,7 @@ func TestStructWithNoElements(t *testing.T) {
 func TestEmptyStruct(t *testing.T) {
 	var original B
 	translated := clone(original)
-	if ok := compare(original, translated); !ok {
+	if ok := reflect.DeepEqual(original, translated); !ok {
 		t.Fatal(spew.Sdump(original), "!=", spew.Sdump(translated))
 	}
 }
@@ -92,7 +93,7 @@ func TestCloneStruct(t *testing.T) {
 	created := create()
 	original := created.(B)
 	translated := clone(original)
-	if ok := compare(original, translated); !ok {
+	if ok := reflect.DeepEqual(original, translated); !ok {
 		t.Fatal(spew.Sdump(original), "!=", spew.Sdump(translated))
 	}
 }
@@ -101,7 +102,7 @@ func TestCloneStructWrappedWithInterface(t *testing.T) {
 	created := create()
 	original := created
 	translated := clone(original)
-	if ok := compare(original, translated); !ok {
+	if ok := reflect.DeepEqual(original, translated); !ok {
 		t.Fatal(spew.Sdump(original), "!=", spew.Sdump(translated))
 	}
 }
@@ -110,7 +111,7 @@ func TestClonePointerToStructWrappedWithInterface(t *testing.T) {
 	created := create()
 	original := &created
 	translated := clone(original)
-	if ok := compare(original, translated); !ok {
+	if ok := reflect.DeepEqual(original, translated); !ok {
 		t.Fatal(spew.Sdump(original), "!=", spew.Sdump(translated))
 	}
 }
@@ -125,7 +126,7 @@ func TestCloneStructWithPointerToStructWrappedWithInterface(t *testing.T) {
 		Payload: &created,
 	}
 	translated := clone(original)
-	if ok := compare(original, translated); !ok {
+	if ok := reflect.DeepEqual(original, translated); !ok {
 		t.Fatal(spew.Sdump(original), "!=", spew.Sdump(translated))
 	}
 }

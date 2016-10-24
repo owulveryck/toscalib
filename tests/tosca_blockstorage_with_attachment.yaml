@@ -43,7 +43,7 @@ topology_template:
         - local_storage:
             node: my_storage
             relationship:
-              type: AttachesTo 
+              type: AttachesTo
               properties:
                 location: { get_input: storage_location }
     my_storage:

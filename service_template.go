@@ -16,12 +16,10 @@ limitations under the License.
 
 package toscalib
 
-import (
-	"fmt"
-	"reflect"
+import "github.com/kenjones-cisco/mergo"
 
-	"github.com/imdario/mergo"
-)
+// TODO(kenjones): Implement ImportDefinition as it is not always going to be a simple
+// list of strings.
 
 // ServiceTemplateDefinition is the meta structure containing an entire tosca document as described in
 // http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
@@ -41,6 +39,56 @@ type ServiceTemplateDefinition struct {
 	GroupTypes         map[string]GroupType            `yaml:"group_types,omitempty" json:"group_types,omitempty"`
 	PolicyTypes        map[string]PolicyType           `yaml:"policy_types" json:"policy_types"`
 	TopologyTemplate   TopologyTemplateType            `yaml:"topology_template" json:"topology_template"` // Defines the topology template of an application or service, consisting of node templates that represent the application’s or service’s components, as well as relationship templates representing relations between the components.
+}
+
+func (s *ServiceTemplateDefinition) resolve() {
+	// reflect properties to attributes
+	s.reflectProperties()
+
+	flatCaps := make(map[string]CapabilityType)
+	for name := range s.CapabilityTypes {
+		flatCaps[name] = s.flattenCapType(name)
+	}
+
+	flatNodes := make(map[string]NodeType)
+	for name := range s.NodeTypes {
+		flatNodes[name] = s.flattenNodeType(name)
+	}
+
+	for k, v := range flatNodes {
+		for name, capDef := range v.Capabilities {
+			capDef.extendFrom(flatCaps[capDef.Type])
+			v.Capabilities[name] = capDef
+		}
+		flatNodes[k] = v
+	}
+
+	// make sure any references are fulfilled
+	for name, node := range s.TopologyTemplate.NodeTemplates {
+		node.fillInterface(*s)
+		node.setRefs(*s, flatNodes)
+		node.setName(name)
+		s.TopologyTemplate.NodeTemplates[name] = node
+	}
+}
+
+func (s *ServiceTemplateDefinition) reflectProperties() {
+	for k, v := range s.CapabilityTypes {
+		v.reflectProperties()
+		s.CapabilityTypes[k] = v
+	}
+
+	for k, v := range s.RelationshipTypes {
+		v.reflectProperties()
+		s.RelationshipTypes[k] = v
+	}
+
+	for k, v := range s.NodeTypes {
+		v.reflectProperties()
+		s.NodeTypes[k] = v
+	}
+
+	s.TopologyTemplate.reflectProperties()
 }
 
 // Clone creates a deep copy of a Service Template Definition
@@ -67,135 +115,128 @@ func (s *ServiceTemplateDefinition) GetNodeTemplate(nodeName string) *NodeTempla
 	return nil
 }
 
-// PA holds a PropertyAssignment and the original
-type PA struct {
-	PA     PropertyAssignment
-	Origin string
+// GetRelationshipSource verifies the RelationshipTemplate exists and then searches the NodeTemplates
+// to determine which one has a requirement for a specific RelationshipTemplate.
+func (s *ServiceTemplateDefinition) GetRelationshipSource(relationshipName string) *NodeTemplate {
+	for _, nt := range s.TopologyTemplate.NodeTemplates {
+		nodeName := nt.GetRelationshipSource(relationshipName)
+		if nodeName != "" && nt.Name == nodeName {
+			return &nt
+		}
+	}
+	return nil
+}
+
+// GetRelationshipTarget verifies the RelationshipTemplate exists and then searches the NodeTemplates
+// to determine which one has a requirement for a specific RelationshipTemplate with target node specified.
+func (s *ServiceTemplateDefinition) GetRelationshipTarget(relationshipName string) *NodeTemplate {
+	for _, nt := range s.TopologyTemplate.NodeTemplates {
+		if nodeName := nt.GetRelationshipTarget(relationshipName); nodeName != "" {
+			return s.GetNodeTemplate(nodeName)
+		}
+	}
+	return nil
 }
 
 // GetProperty returns the property "prop"'s value for node named node
-func (s *ServiceTemplateDefinition) GetProperty(node, prop string) PA {
+func (s *ServiceTemplateDefinition) GetProperty(node, prop string) *PropertyAssignment {
 	var output PropertyAssignment
-	nt := s.GetNodeTemplate(node)
-	if nt != nil {
+	if nt := s.GetNodeTemplate(node); nt != nil {
 		if val, ok := nt.Properties[prop]; ok {
 			output = val
 		}
 	}
-	return PA{PA: output, Origin: node}
+	return &output
 }
 
 // GetAttribute returns the attribute of a Node
-func (s *ServiceTemplateDefinition) GetAttribute(node, attr string) PA {
-	// FIXME(kenjones): Should be AttributeAssignment or a single type that works for
-	// both Property and Attribute
-	var paa PropertyAssignment
-	nt := s.GetNodeTemplate(node)
-	if nt != nil {
-		if aa, ok := nt.Attributes[attr]; ok {
-			for k, v := range aa {
-				paa[k] = reflect.ValueOf(v).Interface().([]interface{})
+func (s *ServiceTemplateDefinition) GetAttribute(node, attr string) *AttributeAssignment {
+	var output AttributeAssignment
+	if nt := s.GetNodeTemplate(node); nt != nil {
+		if val, ok := nt.Attributes[attr]; ok {
+			output = val
+		}
+	}
+	return &output
+}
+
+// GetInputValue retrieves an input value from Service Template Definition in
+// the raw form (function evaluation not performed), or actual value after all
+// function evaluation has completed.
+func (s *ServiceTemplateDefinition) GetInputValue(prop string, raw bool) interface{} {
+	if raw {
+		return s.TopologyTemplate.Inputs[prop].Value
+	}
+	input := s.TopologyTemplate.Inputs[prop].Value
+	return input.Evaluate(s, "")
+}
+
+// SetInputValue sets an input value on a Service Template Definition
+func (s *ServiceTemplateDefinition) SetInputValue(prop string, value interface{}) {
+	v := newPAValue(value)
+	s.TopologyTemplate.Inputs[prop] = PropertyDefinition{Value: *v}
+}
+
+// SetAttribute provides the ability to set a value to a named attribute
+func (s *ServiceTemplateDefinition) SetAttribute(node, attr string, value interface{}) {
+	if nt := s.GetNodeTemplate(node); nt != nil {
+		nt.setAttribute(attr, value)
+		s.TopologyTemplate.NodeTemplates[node] = *nt
+	}
+}
+
+func (s *ServiceTemplateDefinition) nodeTypeHierarchy(name string) []string {
+	var types []string
+	typeName := name
+	for typeName != "" {
+		if nt, ok := s.NodeTypes[typeName]; ok {
+			types = append(types, typeName)
+			typeName = nt.DerivedFrom
+		} else {
+			typeName = ""
+		}
+	}
+	return types
+}
+
+func (s *ServiceTemplateDefinition) findHostNode(name string) *NodeTemplate {
+	nt := s.GetNodeTemplate(name)
+	if nt == nil {
+		return nil
+	}
+
+	if req := nt.getRequirementByRelationship("tosca.relationships.HostedOn"); req != nil {
+		// TODO(kenjones): assume the requirement has a node specified, otherwise need to use the
+		// value stored on the node type to get a list of node templates and then filter
+		// based on the requirement node filter sequence.
+		if targetNode := s.GetNodeTemplate(req.Node); targetNode != nil {
+			nth := s.nodeTypeHierarchy(nt.Type)
+			if targetNode.checkCapabilityMatch(req.Capability, nth) {
+				return targetNode
 			}
 		}
 	}
-	return PA{PA: paa, Origin: node}
+	return nil
 }
 
-// EvaluateStatement handles executing a statement for a pre-defined function
-func (s *ServiceTemplateDefinition) EvaluateStatement(p PA) interface{} {
-	for k, v := range p.PA {
-		switch k {
-		case "value":
-			if len(v) == 1 {
-				return v[0]
-			}
-			return v
+func (s *ServiceTemplateDefinition) findNodeTemplate(name, ctx string) *NodeTemplate {
+	switch name {
+	case Self:
+		return s.GetNodeTemplate(ctx)
 
-		case "concat":
-			var output string
-			for _, val := range v {
-				switch reflect.TypeOf(val).Kind() {
-				case reflect.String:
-					output = fmt.Sprintf("%s%s", output, val)
-				case reflect.Int:
-					output = fmt.Sprintf("%s%s", output, val)
-				case reflect.Map:
-					// Convert it to a PropertyAssignment
-					pa := reflect.ValueOf(val).Interface().(map[interface{}]interface{})
-					paa := make(PropertyAssignment, 0)
-					for k, v := range pa {
-						paa[k.(string)] = reflect.ValueOf(v).Interface().([]interface{})
-						if paa[k.(string)][0] == Self {
-							paa[k.(string)][0] = p.Origin
-						}
+	case Host:
+		// find the host
+		return s.findHostNode(ctx)
 
-					}
-					o := s.EvaluateStatement(PA{PA: paa, Origin: p.Origin})
-					output = fmt.Sprintf("%s%s", output, o)
-				}
-			}
-			return output
+	case Source:
+		// find relationship source
+		return s.GetRelationshipSource(ctx)
 
-		case "get_input":
-			return s.GetInput(v[0].(string))
+	case Target:
+		// find relationship target
+		return s.GetRelationshipTarget(ctx)
 
-		case "get_property":
-			node := v[0].(string)
-			if node == Self {
-				node = p.Origin
-			}
-			if len(v) == 2 {
-				return s.EvaluateStatement(s.GetProperty(node, v[1].(string)))
-			}
-			if len(v) == 3 {
-				var st []string
-				nt := s.GetNodeTemplate(node)
-				if nt != nil {
-					reqs := nt.GetRequirements(v[1].(string))
-					prop := v[2].(string)
-					for _, req := range reqs {
-						vst := s.EvaluateStatement(s.GetProperty(req.Node, prop))
-						st = append(st, vst.(string))
-					}
-				}
-				return st
-			}
-
-		case "get_attribute":
-			node := v[0].(string)
-			if node == Self {
-				node = p.Origin
-			}
-			if len(v) == 2 {
-				return s.EvaluateStatement(s.GetAttribute(node, v[1].(string)))
-			}
-			if len(v) == 3 {
-				var st []string
-				nt := s.GetNodeTemplate(node)
-				if nt != nil {
-					reqs := nt.GetRequirements(v[1].(string))
-					prop := v[2].(string)
-					for _, req := range reqs {
-						vst := s.EvaluateStatement(s.GetAttribute(req.Node, prop))
-						st = append(st, vst.(string))
-					}
-				}
-				return st
-			}
-		}
+	default:
+		return s.GetNodeTemplate(name)
 	}
-
-	return []string{}
-}
-
-// GetInput retrieves an input value from Service Template Definition
-func (s *ServiceTemplateDefinition) GetInput(prop string) string {
-	return s.TopologyTemplate.Inputs[prop].Value
-}
-
-// SetInput sets an input value on a Service Template Definition
-func (s *ServiceTemplateDefinition) SetInput(prop string, value string) {
-	var input = s.TopologyTemplate.Inputs[prop]
-	input.Value = value
-	s.TopologyTemplate.Inputs[prop] = input
 }

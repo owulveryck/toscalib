@@ -50,7 +50,7 @@ type RequirementDefinition struct {
 	Capability   string                      `yaml:"capability" json:"capability"`         // The required reserved keyname used that can be used to provide the name of a valid Capability Type that can fulfil the requirement
 	Node         string                      `yaml:"node,omitempty" json:"node,omitempty"` // The optional reserved keyname used to provide the name of a valid Node Type that contains the capability definition that can be used to fulfil the requirement
 	Relationship RequirementRelationshipType `yaml:"relationship" json:"relationship,omitempty"`
-	Occurrences  ToscaRange                  `yaml:"occurences,omitempty" json:"occurences,omitempty"` // The optional minimum and maximum occurrences for the requirement.  Note: the keyword UNBOUNDED is also supported to represent any positive integer
+	Occurrences  ToscaRange                  `yaml:"occurrences,omitempty" json:"occurrences,omitempty"` // The optional minimum and maximum occurrences for the requirement.  Note: the keyword UNBOUNDED is also supported to represent any positive integer
 }
 
 // UnmarshalYAML is used to match both Simple Notation Example and Full Notation Example
@@ -67,7 +67,7 @@ func (r *RequirementDefinition) UnmarshalYAML(unmarshal func(interface{}) error)
 		Capability   string                      `yaml:"capability" json:"capability"`         // The required reserved keyname used that can be used to provide the name of a valid Capability Type that can fulfil the requirement
 		Node         string                      `yaml:"node,omitempty" json:"node,omitempty"` // The optional reserved keyname used to provide the name of a valid Node Type that contains the capability definition that can be used to fulfil the requirement
 		Relationship RequirementRelationshipType `yaml:"relationship" json:"relationship,omitempty"`
-		Occurrences  ToscaRange                  `yaml:"occurences,omitempty" json:"occurences,omitempty"` // The optional minimum and maximum occurrences for the requirement.  Note: the keyword UNBOUNDED is also supported to represent any positive integer
+		Occurrences  ToscaRange                  `yaml:"occurrences,omitempty" json:"occurrences,omitempty"` // The optional minimum and maximum occurrences for the requirement.  Note: the keyword UNBOUNDED is also supported to represent any positive integer
 	}
 	err = unmarshal(&test2)
 	if err != nil {
@@ -84,7 +84,7 @@ func (r *RequirementDefinition) UnmarshalYAML(unmarshal func(interface{}) error)
 type RequirementRelationship struct {
 	Type       string                         `yaml:"type" json:"type"`                                 // The optional reserved keyname used to provide the name of the Relationship Type for the requirement assignment’s relationship keyname.
 	Interfaces map[string]InterfaceDefinition `yaml:"interfaces,omitempty" json:"interfaces,omitempty"` // The optional reserved keyname used to reference declared (named) interface definitions of the corresponding Relationship Type in order to provide Property assignments for these interfaces or operations of these interfaces.
-	Properties map[string]interface{}         `yaml:"properties" json:"properties"`                     // The optional list property definitions that comprise the schema for a complex Data Type in TOSCA.
+	Properties map[string]PropertyAssignment  `yaml:"properties" json:"properties"`                     // The optional list property definitions that comprise the schema for a complex Data Type in TOSCA.
 }
 
 // UnmarshalYAML is used to match both Simple Notation Example and Full Notation Example
@@ -100,7 +100,7 @@ func (r *RequirementRelationship) UnmarshalYAML(unmarshal func(interface{}) erro
 	var test2 struct {
 		Type       string                         `yaml:"type" json:"type"`
 		Interfaces map[string]InterfaceDefinition `yaml:"interfaces,omitempty" json:"interfaces,omitempty"`
-		Properties map[string]interface{}         `yaml:"properties" json:"properties"`
+		Properties map[string]PropertyAssignment  `yaml:"properties" json:"properties"`
 	}
 	err = unmarshal(&test2)
 	if err != nil {

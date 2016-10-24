@@ -1,10 +1,10 @@
-hash: 3d23201b2014a5679457c14849e45e97fbabb9a0e0a6921f18ffd9012c7b24ff
-updated: 2016-10-14T21:42:50.286843925Z
+hash: 060a5f772978f7a4c2f2790cf1233bad6352956a865b4008fe2061ef8c6c43ce
+updated: 2016-10-24T15:29:28.45149108Z
 imports:
-- name: github.com/imdario/mergo
-  version: 3e95a51e0639b4cf372f2ccf74c86749d747fbdc
+- name: github.com/kenjones-cisco/mergo
+  version: 0149f50ea824b391564215914d0e54ac298dd216
 - name: golang.org/x/tools
-  version: b44548ae6ac7f353d03366d7d115508500b00f0e
+  version: c6efba04dd0d931bb11cd7f556285fa3c9305398
   subpackages:
   - godoc/vfs
   - godoc/vfs/zipfs

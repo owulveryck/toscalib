@@ -5,8 +5,7 @@ import:
   - godoc/vfs
   - godoc/vfs/zipfs
 - package: gopkg.in/yaml.v2
-- package: github.com/imdario/mergo
-  version: ^0.2.2
+- package: github.com/kenjones-cisco/mergo
 testImport:
 - package: github.com/davecgh/go-spew
   version: ^1.0.0

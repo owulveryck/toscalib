@@ -16,10 +16,6 @@ limitations under the License.
 
 package toscalib
 
-import (
-	"errors"
-)
-
 // NodeType as described is Appendix 6.8.
 // A Node Type is a reusable entity that defines the type of one or more Node Templates. As such, a Node Type defines the structure of observable properties via a Properties Definition, the Requirements and Capabilities of the node as well as its supported interfaces.
 type NodeType struct {
@@ -32,14 +28,15 @@ type NodeType struct {
 	Capabilities map[string]CapabilityDefinition    `yaml:"capabilities,omitempty" json:"capabilities,omitempty"` // An optional list of capability definitions for the Node Type
 	Interfaces   map[string]InterfaceDefinition     `yaml:"interfaces,omitempty" json:"interfaces,omitempty"`     // An optional list of interface definitions supported by the Node Type
 	Artifacts    []ArtifactDefinition               `yaml:"artifacts,omitempty" json:"artifacts,omitempty"`       // An optional list of named artifact definitions for the Node Type
-	Copy         string                             `yaml:"copy,omitempty" json:"copy,omitempty"`                 // The optional (symbolic) name of another node template to copy into (all keynames and values) and use as a basis for this node template.
 }
 
-func (n *NodeType) getInterfaceByName(name string) (InterfaceDefinition, error) {
-	for k, v := range n.Interfaces {
-		if name == k {
-			return v, nil
-		}
+func (n *NodeType) reflectProperties() {
+	tmp := reflectDefinitionProps(n.Properties, n.Attributes)
+	n.Attributes = *tmp
+
+	// process Capabilities reflect
+	for capname, c := range n.Capabilities {
+		c.reflectProperties()
+		n.Capabilities[capname] = c
 	}
-	return InterfaceDefinition{}, errors.New("No Interface found")
 }

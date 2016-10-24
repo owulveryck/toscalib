@@ -32,5 +32,17 @@ type TopologyTemplateType struct {
 	Groups                map[string]GroupDefinition      `yaml:"groups" json:"groups"`
 	Policies              []map[string]PolicyDefinition   `yaml:"policies" json:"policies"`
 	Workflows             map[string]WorkflowDefinition   `yaml:"workflows,omitempty" json:"workflows,omitempty"`
-	Outputs               map[string]Output               `yaml:"outputs,omitempty" json:"outputs,omitempty"`
+	Outputs               map[string]PropertyDefinition   `yaml:"outputs,omitempty" json:"outputs,omitempty"`
+}
+
+func (t *TopologyTemplateType) reflectProperties() {
+	for k, v := range t.NodeTemplates {
+		v.reflectProperties()
+		t.NodeTemplates[k] = v
+	}
+
+	for k, v := range t.RelationshipTemplates {
+		v.reflectProperties()
+		t.RelationshipTemplates[k] = v
+	}
 }

@@ -16,47 +16,27 @@ limitations under the License.
 
 package toscalib
 
-import (
-	"fmt"
-)
-
 // AttributeDefinition is a structure describing the property assignmenet in the node template
 // This notion is described in appendix 5.9 of the document
 type AttributeDefinition struct {
-	Type        string      `yaml:"type" json:"type"`                                   //    The required data type for the attribute.
+	Type        string      `yaml:"type" json:"type"`                                   // The required data type for the attribute.
 	Description string      `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the attribute.
-	Default     interface{} `yaml:"default,omitempty" json:"default,omitempty"`         //  An optional key that may provide a value to be used as a default if not provided by another means.
-	Status      string      `yaml:"status,omitempty" json:"status,omitempty"`           // The optional status of the attribute relative to the specification or implementation.
+	Default     interface{} `yaml:"default,omitempty" json:"default,omitempty"`         // An optional key that may provide a value to be used as a default if not provided by another means.
+	Status      Status      `yaml:"status,omitempty" json:"status,omitempty"`           // The optional status of the attribute relative to the specification or implementation.
 	EntrySchema interface{} `yaml:"entry_schema,omitempty" json:"-"`                    // The optional key that is used to declare the name of the Datatype definition for entries of set types such as the TOSCA list or map.
 }
 
-// AttributeAssignment a map of attributes to be assigned
-type AttributeAssignment map[string][]string
+// AttributeAssignment supports Value evaluation
+type AttributeAssignment struct {
+	Assignment
+}
 
-// UnmarshalYAML handles converting an AttributeAssignment from YAML to type
-func (a *AttributeAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	*a = make(map[string][]string, 1)
+func newAAValue(val interface{}) *AttributeAssignment {
+	v := new(AttributeAssignment)
+	v.Value = val
+	return v
+}
 
-	var s string
-	if err := unmarshal(&s); err == nil {
-		(*a)["value"] = append([]string{}, s)
-		return nil
-	}
-	var m map[string]string
-	if err := unmarshal(&m); err == nil {
-		for k, v := range m {
-			(*a)[k] = append([]string{}, v)
-		}
-		return nil
-	}
-	var mm map[string][]string
-	if err := unmarshal(&mm); err == nil {
-		for k, v := range mm {
-			(*a)[k] = v
-		}
-		return nil
-	}
-	var res interface{}
-	_ = unmarshal(&res)
-	return fmt.Errorf("Cannot parse Attribute %v", res)
+func newAA(def AttributeDefinition) *AttributeAssignment {
+	return newAAValue(def.Default)
 }

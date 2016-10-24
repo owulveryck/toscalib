@@ -142,13 +142,8 @@ func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver, hooks 
 	// update the initial context with the freshly loaded context
 	*t = std
 
-	// make sure any references are fulfilled
-	for name, node := range t.TopologyTemplate.NodeTemplates {
-		node.fillInterface(*t)
-		node.setRefs(t)
-		node.setName(name)
-		t.TopologyTemplate.NodeTemplates[name] = node
-	}
+	// resolve all references and inherited elements
+	t.resolve()
 
 	return nil
 }

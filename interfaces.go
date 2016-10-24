@@ -19,8 +19,10 @@ package toscalib
 // InterfaceType as described in Appendix A 6.4
 // An Interface Type is a reusable entity that describes a set of operations that can be used to interact with or manage a node or relationship in a TOSCA topology.
 type InterfaceType struct {
-	Description string                         `yaml:"description,omitempty"`
+	DerivedFrom string                         `yaml:"derived_from,omitempty" json:"derived_from"`
 	Version     Version                        `yaml:"version,omitempty"`
+	Metadata    Metadata                       `yaml:"metadata,omitempty" json:"metadata"`
+	Description string                         `yaml:"description,omitempty"`
 	Operations  map[string]OperationDefinition `yaml:"operations,inline"`
 	Inputs      map[string]PropertyDefinition  `yaml:"inputs,omitempty" json:"inputs"` // The optional list of input parameter definitions.
 }
@@ -54,33 +56,35 @@ func (i *OperationDefinition) UnmarshalYAML(unmarshal func(interface{}) error) e
 }
 
 // InterfaceDefinition is related to a node type
-type InterfaceDefinition map[string]InterfaceDef
-
-// InterfaceDef defines the keywords of an Interface
-type InterfaceDef struct {
-	Inputs         map[string]PropertyAssignment `yaml:"inputs,omitempty"`
-	Description    string                        `yaml:"description,omitempty"`
-	Implementation string                        `yaml:"implementation,omitempty"`
-	// FIXME(kenjones): Missing OperationDefinition here
+type InterfaceDefinition struct {
+	Type           string                         `yaml:"type" json:"type"`
+	Inputs         map[string]PropertyAssignment  `yaml:"inputs,omitempty"`
+	Description    string                         `yaml:"description,omitempty"`
+	Implementation string                         `yaml:"implementation,omitempty"`
+	Operations     map[string]OperationDefinition `yaml:"operations,inline"`
 }
 
 // UnmarshalYAML converts YAML text to a type
-func (i *InterfaceDef) UnmarshalYAML(unmarshal func(interface{}) error) error {
+func (i *InterfaceDefinition) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	if err := unmarshal(&s); err == nil {
 		i.Implementation = s
 		return nil
 	}
 	var str struct {
-		Inputs         map[string]PropertyAssignment `yaml:"inputs,omitempty"`
-		Description    string                        `yaml:"description,omitempty"`
-		Implementation string                        `yaml:"implementation,omitempty"`
+		Type           string                         `yaml:"type" json:"type"`
+		Inputs         map[string]PropertyAssignment  `yaml:"inputs,omitempty"`
+		Description    string                         `yaml:"description,omitempty"`
+		Implementation string                         `yaml:"implementation,omitempty"`
+		Operations     map[string]OperationDefinition `yaml:"operations,inline"`
 	}
 	if err := unmarshal(&str); err != nil {
 		return err
 	}
+	i.Type = str.Type
 	i.Inputs = str.Inputs
 	i.Implementation = str.Implementation
 	i.Description = str.Description
+	i.Operations = str.Operations
 	return nil
 }

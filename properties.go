@@ -27,26 +27,28 @@ import "fmt"
 // The value of a property can be retrieved using the
 // get_property function within TOSCA Service Templates
 type PropertyDefinition struct {
-	// FIXME(kenjones): Value is not part of any version of the specs going back to the original in April 2014
-	Value       string      `yaml:"value,omitempty"`
-	Type        string      `yaml:"type" json:"type"`                                   // The required data type for the property
-	Description string      `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the property.
-	Required    bool        `yaml:"required,omitempty" json:"required,omitempty"`       // An optional key that declares a property as required ( true) or not ( false) Default: true
-	Default     string      `yaml:"default,omitempty" json:"default,omitempty"`
-	Status      Status      `yaml:"status,omitempty" json:"status,omitempty"`
-	Constraints Constraints `yaml:"constraints,omitempty,flow" json:"constraints,omitempty"`
-	EntrySchema interface{} `yaml:"entry_schema,omitempty" json:"entry_schema,omitempty"`
+	// Value is not part of PropertyDefinition but an extension to represent both
+	// PropertyDefinition and ParameterDefinition within a single type.
+	Value       PropertyAssignment `yaml:"value,omitempty"`
+	Type        string             `yaml:"type" json:"type"`                                   // The required data type for the property
+	Description string             `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the property.
+	Required    bool               `yaml:"required,omitempty" json:"required,omitempty"`       // An optional key that declares a property as required ( true) or not ( false) Default: true
+	Default     string             `yaml:"default,omitempty" json:"default,omitempty"`
+	Status      Status             `yaml:"status,omitempty" json:"status,omitempty"`
+	Constraints Constraints        `yaml:"constraints,omitempty,flow" json:"constraints,omitempty"`
+	EntrySchema interface{}        `yaml:"entry_schema,omitempty" json:"entry_schema,omitempty"`
 }
 
 // UnmarshalYAML converts YAML text to a type
 func (p *PropertyDefinition) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	var s string
 	if err := unmarshal(&s); err == nil {
-		p.Value = s
+		v := newPAValue(s)
+		p.Value = *v
 		return nil
 	}
 	var test2 struct {
-		Value       string                 `yaml:"value,omitempty"`
+		Value       PropertyAssignment     `yaml:"value,omitempty"`
 		Type        string                 `yaml:"type" json:"type"`                                   // The required data type for the property
 		Description string                 `yaml:"description,omitempty" json:"description,omitempty"` // The optional description for the property.
 		Required    bool                   `yaml:"required,omitempty" json:"required,omitempty"`       // An optional key that declares a property as required ( true) or not ( false) Default: true
@@ -72,59 +74,20 @@ func (p *PropertyDefinition) UnmarshalYAML(unmarshal func(interface{}) error) er
 	return fmt.Errorf("Cannot parse Property %v", res)
 }
 
-// PropertyAssignment is always a map, but the key may be value
-type PropertyAssignment map[string][]interface{}
+// PropertyAssignment supports Value evaluation
+type PropertyAssignment struct {
+	Assignment
+}
 
-// UnmarshalYAML converts YAML text to a type
-func (p *PropertyAssignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	*p = make(map[string][]interface{}, 1)
-	intf := make([]interface{}, 1)
+func newPAValue(val interface{}) *PropertyAssignment {
+	v := new(PropertyAssignment)
+	v.Value = val
+	return v
+}
 
-	var s string
-	if err := unmarshal(&s); err == nil {
-		(*p)["value"] = intf
-		(*p)["value"][0] = s
-		return nil
+func newPA(def PropertyDefinition) *PropertyAssignment {
+	if def.Value.Value != nil {
+		return &def.Value
 	}
-	var m map[string]string
-	if err := unmarshal(&m); err == nil {
-		for k, v := range m {
-			(*p)[k] = intf
-			(*p)[k][0] = v
-		}
-		return nil
-	}
-	var mm map[string][]string
-	if err := unmarshal(&mm); err == nil {
-		for k, v := range mm {
-			(*p)[k] = make([]interface{}, len(v))
-			for i, vv := range v {
-				(*p)[k][i] = vv
-			}
-		}
-		return nil
-	}
-	var mmm map[string][]interface{}
-	if err := unmarshal(&mmm); err == nil {
-		for k, v := range mmm {
-			(*p)[k] = make([]interface{}, len(v))
-			for i, vv := range v {
-				(*p)[k][i] = vv
-			}
-		}
-		return nil
-	}
-	// Support for multi-valued attributes
-	var mmmm []interface{}
-	if err := unmarshal(&mmmm); err == nil {
-		(*p)["value"] = make([]interface{}, len(mmmm))
-		for i, v := range mmmm {
-			(*p)["value"][i] = v
-		}
-		return nil
-	}
-
-	var res interface{}
-	_ = unmarshal(&res)
-	return fmt.Errorf("Cannot parse Property %v", res)
+	return newPAValue(def.Default)
 }

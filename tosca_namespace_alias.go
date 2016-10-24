@@ -130,7 +130,7 @@ func (s *Scalar) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	re := regexp.MustCompile("^([0-9.]+)[[:blank:]]*(B|kB|KiB|MB|MiB|GB|GiB|TB|TiB|d|h|m|s|ms|us|ns|Hz|kHz|MHz|GHz)$")
 	res := re.FindStringSubmatch(sString)
 	if len(res) != 3 {
-		return fmt.Errorf("Tosca type unkown")
+		return fmt.Errorf("Tosca type unknown")
 	}
 	val, err := strconv.ParseFloat(res[1], 64)
 	if err != nil {

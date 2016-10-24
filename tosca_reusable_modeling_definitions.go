@@ -16,12 +16,6 @@ limitations under the License.
 
 package toscalib
 
-// Output is the output of the topology
-type Output struct {
-	Value       map[string]interface{} `yaml:"value" json:"value"`
-	Description string                 `yaml:"description" json:"description"`
-}
-
 // ArtifactDefinition TODO: Appendix 5.5
 type ArtifactDefinition map[string]interface{}
 

@@ -7,24 +7,24 @@ import "reflect"
 // There is an implied assumption that all attributes on a Struct are exported.
 // For toscalib that will be the case so that assumption should work for us.
 
-func _deepClone(copy, original reflect.Value) {
-	switch original.Kind() {
+func _deepClone(to, from reflect.Value) {
+	switch from.Kind() {
 	// The first cases handle nested structures and translate them recursively
 
 	// If it is a pointer we need to unwrap and call once again
 	case reflect.Ptr:
-		// To get the actual value of the original we have to call Elem()
+		// To get the actual value of the from we have to call Elem()
 		// At the same time this unwraps the pointer so we don't end up in
 		// an infinite recursion
-		originalValue := original.Elem()
+		fromValue := from.Elem()
 		// Check if the pointer is nil
-		if !originalValue.IsValid() {
+		if !fromValue.IsValid() {
 			return
 		}
 		// Allocate a new object and set the pointer to it
-		copy.Set(reflect.New(originalValue.Type()))
+		to.Set(reflect.New(fromValue.Type()))
 		// Unwrap the newly created pointer
-		_deepClone(copy.Elem(), originalValue)
+		_deepClone(to.Elem(), fromValue)
 
 	// If it is an interface (which is very similar to a pointer), do basically the
 	// same as for the pointer. Though a pointer is not the same as an interface so
@@ -32,60 +32,70 @@ func _deepClone(copy, original reflect.Value) {
 	// we would end up with an actual pointer
 	case reflect.Interface:
 		// Get rid of the wrapping interface
-		originalValue := original.Elem()
-		if !originalValue.IsValid() {
+		fromValue := from.Elem()
+		if !fromValue.IsValid() {
 			return
 		}
 
 		// Create a new object. Now new gives us a pointer, but we want the value it
 		// points to, so we have to call Elem() to unwrap it
-		copyValue := reflect.New(originalValue.Type()).Elem()
-		_deepClone(copyValue, originalValue)
-		copy.Set(copyValue)
+		toValue := reflect.New(fromValue.Type()).Elem()
+		_deepClone(toValue, fromValue)
+		to.Set(toValue)
 
 	// If it is a struct we translate each field
 	case reflect.Struct:
-		for i := 0; i < original.NumField(); i++ {
-			_deepClone(copy.Field(i), original.Field(i))
+		for i := 0; i < from.NumField(); i++ {
+			_deepClone(to.Field(i), from.Field(i))
 		}
 
 	// If it is a slice we create a new slice and translate each element
 	case reflect.Slice:
-		if original.IsNil() {
+		if from.IsNil() {
 			return
 		}
-		copy.Set(reflect.MakeSlice(original.Type(), original.Len(), original.Cap()))
-		for i := 0; i < original.Len(); i++ {
-			_deepClone(copy.Index(i), original.Index(i))
+		to.Set(reflect.MakeSlice(from.Type(), from.Len(), from.Cap()))
+		for i := 0; i < from.Len(); i++ {
+			_deepClone(to.Index(i), from.Index(i))
 		}
 
 	// If it is a map we create a new map and translate each value
 	case reflect.Map:
-		if original.IsNil() {
+		if from.IsNil() {
 			return
 		}
-		copy.Set(reflect.MakeMap(original.Type()))
-		for _, key := range original.MapKeys() {
-			originalValue := original.MapIndex(key)
+		to.Set(reflect.MakeMap(from.Type()))
+		for _, key := range from.MapKeys() {
+			fromValue := from.MapIndex(key)
 			// New gives us a pointer, but again we want the value
-			copyValue := reflect.New(originalValue.Type()).Elem()
-			_deepClone(copyValue, originalValue)
-			copy.SetMapIndex(key, copyValue)
+			toValue := reflect.New(fromValue.Type()).Elem()
+			_deepClone(toValue, fromValue)
+			to.SetMapIndex(key, toValue)
 		}
 
-	// And everything else will simply be taken from the original
+	// And everything else will simply be taken from the from
 	default:
-		copy.Set(original)
+		to.Set(from)
 	}
 }
 
 func clone(obj interface{}) interface{} {
-	// Wrap the original in a reflect.Value
-	original := reflect.ValueOf(obj)
+	// Wrap the from in a reflect.Value
+	from := reflect.ValueOf(obj)
 
-	copy := reflect.New(original.Type()).Elem()
-	_deepClone(copy, original)
+	to := reflect.New(from.Type()).Elem()
+	_deepClone(to, from)
 
 	// Remove the reflection wrapper
-	return copy.Interface()
+	return to.Interface()
+}
+
+func get(k int, list []interface{}) string {
+	if len(list) <= k {
+		return ""
+	}
+	if v, ok := list[k].(string); ok {
+		return v
+	}
+	return ""
 }

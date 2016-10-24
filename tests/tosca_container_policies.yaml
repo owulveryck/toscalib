@@ -24,9 +24,6 @@ topology_template:
     # The MYSQL container based on official MySQL image in Docker hub
     mysql_container:
       type: tosca.nodes.Container.Application.Docker
-      capabilities:
-        # This is a capability that would mimic the Docker –link feature
-        database_link: tosca.capabilities.Docker.Link
       artifacts:
         my_image:
           file: mysql
@@ -42,8 +39,6 @@ topology_template:
     # The WordPress container based on official WordPress image in Docker hub
     wordpress_container:
       type: tosca.nodes.Container.Application.Docker
-      requirements:
-        - database_link: mysql_container
       artifacts:
         my_image:
           file: wordpress

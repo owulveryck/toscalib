@@ -39,21 +39,3 @@ const (
 	// of a Node or Capability which would be assigned to them by the underlying platform at runtime.
 	NetworkPublic = "PUBLIC"
 )
-
-const (
-	// Self is ref for a TOSCA orchestrator will interpret this keyword as the Node or Relationship Template
-	// instance that contains the function at the time the function is evaluated
-	Self = "SELF"
-
-	// Source is a ref a TOSCA orchestrator will interpret this keyword as the Node Template instance
-	// that is at the source end of the relationship that contains the referencing function.
-	Source = "SOURCE"
-
-	// Target is a ref a TOSCA orchestrator will interpret this keyword as the Node Template instance
-	// that is at the source end of the relationship that contains the referencing function.
-	Target = "TARGET"
-
-	// Host is a ref a TOSCA orchestrator will interpret this keyword to refer to the all nodes
-	// that “host” the node using this reference (i.e., as identified by its HostedOn relationship).
-	Host = "HOST"
-)
