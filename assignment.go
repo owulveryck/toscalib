@@ -149,6 +149,77 @@ func getNTByArgs(std *ServiceTemplateDefinition, ctx string, args []interface{})
 	return nt, nil
 }
 
+func (p *Assignment) evalConcat(std *ServiceTemplateDefinition, ctx string) interface{} {
+	var output string
+	for _, val := range p.Args {
+		switch reflect.TypeOf(val).Kind() {
+		case reflect.String, reflect.Int:
+			output = fmt.Sprintf("%s%s", output, val)
+		case reflect.Map:
+			if pa := newAssignmentFunc(val); pa != nil {
+				if o := pa.Evaluate(std, ctx); o != nil {
+					output = fmt.Sprintf("%s%s", output, o)
+				}
+			}
+		}
+	}
+	return output
+}
+
+func (p *Assignment) evalProperty(std *ServiceTemplateDefinition, ctx string) interface{} {
+	nt, rnt := getNTByArgs(std, ctx, p.Args)
+	if nt == nil {
+		return nil
+	}
+
+	if len(p.Args) == 2 {
+		if prop := nt.findProperty(p.Args[1].(string), ""); prop != nil {
+			return prop.evaluate(std, nt.Name, "")
+		}
+	}
+	if len(p.Args) >= 3 {
+		if rnt != nil {
+			if prop := rnt.findProperty(p.Args[2].(string), p.Args[1].(string)); prop != nil {
+				return prop.evaluate(std, rnt.Name, get(3, p.Args))
+			}
+		}
+		if prop := nt.findProperty(p.Args[2].(string), p.Args[1].(string)); prop != nil {
+			return prop.evaluate(std, nt.Name, get(3, p.Args))
+		}
+		if prop := nt.findProperty(p.Args[1].(string), ""); prop != nil {
+			return prop.evaluate(std, nt.Name, get(2, p.Args))
+		}
+	}
+	return nil
+}
+
+func (p *Assignment) evalAttribute(std *ServiceTemplateDefinition, ctx string) interface{} {
+	nt, rnt := getNTByArgs(std, ctx, p.Args)
+	if nt == nil {
+		return nil
+	}
+
+	if len(p.Args) == 2 {
+		if attr := nt.findAttribute(p.Args[1].(string), ""); attr != nil {
+			return attr.evaluate(std, nt.Name, "")
+		}
+	}
+	if len(p.Args) >= 3 {
+		if rnt != nil {
+			if attr := rnt.findAttribute(p.Args[2].(string), p.Args[1].(string)); attr != nil {
+				return attr.evaluate(std, rnt.Name, get(3, p.Args))
+			}
+		}
+		if attr := nt.findAttribute(p.Args[2].(string), p.Args[1].(string)); attr != nil {
+			return attr.evaluate(std, nt.Name, get(3, p.Args))
+		}
+		if attr := nt.findAttribute(p.Args[1].(string), ""); attr != nil {
+			return attr.evaluate(std, nt.Name, get(2, p.Args))
+		}
+	}
+	return nil
+}
+
 // Evaluate gets the value of an Assignment, including the evaluation of expression or function
 func (p *Assignment) Evaluate(std *ServiceTemplateDefinition, ctx string) interface{} {
 	// TODO(kenjones): Add support for the evaluation of ConstraintClause
@@ -158,20 +229,7 @@ func (p *Assignment) Evaluate(std *ServiceTemplateDefinition, ctx string) interf
 
 	switch p.Function {
 	case ConcatFunc:
-		var output string
-		for _, val := range p.Args {
-			switch reflect.TypeOf(val).Kind() {
-			case reflect.String, reflect.Int:
-				output = fmt.Sprintf("%s%s", output, val)
-			case reflect.Map:
-				if pa := newAssignmentFunc(val); pa != nil {
-					if o := pa.Evaluate(std, ctx); o != nil {
-						output = fmt.Sprintf("%s%s", output, o)
-					}
-				}
-			}
-		}
-		return output
+		return p.evalConcat(std, ctx)
 
 	case GetInputFunc:
 		if len(p.Args) == 1 {
@@ -179,54 +237,10 @@ func (p *Assignment) Evaluate(std *ServiceTemplateDefinition, ctx string) interf
 		}
 
 	case GetPropFunc:
-		nt, rnt := getNTByArgs(std, ctx, p.Args)
-		if nt == nil {
-			break
-		}
-
-		if len(p.Args) == 2 {
-			if prop := nt.findProperty(p.Args[1].(string), ""); prop != nil {
-				return prop.evaluate(std, nt.Name, "")
-			}
-		}
-		if len(p.Args) >= 3 {
-			if rnt != nil {
-				if prop := rnt.findProperty(p.Args[2].(string), p.Args[1].(string)); prop != nil {
-					return prop.evaluate(std, rnt.Name, get(3, p.Args))
-				}
-			}
-			if prop := nt.findProperty(p.Args[2].(string), p.Args[1].(string)); prop != nil {
-				return prop.evaluate(std, nt.Name, get(3, p.Args))
-			}
-			if prop := nt.findProperty(p.Args[1].(string), ""); prop != nil {
-				return prop.evaluate(std, nt.Name, get(2, p.Args))
-			}
-		}
+		return p.evalProperty(std, ctx)
 
 	case GetAttrFunc:
-		nt, rnt := getNTByArgs(std, ctx, p.Args)
-		if nt == nil {
-			break
-		}
-
-		if len(p.Args) == 2 {
-			if attr := nt.findAttribute(p.Args[1].(string), ""); attr != nil {
-				return attr.evaluate(std, nt.Name, "")
-			}
-		}
-		if len(p.Args) >= 3 {
-			if rnt != nil {
-				if attr := rnt.findAttribute(p.Args[2].(string), p.Args[1].(string)); attr != nil {
-					return attr.evaluate(std, rnt.Name, get(3, p.Args))
-				}
-			}
-			if attr := nt.findAttribute(p.Args[2].(string), p.Args[1].(string)); attr != nil {
-				return attr.evaluate(std, nt.Name, get(3, p.Args))
-			}
-			if attr := nt.findAttribute(p.Args[1].(string), ""); attr != nil {
-				return attr.evaluate(std, nt.Name, get(2, p.Args))
-			}
-		}
+		return p.evalAttribute(std, ctx)
 	}
 
 	return nil
