@@ -3,6 +3,20 @@
 This library is an implementation of the TOSCA definition as described in the document written in pure GO
 [TOSCA Simple Profile in YAML Version 1.0](http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/TOSCA-Simple-Profile-YAML-v1.0.html)
 
+## Status
+
+[![GoDoc][1]][2]
+[![GoCard][3]][4]
+[![coverage][5]][6]
+
+[1]: https://godoc.org/github.com/CiscoCloud/toscalib?status.svg
+[2]: https://godoc.org/github.com/CiscoCloud/toscalib
+[3]: https://goreportcard.com/badge/CiscoCloud/toscalib
+[4]: https://goreportcard.com/report/github.com/CiscoCloud/toscalib
+[5]: http://gocover.io/_badge/github.com/CiscoCloud/toscalib
+[6]: http://gocover.io/github.com/CiscoCloud/toscalib
+
+
 ## Normative Types
 The normative types definitions are included de facto. The files are embeded using go-bindata.
 
@@ -28,10 +42,6 @@ if err != nil {
 }
 ```
 
-
-## Test
-
-The basic tests function are taking all the examples of the standard and try to parse them.
 
 ## Origins
 
