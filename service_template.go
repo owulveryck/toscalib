@@ -45,31 +45,9 @@ func (s *ServiceTemplateDefinition) resolve() {
 	// reflect properties to attributes
 	s.reflectProperties()
 
-	flatCaps := make(map[string]CapabilityType)
-	for name := range s.CapabilityTypes {
-		flatCaps[name] = s.flattenCapType(name)
-	}
-
-	flatNodes := make(map[string]NodeType)
-	for name := range s.NodeTypes {
-		flatNodes[name] = s.flattenNodeType(name)
-	}
-
-	for k, v := range flatNodes {
-		for name, capDef := range v.Capabilities {
-			capDef.extendFrom(flatCaps[capDef.Type])
-			v.Capabilities[name] = capDef
-		}
-		flatNodes[k] = v
-	}
-
-	// make sure any references are fulfilled
-	for name, node := range s.TopologyTemplate.NodeTemplates {
-		node.fillInterface(*s)
-		node.setRefs(*s, flatNodes)
-		node.setName(name)
-		s.TopologyTemplate.NodeTemplates[name] = node
-	}
+	// resolve inherited data
+	ft := flattenHierarchy(*s)
+	s.TopologyTemplate.extendFrom(ft)
 }
 
 func (s *ServiceTemplateDefinition) reflectProperties() {

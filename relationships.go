@@ -35,6 +35,22 @@ func (r *RelationshipType) reflectProperties() {
 	r.Attributes = *tmp
 }
 
+// IsValidTarget checks to see if a specified type is in the list of valid targets
+// and returns true/false. If there are no defined valid targets then it will
+// always be true.
+func (r *RelationshipType) IsValidTarget(typeName string) bool {
+	if len(r.ValidTarget) == 0 {
+		return true
+	}
+
+	for _, t := range r.ValidTarget {
+		if t == typeName {
+			return true
+		}
+	}
+	return false
+}
+
 // RelationshipTemplate specifies the occurrence of a manageable relationship between node templates
 // as part of an application’s topology model that is defined in a TOSCA Service Template.
 // A Relationship template is an instance of a specified Relationship Type and can provide customized
@@ -55,18 +71,25 @@ func (r *RelationshipTemplate) reflectProperties() {
 	r.Attributes = *tmp
 }
 
-// IsValidTarget checks to see if a specified type is in the list of valid targets
-// and returns true/false. If there are no defined valid targets then it will
-// always be true.
-func (r *RelationshipType) IsValidTarget(typeName string) bool {
-	if len(r.ValidTarget) == 0 {
-		return true
-	}
-
-	for _, t := range r.ValidTarget {
-		if t == typeName {
-			return true
+func (r *RelationshipTemplate) extendFrom(relType RelationshipType) {
+	for k, v := range relType.Interfaces {
+		if len(r.Interfaces) == 0 {
+			r.Interfaces = make(map[string]InterfaceDefinition)
+		}
+		if _, ok := r.Interfaces[k]; !ok {
+			r.Interfaces[k] = v
 		}
 	}
-	return false
+
+	for k, v := range relType.Properties {
+		if len(r.Properties) == 0 {
+			r.Properties = make(map[string]PropertyAssignment)
+		}
+		if _, ok := r.Properties[k]; !ok {
+			tmp := newPA(v)
+			r.Properties[k] = *tmp
+		}
+	}
+
+	r.reflectProperties()
 }

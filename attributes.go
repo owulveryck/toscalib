@@ -36,7 +36,3 @@ func newAAValue(val interface{}) *AttributeAssignment {
 	v.Value = val
 	return v
 }
-
-func newAA(def AttributeDefinition) *AttributeAssignment {
-	return newAAValue(def.Default)
-}

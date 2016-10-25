@@ -16,10 +16,10 @@ limitations under the License.
 
 package toscalib
 
-// ArtifactDefinition TODO: Appendix 5.5
+// ArtifactDefinition Appendix 5.5 TODO: Implement ArtifactDefinition struct
 type ArtifactDefinition map[string]interface{}
 
-// NodeFilter TODO Appendix 5.4
+// NodeFilter Appendix 5.4 TODO: Implement NodeFilter struct
 // A node filter definition defines criteria for selection of a TOSCA Node Template based upon the template’s property values, capabilities and capability properties.
 type NodeFilter interface{}
 
@@ -67,7 +67,7 @@ func (r *RepositoryDefinition) UnmarshalYAML(unmarshal func(interface{}) error) 
 
 // ArtifactType as described in appendix 6.3
 // An Artifact Type is a reusable entity that defines the type of one or more files which Node Types or Node Templates can have dependent relationships and used during operations such as during installation or deployment.
-// TODO
+// TODO: Implement ArtifactType struct
 type ArtifactType interface{}
 
 // Metadata is provides support for attaching provider specific attributes

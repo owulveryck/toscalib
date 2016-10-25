@@ -46,3 +46,26 @@ func (t *TopologyTemplateType) reflectProperties() {
 		t.RelationshipTemplates[k] = v
 	}
 }
+
+func (t *TopologyTemplateType) extendFrom(ft flatTypes) {
+	for k, v := range t.NodeTemplates {
+		v.extendFrom(ft.Nodes[v.Type])
+		v.setName(k)
+		t.NodeTemplates[k] = v
+	}
+
+	for k, v := range t.RelationshipTemplates {
+		v.extendFrom(ft.Relationships[v.Type])
+		t.RelationshipTemplates[k] = v
+	}
+
+	// TODO(kenjones): Add support for Groups
+
+	for i, policies := range t.Policies {
+		for k, v := range policies {
+			v.extendFrom(ft.Policies[v.Type])
+			policies[k] = v
+		}
+		t.Policies[i] = policies
+	}
+}

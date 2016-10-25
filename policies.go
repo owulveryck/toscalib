@@ -1,5 +1,7 @@
 package toscalib
 
+import "github.com/kenjones-cisco/mergo"
+
 // EventFilterDefinition provides structure for event_filter of a Trigger
 type EventFilterDefinition struct {
 	Node        string `yaml:"node" json:"node"`
@@ -82,4 +84,21 @@ func (pd *PolicyDefinition) IsValidTarget(name string) bool {
 		}
 	}
 	return false
+}
+
+func (pd *PolicyDefinition) extendFrom(pt PolicyType) {
+
+	base := pt.Triggers
+	_ = mergo.MergeWithOverwrite(&base, pd.Triggers)
+	pd.Triggers = base
+
+	for k, v := range pt.Properties {
+		if len(pd.Properties) == 0 {
+			pd.Properties = make(map[string]PropertyAssignment)
+		}
+		if _, ok := pd.Properties[k]; !ok {
+			tmp := newPA(v)
+			pd.Properties[k] = *tmp
+		}
+	}
 }

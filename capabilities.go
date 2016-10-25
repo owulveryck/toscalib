@@ -16,7 +16,7 @@ limitations under the License.
 
 package toscalib
 
-// CapabilityDefinition TODO: Appendix 6.1
+// CapabilityDefinition Appendix 6.1
 type CapabilityDefinition struct {
 	Type             string                         `yaml:"type" json:"type"`                                    //  The required name of the Capability Type the capability definition is based upon.
 	Description      string                         `yaml:"description,omitempty" jsson:"description,omitempty"` // The optional description of the Capability definition.
@@ -113,9 +113,7 @@ func (c *CapabilityDefinition) extendFrom(capType CapabilityType) {
 		}
 	}
 
-	// handle reflecting any new properties as attributes
-	tmp := reflectDefinitionProps(c.Properties, c.Attributes)
-	c.Attributes = *tmp
+	c.reflectProperties()
 }
 
 // CapabilityType as described in appendix 6.6
@@ -145,4 +143,18 @@ type CapabilityAssignment struct {
 func (c *CapabilityAssignment) reflectProperties() {
 	tmp := reflectAssignmentProps(c.Properties, c.Attributes)
 	c.Attributes = *tmp
+}
+
+func (c *CapabilityAssignment) extendFrom(cd CapabilityDefinition) {
+	for k, v := range cd.Properties {
+		if len(c.Properties) == 0 {
+			c.Properties = make(map[string]PropertyAssignment)
+		}
+		if _, ok := c.Properties[k]; !ok {
+			tmp := newPA(v)
+			c.Properties[k] = *tmp
+		}
+	}
+
+	c.reflectProperties()
 }

@@ -16,6 +16,9 @@ This library is an implementation of the TOSCA definition as described in the do
 [5]: http://gocover.io/_badge/github.com/CiscoCloud/toscalib
 [6]: http://gocover.io/github.com/CiscoCloud/toscalib
 
+## Plans
+
+[ToDo Tasks](TODO.md)
 
 ## Normative Types
 The normative types definitions are included de facto. The files are embeded using go-bindata.

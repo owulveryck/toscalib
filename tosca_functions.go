@@ -50,9 +50,3 @@ func isFunction(f string) bool {
 	}
 	return false
 }
-
-// ToscaFunction defines the interface for implementing a pre-defined
-// function from tosca.
-type ToscaFunction interface {
-	Evaluate(std *ServiceTemplateDefinition, ctx string) interface{}
-}

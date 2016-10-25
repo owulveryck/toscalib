@@ -40,38 +40,37 @@ import (
 // 			that has the same qualifer_string
 type Version string
 
-// TODO(kenjones): Leverage https://github.com/blang/semver
-// to provide implementation details.
+// TODO(kenjones): Leverage https://github.com/blang/semver to provide Version implementation details.
 
-/*TODO
+/*TODO Version.GetMajor
 // GetMajor returns the major_version number
 func (toscaVersion *Version) GetMajor() int {
         return 0
 }
 */
 
-/*TODO
+/*TODO Version.GetMinor
 // GetMinor returns the minor_version number
 func (toscaVersion *Version) GetMinor() int {
         return 0
 }
 */
 
-/*TODO
+/*TODO Version.GetFixVersion
 // GetFixVersion returns the fix_version integer value
 func (toscaVersion *Version) GetFixVersion() int {
         return 0
 }
 */
 
-/*TODO
+/*TODO Version.GetQualifier
 // GetQualifier returns the named, pre-release version of the associated code that has been derived    from the version of the code identified by the combination major_version, minor_version and fix_version numbers
 func (toscaVersion *Version) GetQualifier() string {
         return nil
 }
 */
 
-/*TODO
+/*TODO Version.GetBuildVersion
 // GetBuildVersion returns an  integer value greater than or equal to 0 (zero) that can be used to further        qualify different build versions of the code that has the same qualifer_string
 func (toscaVersion *Version) GetBuildVersion() int {
         return 0

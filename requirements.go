@@ -16,6 +16,8 @@ limitations under the License.
 
 package toscalib
 
+import "github.com/kenjones-cisco/mergo"
+
 // RequirementRelationshipType defines the Relationship type of a Requirement Definition
 type RequirementRelationshipType struct {
 	Type       string                         `yaml:"type" json:"type"`
@@ -150,4 +152,20 @@ func (r *RequirementAssignment) UnmarshalYAML(unmarshal func(interface{}) error)
 	r.Nodefilter = test2.Nodefilter
 	r.Relationship = test2.Relationship
 	return nil
+}
+
+func (r *RequirementAssignment) extendFrom(rd RequirementDefinition) {
+	if r.Capability == "" {
+		r.Capability = rd.Capability
+	}
+	if r.Node == "" {
+		r.Node = rd.Node
+	}
+	if r.Relationship.Type == "" {
+		r.Relationship.Type = rd.Relationship.Type
+	}
+
+	base := rd.Relationship.Interfaces
+	_ = mergo.MergeWithOverwrite(&base, r.Relationship.Interfaces)
+	r.Relationship.Interfaces = base
 }

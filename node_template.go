@@ -16,10 +16,7 @@ limitations under the License.
 
 package toscalib
 
-import (
-	"fmt"
-	"regexp"
-)
+import "github.com/kenjones-cisco/mergo"
 
 // NodeTemplate as described in Appendix 7.3
 // A Node Template specifies the occurrence of a manageable software component
@@ -37,13 +34,12 @@ type NodeTemplate struct {
 	Attributes   map[string]AttributeAssignment     `yaml:"attributes,omitempty" json:"-" json:"attributes,omitempty"`     // An optional list of attribute value assignments for the Node Template.
 	Requirements []map[string]RequirementAssignment `yaml:"requirements,omitempty" json:"-" json:"requirements,omitempty"` // An optional sequenced list of requirement assignments for the Node Template.
 	Capabilities map[string]CapabilityAssignment    `yaml:"capabilities,omitempty" json:"-" json:"capabilities,omitempty"` // An optional list of capability assignments for the Node Template.
-	Interfaces   map[string]InterfaceType           `yaml:"interfaces,omitempty" json:"-" json:"interfaces,omitempty"`     // An optional list of named interface definitions for the Node Template.
+	Interfaces   map[string]InterfaceDefinition     `yaml:"interfaces,omitempty" json:"-" json:"interfaces,omitempty"`     // An optional list of named interface definitions for the Node Template.
 	Artifacts    map[string]ArtifactDefinition      `yaml:"artifacts,omitempty" json:"-" json:"artifacts,omitempty"`       // An optional list of named artifact definitions for the Node Template.
 	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty" json:"-" json:"node_filter,omitempty"`   // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
 	Copy         string                             `yaml:"copy,omitempty" json:"copy,omitempty"`                          // The optional (symbolic) name of another node template to copy into (all keynames and values) and use as a basis for this node template.
 	Refs         struct {
-		Type       NodeType        `yaml:"-",json:"-"`
-		Interfaces []InterfaceType `yaml:"-",json:"-"`
+		Type NodeType `yaml:"-",json:"-"`
 	} `yaml:"-",json:"-"`
 }
 
@@ -80,28 +76,9 @@ func (n *NodeTemplate) GetRelationshipTarget(relationshipName string) string {
 
 func (n *NodeTemplate) getRequirementByRelationship(relationshipName string) *RequirementAssignment {
 	for _, req := range n.Requirements {
-		for name, r := range req {
+		for _, r := range req {
 			if r.Relationship.Type == relationshipName {
 				return &r
-			}
-			if r.Relationship.Type == "" {
-				if rd := n.getRequirementRelationshipType(name, relationshipName); rd != nil {
-					r.Capability = rd.Capability
-					r.Relationship.Type = rd.Relationship.Type
-					// TODO(kenjones): Set Node attribute from node type when Node Filters implemented
-					return &r
-				}
-			}
-		}
-	}
-	return nil
-}
-
-func (n *NodeTemplate) getRequirementRelationshipType(name, relationshipName string) *RequirementDefinition {
-	for _, req := range n.Refs.Type.Requirements {
-		if rd, ok := req[name]; ok {
-			if rd.Relationship.Type == relationshipName {
-				return &rd
 			}
 		}
 	}
@@ -126,15 +103,9 @@ func (n *NodeTemplate) findProperty(key, capname string) *PropertyAssignment {
 		if prop, ok := n.Capabilities[capname].Properties[key]; ok {
 			return &prop
 		}
-		if prop, ok := n.Refs.Type.Capabilities[capname].Properties[key]; ok {
-			return newPA(prop)
-		}
 	}
 	if prop, ok := n.Properties[key]; ok {
 		return &prop
-	}
-	if prop, ok := n.Refs.Type.Properties[key]; ok {
-		return newPA(prop)
 	}
 	return nil
 }
@@ -144,15 +115,9 @@ func (n *NodeTemplate) findAttribute(key, capname string) *AttributeAssignment {
 		if attr, ok := n.Capabilities[capname].Attributes[key]; ok {
 			return &attr
 		}
-		if attr, ok := n.Refs.Type.Capabilities[capname].Attributes[key]; ok {
-			return newAA(attr)
-		}
 	}
 	if attr, ok := n.Attributes[key]; ok {
 		return &attr
-	}
-	if attr, ok := n.Refs.Type.Attributes[key]; ok {
-		return newAA(attr)
 	}
 	return nil
 }
@@ -168,80 +133,82 @@ func (n *NodeTemplate) reflectProperties() {
 	}
 }
 
-// setRefs fills in the references of the node
-func (n *NodeTemplate) setRefs(s ServiceTemplateDefinition, nt map[string]NodeType) {
-	for name := range n.Interfaces {
-		re := regexp.MustCompile(fmt.Sprintf("%v$", name))
-		for na, v := range s.InterfaceTypes {
-			if re.MatchString(na) {
-				n.Refs.Interfaces = append(n.Refs.Interfaces, v)
-			}
+func (n *NodeTemplate) _extendCaps(nt NodeType) {
+	// make sure each inherited Capability is added
+	for k := range nt.Capabilities {
+		if len(n.Capabilities) == 0 {
+			n.Capabilities = make(map[string]CapabilityAssignment)
+		}
+		if _, ok := n.Capabilities[k]; !ok {
+			n.Capabilities[k] = CapabilityAssignment{}
 		}
 	}
-	n.Refs.Type = nt[n.Type]
+
+	// then make sure the values are extended from the inherited
+	for k, v := range n.Capabilities {
+		v.extendFrom(nt.Capabilities[k])
+		n.Capabilities[k] = v
+	}
 }
 
-// fillInterface Completes the interface of the node with any values found in its type
-// All the Operations will be filled
-func (n *NodeTemplate) fillInterface(s ServiceTemplateDefinition) {
-	nt := s.NodeTypes[n.Type]
-	if len(n.Interfaces) == 0 {
-		// If no interface is found, take the one from the node type
-		myInterfaces := make(map[string]InterfaceType, 1)
-
-		for intfname, intftype := range nt.Interfaces {
-			operations := make(map[string]OperationDefinition, 0)
-			for opname, interfacedef := range intftype.Operations {
-				operations[opname] = OperationDefinition{
-					Description:    interfacedef.Description,
-					Implementation: interfacedef.Implementation,
-				}
-			}
-			myInterfaces[intfname] = InterfaceType{Operations: operations}
+func (n *NodeTemplate) _extendReqs(nt NodeType) {
+	// make sure each inherited Requirement is added
+	for _, reqs := range nt.Requirements {
+		if len(n.Requirements) == 0 {
+			n.Requirements = make([]map[string]RequirementAssignment, 0)
 		}
-
-		n.Interfaces = myInterfaces
-		return
-	}
-
-	for name, intf := range n.Interfaces {
-		intf2, ok := nt.Interfaces[name]
-		if !ok {
-			continue
-		}
-		re := regexp.MustCompile(fmt.Sprintf("%v$", name))
-		for ifacename, iface := range s.InterfaceTypes {
-			if re.MatchString(ifacename) {
-				operations := make(map[string]OperationDefinition, 0)
-
-				for op := range iface.Operations {
-					v, ok := intf.Operations[op]
-					v2, ok2 := intf2.Operations[op]
-
-					switch {
-					case !ok && ok2:
-						operations[op] = OperationDefinition{
-							Description:    v2.Description,
-							Implementation: v2.Implementation,
-						}
-					case ok:
-						if ok2 && v.Implementation == "" {
-							v.Implementation = v2.Implementation
-						}
-						operations[op] = v
-					}
-				}
-
-				n.Interfaces[name] = InterfaceType{
-					Description: n.Interfaces[name].Description,
-					Version:     n.Interfaces[name].Version,
-					Operations:  operations,
-					Inputs:      n.Interfaces[name].Inputs,
-				}
-
+		for k := range reqs {
+			if r := n.GetRequirement(k); r == nil {
+				tmp := make(map[string]RequirementAssignment)
+				tmp[k] = RequirementAssignment{}
+				n.Requirements = append(n.Requirements, tmp)
 			}
 		}
 	}
+
+	// then make sure the values are extended from the inherited
+	for i, reqs := range n.Requirements {
+		for k, v := range reqs {
+			v.extendFrom(nt.getRequirement(k))
+			reqs[k] = v
+		}
+		n.Requirements[i] = reqs
+	}
+}
+
+func (n *NodeTemplate) extendFrom(nt NodeType) {
+	n.Refs.Type = nt
+
+	for k, v := range nt.Interfaces {
+		if len(n.Interfaces) == 0 {
+			n.Interfaces = make(map[string]InterfaceDefinition)
+		}
+		if intf, ok := n.Interfaces[k]; ok {
+			intf.merge(v)
+			n.Interfaces[k] = intf
+		} else {
+			n.Interfaces[k] = v
+		}
+	}
+
+	abase := nt.Artifacts
+	_ = mergo.MergeWithOverwrite(&abase, n.Artifacts)
+	n.Artifacts = abase
+
+	n._extendCaps(nt)
+	n._extendReqs(nt)
+
+	for k, v := range nt.Properties {
+		if len(n.Properties) == 0 {
+			n.Properties = make(map[string]PropertyAssignment)
+		}
+		if _, ok := n.Properties[k]; !ok {
+			tmp := newPA(v)
+			n.Properties[k] = *tmp
+		}
+	}
+
+	n.reflectProperties()
 }
 
 func (n *NodeTemplate) setName(name string) {

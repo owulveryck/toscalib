@@ -16,6 +16,8 @@ limitations under the License.
 
 package toscalib
 
+import "github.com/kenjones-cisco/mergo"
+
 // InterfaceType as described in Appendix A 6.4
 // An Interface Type is a reusable entity that describes a set of operations that can be used to interact with or manage a node or relationship in a TOSCA topology.
 type InterfaceType struct {
@@ -23,8 +25,8 @@ type InterfaceType struct {
 	Version     Version                        `yaml:"version,omitempty"`
 	Metadata    Metadata                       `yaml:"metadata,omitempty" json:"metadata"`
 	Description string                         `yaml:"description,omitempty"`
-	Operations  map[string]OperationDefinition `yaml:"operations,inline"`
 	Inputs      map[string]PropertyDefinition  `yaml:"inputs,omitempty" json:"inputs"` // The optional list of input parameter definitions.
+	Operations  map[string]OperationDefinition `yaml:"operations,inline"`
 }
 
 // OperationDefinition defines a named function or procedure that can be bound to an implementation artifact (e.g., a script).
@@ -57,34 +59,65 @@ func (i *OperationDefinition) UnmarshalYAML(unmarshal func(interface{}) error) e
 
 // InterfaceDefinition is related to a node type
 type InterfaceDefinition struct {
-	Type           string                         `yaml:"type" json:"type"`
-	Inputs         map[string]PropertyAssignment  `yaml:"inputs,omitempty"`
-	Description    string                         `yaml:"description,omitempty"`
-	Implementation string                         `yaml:"implementation,omitempty"`
-	Operations     map[string]OperationDefinition `yaml:"operations,inline"`
+	Type       string                         `yaml:"type" json:"type"`
+	Inputs     map[string]PropertyAssignment  `yaml:"inputs,omitempty"`
+	Operations map[string]OperationDefinition `yaml:"operations,inline"`
 }
 
-// UnmarshalYAML converts YAML text to a type
-func (i *InterfaceDefinition) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	var s string
-	if err := unmarshal(&s); err == nil {
-		i.Implementation = s
-		return nil
+func (i *InterfaceDefinition) extendFrom(intfType InterfaceType) {
+
+	base := intfType.Operations
+	_ = mergo.MergeWithOverwrite(&base, i.Operations)
+	i.Operations = base
+
+	for k, v := range intfType.Inputs {
+		if len(i.Inputs) == 0 {
+			i.Inputs = make(map[string]PropertyAssignment)
+		}
+		if _, ok := i.Inputs[k]; !ok {
+			tmp := newPA(v)
+			i.Inputs[k] = *tmp
+		}
 	}
-	var str struct {
-		Type           string                         `yaml:"type" json:"type"`
-		Inputs         map[string]PropertyAssignment  `yaml:"inputs,omitempty"`
-		Description    string                         `yaml:"description,omitempty"`
-		Implementation string                         `yaml:"implementation,omitempty"`
-		Operations     map[string]OperationDefinition `yaml:"operations,inline"`
+}
+
+func (i *InterfaceDefinition) merge(other InterfaceDefinition) {
+	if i.Type == "" {
+		i.Type = other.Type
 	}
-	if err := unmarshal(&str); err != nil {
-		return err
+
+	for k, v := range other.Inputs {
+		if len(i.Inputs) == 0 {
+			i.Inputs = make(map[string]PropertyAssignment)
+		}
+		if _, ok := i.Inputs[k]; !ok {
+			i.Inputs[k] = v
+		}
 	}
-	i.Type = str.Type
-	i.Inputs = str.Inputs
-	i.Implementation = str.Implementation
-	i.Description = str.Description
-	i.Operations = str.Operations
-	return nil
+
+	for k, v := range other.Operations {
+		if len(i.Operations) == 0 {
+			i.Operations = make(map[string]OperationDefinition)
+		}
+		if op, ok := i.Operations[k]; ok {
+			if op.Description == "" {
+				op.Description = v.Description
+			}
+			if op.Implementation == "" {
+				op.Implementation = v.Implementation
+			}
+			if len(op.Inputs) == 0 {
+				op.Inputs = v.Inputs
+			} else {
+				for pn, pv := range v.Inputs {
+					if _, ok := op.Inputs[pn]; !ok {
+						op.Inputs[pn] = pv
+					}
+				}
+			}
+			i.Operations[k] = op
+		} else {
+			i.Operations[k] = v
+		}
+	}
 }

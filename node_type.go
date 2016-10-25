@@ -27,7 +27,7 @@ type NodeType struct {
 	Requirements []map[string]RequirementDefinition `yaml:"requirements,omitempty" json:"requirements,omitempty"` // An optional sequenced list of requirement definitions for the Node Type
 	Capabilities map[string]CapabilityDefinition    `yaml:"capabilities,omitempty" json:"capabilities,omitempty"` // An optional list of capability definitions for the Node Type
 	Interfaces   map[string]InterfaceDefinition     `yaml:"interfaces,omitempty" json:"interfaces,omitempty"`     // An optional list of interface definitions supported by the Node Type
-	Artifacts    []ArtifactDefinition               `yaml:"artifacts,omitempty" json:"artifacts,omitempty"`       // An optional list of named artifact definitions for the Node Type
+	Artifacts    map[string]ArtifactDefinition      `yaml:"artifacts,omitempty" json:"artifacts,omitempty"`       // An optional list of named artifact definitions for the Node Type
 }
 
 func (n *NodeType) reflectProperties() {
@@ -39,4 +39,15 @@ func (n *NodeType) reflectProperties() {
 		c.reflectProperties()
 		n.Capabilities[capname] = c
 	}
+}
+
+func (n *NodeType) getRequirement(name string) RequirementDefinition {
+	for _, reqs := range n.Requirements {
+		for k, v := range reqs {
+			if k == name {
+				return v
+			}
+		}
+	}
+	return RequirementDefinition{}
 }
