@@ -21,7 +21,7 @@ import "github.com/kenjones-cisco/mergo"
 // ServiceTemplateDefinition is the meta structure containing an entire tosca document as described in
 // http://docs.oasis-open.org/tosca/TOSCA-Simple-Profile-YAML/v1.0/csd03/TOSCA-Simple-Profile-YAML-v1.0-csd03.html
 type ServiceTemplateDefinition struct {
-	DefinitionsVersion Version                         `yaml:"tosca_definitions_version" json:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
+	DefinitionsVersion string                          `yaml:"tosca_definitions_version" json:"tosca_definitions_version"` // A.9.3.1 tosca_definitions_version
 	Metadata           Metadata                        `yaml:"metadata,omitempty" json:"metadata"`
 	Description        string                          `yaml:"description,omitempty" json:"description,omitempty"`
 	DslDefinitions     interface{}                     `yaml:"dsl_definitions,omitempty" json:"dsl_definitions,omitempty"`       // Declares optional DSL-specific definitions and conventions.  For example, in YAML, this allows defining reusable YAML macros (i.e., YAML alias anchors) for use throughout the TOSCA Service Template.

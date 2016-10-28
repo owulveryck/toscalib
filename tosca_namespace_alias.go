@@ -23,6 +23,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/blang/semver"
 )
 
 // This implements the type defined in Appendix A 2 of the definition file
@@ -38,44 +40,106 @@ import (
 // 		BuildVersion is an optional integer value greater than or equal to 0 (zero)
 // 			that can be used to further qualify different build versions of the code
 // 			that has the same qualifer_string
-type Version string
+type Version struct {
+	semver.Version
+}
 
-// TODO(kenjones): Leverage https://github.com/blang/semver to provide Version implementation details.
-
-/*TODO Version.GetMajor
 // GetMajor returns the major_version number
-func (toscaVersion *Version) GetMajor() int {
-        return 0
+func (v *Version) GetMajor() int {
+	return int(v.Major)
 }
-*/
 
-/*TODO Version.GetMinor
 // GetMinor returns the minor_version number
-func (toscaVersion *Version) GetMinor() int {
-        return 0
+func (v *Version) GetMinor() int {
+	return int(v.Minor)
 }
-*/
 
-/*TODO Version.GetFixVersion
 // GetFixVersion returns the fix_version integer value
-func (toscaVersion *Version) GetFixVersion() int {
-        return 0
+func (v *Version) GetFixVersion() int {
+	return int(v.Patch)
 }
-*/
 
-/*TODO Version.GetQualifier
-// GetQualifier returns the named, pre-release version of the associated code that has been derived    from the version of the code identified by the combination major_version, minor_version and fix_version numbers
-func (toscaVersion *Version) GetQualifier() string {
-        return nil
+// GetQualifier returns the named, pre-release version of the associated code that has been derived
+// from the version of the code identified by the combination major_version, minor_version and fix_version numbers
+func (v *Version) GetQualifier() string {
+	for i := range v.Pre {
+		if !v.Pre[i].IsNum {
+			return v.Pre[i].VersionStr
+		}
+	}
+	return ""
 }
-*/
 
-/*TODO Version.GetBuildVersion
-// GetBuildVersion returns an  integer value greater than or equal to 0 (zero) that can be used to further        qualify different build versions of the code that has the same qualifer_string
-func (toscaVersion *Version) GetBuildVersion() int {
-        return 0
+// GetBuildVersion returns an  integer value greater than or equal to 0 (zero) that can be used to further
+// qualify different build versions of the code that has the same qualifer_string
+func (v *Version) GetBuildVersion() int {
+	for i := range v.Pre {
+		if v.Pre[i].IsNum {
+			return int(v.Pre[i].VersionNum)
+		}
+	}
+	return 0
 }
-*/
+
+func parseToscaVersion(s string) (semver.Version, error) {
+	s = strings.TrimSpace(s)
+	s = strings.TrimPrefix(s, "v")
+
+	// Split into major.minor.patch.pr(-meta)
+	parts := strings.SplitN(s, ".", 4)
+	if len(parts) < 3 {
+		parts = append(parts, "0")
+		s = strings.Join(parts, ".")
+	}
+	if len(parts) == 3 {
+		if strings.ContainsAny(parts[len(parts)-1], "-") {
+			x, parts := parts[len(parts)-1], parts[:len(parts)-1]
+			parts = append(parts, "0")
+			s = strings.Join(parts, ".")
+			s = s + "-" + strings.Join(strings.SplitN(x, "-", 2), ".")
+		}
+	}
+	if len(parts) == 4 {
+		if strings.ContainsAny(parts[len(parts)-1], "-") {
+			x, parts := parts[len(parts)-1], parts[:len(parts)-1]
+			s = strings.Join(parts, ".")
+			s = s + "-" + strings.Join(strings.SplitN(x, "-", 2), ".")
+		}
+	}
+
+	return semver.ParseTolerant(s)
+}
+
+// UnmarshalYAML is used to convert string to Version
+func (v *Version) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	err := unmarshal(&s)
+	if err != nil {
+		return err
+	}
+
+	// try to use a real semver
+	ver, err := semver.Make(s)
+	if err == nil {
+		v.Major = ver.Major
+		v.Minor = ver.Minor
+		v.Patch = ver.Patch
+		v.Pre = ver.Pre
+		v.Build = ver.Build
+		return nil
+	}
+
+	ver, err = parseToscaVersion(s)
+	if err == nil {
+		v.Major = ver.Major
+		v.Minor = ver.Minor
+		v.Patch = ver.Patch
+		v.Pre = ver.Pre
+		v.Build = ver.Build
+		return nil
+	}
+	return fmt.Errorf("Invalid version %v: %s", s, err)
+}
 
 // UNBOUNDED A.2.3 TOCSA range type
 const UNBOUNDED uint64 = 9223372036854775807

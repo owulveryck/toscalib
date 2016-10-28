@@ -1,6 +1,8 @@
-hash: 060a5f772978f7a4c2f2790cf1233bad6352956a865b4008fe2061ef8c6c43ce
-updated: 2016-10-24T15:29:28.45149108Z
+hash: b38aa1a8a50f4097b8acba76b8f5004895a6d8c8174bbb4aaebd7556056d4870
+updated: 2016-10-28T21:14:53.071030672Z
 imports:
+- name: github.com/blang/semver
+  version: 60ec3488bfea7cca02b021d106d9911120d25fe9
 - name: github.com/kenjones-cisco/mergo
   version: 0149f50ea824b391564215914d0e54ac298dd216
 - name: golang.org/x/tools

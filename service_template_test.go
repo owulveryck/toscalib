@@ -21,9 +21,11 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
+	"gopkg.in/yaml.v2"
 )
 
 func TestFlattenNodeType(t *testing.T) {
@@ -289,6 +291,186 @@ func TestParseCsar(t *testing.T) {
 			t.Fatalf("%v failed with error %v", f, err)
 		}
 	}
+}
+
+func isExpectedType(t reflect.Type, k reflect.Kind) bool {
+	return t.Kind() == k
+}
+
+func toBytes(s string) []byte {
+	r := strings.NewReader(s)
+	b, _ := ioutil.ReadAll(r)
+	return b
+}
+
+func TestVersion(t *testing.T) {
+	fname := "./tests/custom_types/custom_policy_types.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	for name, p := range s.PolicyTypes {
+		major := p.Version.GetMajor()
+		if !isExpectedType(reflect.TypeOf(major), reflect.Int) {
+			t.Log(name, "has invalid Major version component:", major)
+			t.Fail()
+		}
+
+		minor := p.Version.GetMinor()
+		if !isExpectedType(reflect.TypeOf(minor), reflect.Int) {
+			t.Log(name, "has invalid Minor version component:", minor)
+			t.Fail()
+		}
+
+		fixv := p.Version.GetFixVersion()
+		if !isExpectedType(reflect.TypeOf(fixv), reflect.Int) {
+			t.Log(name, "has invalid Fix version component:", fixv)
+			t.Fail()
+		}
+
+		rel := p.Version.GetQualifier()
+		if !isExpectedType(reflect.TypeOf(rel), reflect.String) {
+			t.Log(name, "has invalid Qualifier version component:", rel)
+			t.Fail()
+		}
+
+		build := p.Version.GetBuildVersion()
+		if !isExpectedType(reflect.TypeOf(build), reflect.Int) {
+			t.Log(name, "has invalid Build version component:", build)
+			t.Fail()
+		}
+	}
+
+	var v Version
+	var str = "1.0.0.alpha-10"
+	var data = toBytes(str)
+	if err = yaml.Unmarshal(data, &v); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	if v.GetMajor() != 1 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetMinor() != 0 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetFixVersion() != 0 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetQualifier() != "alpha" {
+		t.Log(v.String(), "not parsed correctly", v.GetQualifier())
+		t.Fail()
+	}
+	if v.GetBuildVersion() != 10 {
+		t.Log(v.String(), "not parsed correctly", v.GetBuildVersion())
+		t.Fail()
+	}
+
+	str = "1.0.alpha-9"
+	data = toBytes(str)
+	if err = yaml.Unmarshal(data, &v); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	if v.GetMajor() != 1 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetMinor() != 0 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetFixVersion() != 0 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetQualifier() != "alpha" {
+		t.Log(v.String(), "not parsed correctly", v.GetQualifier())
+		t.Fail()
+	}
+	if v.GetBuildVersion() != 9 {
+		t.Log(v.String(), "not parsed correctly", v.GetBuildVersion())
+		t.Fail()
+	}
+
+	str = "1.0"
+	data = toBytes(str)
+	if err = yaml.Unmarshal(data, &v); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	if v.GetMajor() != 1 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetMinor() != 0 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetFixVersion() != 0 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetQualifier() != "" {
+		t.Log(v.String(), "not parsed correctly", v.GetQualifier())
+		t.Fail()
+	}
+	if v.GetBuildVersion() != 0 {
+		t.Log(v.String(), "not parsed correctly", v.GetBuildVersion())
+		t.Fail()
+	}
+
+	str = "1"
+	data = toBytes(str)
+	if err = yaml.Unmarshal(data, &v); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+	if v.GetMajor() != 1 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetMinor() != 0 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetFixVersion() != 0 {
+		t.Log(v.String(), "not parsed correctly")
+		t.Fail()
+	}
+	if v.GetQualifier() != "" {
+		t.Log(v.String(), "not parsed correctly", v.GetQualifier())
+		t.Fail()
+	}
+	if v.GetBuildVersion() != 0 {
+		t.Log(v.String(), "not parsed correctly", v.GetBuildVersion())
+		t.Fail()
+	}
+
+	str = "test"
+	data = toBytes(str)
+	if err = yaml.Unmarshal(data, &v); err == nil {
+		t.Log(str, "is not a valid version but parsed successfully")
+		t.Fail()
+	}
+
+	str = "version: 1"
+	data = toBytes(str)
+	if err = yaml.Unmarshal(data, &v); err == nil {
+		t.Log(str, "is not a valid version but parsed successfully")
+		t.Fail()
+	}
+
 }
 
 func TestEvaluate(t *testing.T) {

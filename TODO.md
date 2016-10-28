@@ -19,20 +19,6 @@
 (line 62) (kenjones): Add support for Groups
 
 
-### ``tosca_namespace_alias.go``
-(line 43) (kenjones): Leverage https://github.com/blang/semver to provide Version implementation details.
-
-(line 45) Version.GetMajor
-
-(line 52) Version.GetMinor
-
-(line 59) Version.GetFixVersion
-
-(line 66) Version.GetQualifier
-
-(line 73) Version.GetBuildVersion
-
-
 ### ``tosca_reusable_modeling_definitions.go``
 (line 21) : Implement ArtifactDefinition struct
 

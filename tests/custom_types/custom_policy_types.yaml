@@ -7,6 +7,7 @@ description: >
 policy_types:
   my.policies.types.Performance:
     derived_from: tosca.policies.Performance
+    version: 1.0.0
     description: |
       The definition that is used to declare the performance requirements
       of nodes or groups of nodes.
@@ -38,6 +39,7 @@ policy_types:
 
   my.policies.types.UpdateScalingConstraints:
     derived_from: tosca.policies.Update
+    version: 1.0.0-beta
     description: The definition that is used to govern scaling of nodes or groups of nodes.
     properties:
       min_instances:
