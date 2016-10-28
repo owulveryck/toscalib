@@ -105,6 +105,9 @@ func parseImports(impDefs []ImportDefinition, resolver Resolver, hooks ParserHoo
 
 		if len(tt.Imports) != 0 {
 			tt, err = parseImports(tt.Imports, resolver, hooks)
+			if err != nil {
+				return std, err
+			}
 		}
 
 		std = std.Merge(tt)
