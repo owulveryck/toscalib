@@ -84,6 +84,35 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 	}, ParserHooks{ParsedSTD: noop}) // TODO(kenjones): Add hooks as method parameter
 }
 
+func parseImports(impDefs []ImportDefinition, resolver Resolver, hooks ParserHooks) (ServiceTemplateDefinition, error) {
+	var std ServiceTemplateDefinition
+
+	for _, im := range impDefs {
+		r, err := resolver(im.File)
+		if err != nil {
+			return std, err
+		}
+
+		var tt ServiceTemplateDefinition
+		err = yaml.Unmarshal(r, &tt)
+		if err != nil {
+			return std, err
+		}
+		err = hooks.ParsedSTD(im.File, &tt)
+		if err != nil {
+			return std, err
+		}
+
+		if len(tt.Imports) != 0 {
+			tt, err = parseImports(tt.Imports, resolver, hooks)
+		}
+
+		std = std.Merge(tt)
+	}
+
+	return std, nil
+}
+
 func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver, hooks ParserHooks) error {
 	var std ServiceTemplateDefinition
 	// Unmarshal the data in an interface
@@ -117,27 +146,13 @@ func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver, hooks 
 		std = std.Merge(tt)
 	}
 
-	// Load all referenced Imports
-	for _, im := range std.Imports {
-		r, err := resolver(im)
-		if err != nil {
-			return err
-		}
-
-		var tt ServiceTemplateDefinition
-		err = yaml.Unmarshal(r, &tt)
-		if err != nil {
-			return err
-		}
-		err = hooks.ParsedSTD(im, &tt)
-		if err != nil {
-			return err
-		}
-		std = std.Merge(tt)
+	// Load all referenced Imports (recursively)
+	var tt ServiceTemplateDefinition
+	tt, err = parseImports(std.Imports, resolver, hooks)
+	if err != nil {
+		return err
 	}
-	// Free the imports
-	// TODO(kenjones): Does dropping the Imports list really have any impact?
-	std.Imports = []string{}
+	std = std.Merge(tt)
 
 	// update the initial context with the freshly loaded context
 	*t = std

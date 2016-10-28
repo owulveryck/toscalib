@@ -234,11 +234,38 @@ func TestParseVerifyPropertyExpression(t *testing.T) {
 	}
 }
 
+func TestParseBadImportsSimple(t *testing.T) {
+	fname := "./tests/invalids/test_bad_import_format.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err == nil {
+		t.Log(fname, "has bad imports but it did not error out")
+		t.Fail()
+	}
+}
+
+func TestParseBadImportsComplex(t *testing.T) {
+	fname := "./tests/invalids/test_bad_import_format_defs.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err == nil {
+		t.Log(fname, "has bad imports but it did not error out")
+		t.Fail()
+	}
+}
+
 func TestParseCsar(t *testing.T) {
 
 	testsko := []string{
 		"tests/csar_metadata_not_yaml.zip",
-		"tests/csar_wordpress_invalid_import_path.zip",
 		"tests/csar_wrong_metadata_file.zip",
 		"tests/csar_not_zip.zip",
 	}

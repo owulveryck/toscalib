@@ -10,13 +10,9 @@
 ### ``parser.go``
 (line 84) (kenjones): Add hooks as method parameter
 
-(line 139) (kenjones): Does dropping the Imports list really have any impact?
-
 
 ### ``service_template.go``
-(line 21) (kenjones): Implement ImportDefinition as it is not always going to be a simple
-
-(line 187) (kenjones): assume the requirement has a node specified, otherwise need to use the
+(line 184) (kenjones): assume the requirement has a node specified, otherwise need to use the
 
 
 ### ``topology.go``
@@ -38,9 +34,9 @@
 
 
 ### ``tosca_reusable_modeling_definitions.go``
-(line 19) : Implement ArtifactDefinition struct
+(line 21) : Implement ArtifactDefinition struct
 
-(line 22) : Implement NodeFilter struct
+(line 26) : Implement ArtifactType struct
 
-(line 70) : Implement ArtifactType struct
+(line 29) : Implement NodeFilter struct
 

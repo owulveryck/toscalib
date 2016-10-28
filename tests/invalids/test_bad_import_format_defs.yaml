@@ -1,0 +1,11 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Imports another template that then imports other templates. (recursion)
+
+imports:
+  - complex_import:
+      file: tests/example2.yaml
+    mycomplex_import:
+      file: example3.yaml
+
+# that is all

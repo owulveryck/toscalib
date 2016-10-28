@@ -5,7 +5,8 @@ description: >
 
 # Repositories to retrieve code artifacts from
 repositories:
-  docker_hub: https://registry.hub.docker.com/
+  docker_hub:
+    url: https://registry.hub.docker.com/
 
 topology_template:
 
