@@ -1,22 +1,19 @@
 #!/bin/bash
 
-rm -f err.txt*
-rm -f vet.txt
+set -o errexit
+set -o nounset
+set -o pipefail
 
-for pkg in $(glide nv); do
-    errcheck $pkg >> err.txt 2>&1
-    go vet $pkg >> vet.txt 2>&1
-done
-
-# ignore generated files
-sed -i.prev '/defer/d' err.txt
-
-# remove when it exists
-rm -f err.txt.prev
-
-if [[ -s err.txt ]] || [[ -s vet.txt ]]
-then
-    cat err.txt
-    cat vet.txt
-    exit 1
-fi
+# Excludes:
+#   - normative_definitions.go is generated code so static analysis will always have some issue
+#   - when using defer there is no way to check to returned value so ignore
+gometalinter \
+    --exclude='normative_definitions\.go:.*$' \
+    --exclude='error return value not checked.*(Close|Log|Print).*\(errcheck\)$' \
+    --disable=aligncheck \
+    --disable=dupl \
+    --disable=gotype \
+    --enable=unused \
+    --cyclo-over=20 \
+    --tests \
+    --deadline=20s

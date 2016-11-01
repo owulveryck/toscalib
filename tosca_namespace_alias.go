@@ -93,16 +93,16 @@ func parseToscaVersion(s string) (semver.Version, error) {
 	}
 	if len(parts) == 3 {
 		if strings.ContainsAny(parts[len(parts)-1], "-") {
-			x, parts := parts[len(parts)-1], parts[:len(parts)-1]
-			parts = append(parts, "0")
-			s = strings.Join(parts, ".")
+			x, tparts := parts[len(parts)-1], parts[:len(parts)-1]
+			tparts = append(tparts, "0")
+			s = strings.Join(tparts, ".")
 			s = s + "-" + strings.Join(strings.SplitN(x, "-", 2), ".")
 		}
 	}
 	if len(parts) == 4 {
 		if strings.ContainsAny(parts[len(parts)-1], "-") {
-			x, parts := parts[len(parts)-1], parts[:len(parts)-1]
-			s = strings.Join(parts, ".")
+			x, tparts := parts[len(parts)-1], parts[:len(parts)-1]
+			s = strings.Join(tparts, ".")
 			s = s + "-" + strings.Join(strings.SplitN(x, "-", 2), ".")
 		}
 	}

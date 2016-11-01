@@ -51,10 +51,7 @@ add-dep: build/image_build
 format: vendor
 	${DOCKERNOVENDOR} bash ./scripts/fmt.sh
 
-lint: format
-	${DOCKERRUN} bash ./scripts/lint.sh
-
-check: lint
+check: format
 	${DOCKERRUN} bash ./scripts/check.sh
 
 # default task

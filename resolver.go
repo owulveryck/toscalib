@@ -22,7 +22,8 @@ func defaultResolver(location string) ([]byte, error) {
 
 	switch u.Scheme {
 	case "http", "https":
-		res, err := http.Get(u.String())
+		var res *http.Response
+		res, err = http.Get(u.String())
 		if err != nil {
 			return r, err
 		}

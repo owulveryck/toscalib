@@ -21,6 +21,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -303,6 +304,60 @@ func toBytes(s string) []byte {
 	return b
 }
 
+func checkVersion(value string, expected map[string]string, t *testing.T) {
+	var v Version
+	var data = toBytes(value)
+	if err := yaml.Unmarshal(data, &v); err != nil {
+		t.Log(err)
+		t.Fail()
+	}
+
+	major, err := strconv.Atoi(expected["major"])
+	if err != nil {
+		t.Log(expected["major"], "must be convertible to an int")
+		t.Fatal(err)
+	}
+	if v.GetMajor() != major {
+		t.Log(v.String(), "not parsed correctly", v.GetMajor())
+		t.Fail()
+	}
+
+	minor, err := strconv.Atoi(expected["minor"])
+	if err != nil {
+		t.Log(expected["minor"], "must be convertible to an int")
+		t.Fatal(err)
+	}
+	if v.GetMinor() != minor {
+		t.Log(v.String(), "not parsed correctly", v.GetMinor())
+		t.Fail()
+	}
+
+	fix, err := strconv.Atoi(expected["fix"])
+	if err != nil {
+		t.Log(expected["fix"], "must be convertible to an int")
+		t.Fatal(err)
+	}
+	if v.GetFixVersion() != fix {
+		t.Log(v.String(), "not parsed correctly", v.GetFixVersion())
+		t.Fail()
+	}
+
+	if v.GetQualifier() != expected["rel"] {
+		t.Log(v.String(), "not parsed correctly", v.GetQualifier())
+		t.Fail()
+	}
+
+	build, err := strconv.Atoi(expected["build"])
+	if err != nil {
+		t.Log(expected["build"], "must be convertible to an int")
+		t.Fatal(err)
+	}
+	if v.GetBuildVersion() != build {
+		t.Log(v.String(), "not parsed correctly", v.GetBuildVersion())
+		t.Fail()
+	}
+}
+
 func TestVersion(t *testing.T) {
 	fname := "./tests/custom_types/custom_policy_types.yaml"
 	var s ServiceTemplateDefinition
@@ -348,117 +403,45 @@ func TestVersion(t *testing.T) {
 		}
 	}
 
+	expected := map[string]string{
+		"major": "1",
+		"minor": "0",
+		"fix":   "0",
+		"rel":   "alpha",
+		"build": "10",
+	}
+	checkVersion("1.0.0.alpha-10", expected, t)
+
+	expected = map[string]string{
+		"major": "1",
+		"minor": "0",
+		"fix":   "0",
+		"rel":   "alpha",
+		"build": "9",
+	}
+	checkVersion("1.0.alpha-9", expected, t)
+
+	expected = map[string]string{
+		"major": "1",
+		"minor": "0",
+		"fix":   "0",
+		"rel":   "",
+		"build": "0",
+	}
+	checkVersion("1.0", expected, t)
+
+	expected = map[string]string{
+		"major": "1",
+		"minor": "0",
+		"fix":   "0",
+		"rel":   "",
+		"build": "0",
+	}
+	checkVersion("1", expected, t)
+
 	var v Version
-	var str = "1.0.0.alpha-10"
-	var data = toBytes(str)
-	if err = yaml.Unmarshal(data, &v); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-	if v.GetMajor() != 1 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetMinor() != 0 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetFixVersion() != 0 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetQualifier() != "alpha" {
-		t.Log(v.String(), "not parsed correctly", v.GetQualifier())
-		t.Fail()
-	}
-	if v.GetBuildVersion() != 10 {
-		t.Log(v.String(), "not parsed correctly", v.GetBuildVersion())
-		t.Fail()
-	}
-
-	str = "1.0.alpha-9"
-	data = toBytes(str)
-	if err = yaml.Unmarshal(data, &v); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-	if v.GetMajor() != 1 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetMinor() != 0 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetFixVersion() != 0 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetQualifier() != "alpha" {
-		t.Log(v.String(), "not parsed correctly", v.GetQualifier())
-		t.Fail()
-	}
-	if v.GetBuildVersion() != 9 {
-		t.Log(v.String(), "not parsed correctly", v.GetBuildVersion())
-		t.Fail()
-	}
-
-	str = "1.0"
-	data = toBytes(str)
-	if err = yaml.Unmarshal(data, &v); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-	if v.GetMajor() != 1 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetMinor() != 0 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetFixVersion() != 0 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetQualifier() != "" {
-		t.Log(v.String(), "not parsed correctly", v.GetQualifier())
-		t.Fail()
-	}
-	if v.GetBuildVersion() != 0 {
-		t.Log(v.String(), "not parsed correctly", v.GetBuildVersion())
-		t.Fail()
-	}
-
-	str = "1"
-	data = toBytes(str)
-	if err = yaml.Unmarshal(data, &v); err != nil {
-		t.Log(err)
-		t.Fail()
-	}
-	if v.GetMajor() != 1 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetMinor() != 0 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetFixVersion() != 0 {
-		t.Log(v.String(), "not parsed correctly")
-		t.Fail()
-	}
-	if v.GetQualifier() != "" {
-		t.Log(v.String(), "not parsed correctly", v.GetQualifier())
-		t.Fail()
-	}
-	if v.GetBuildVersion() != 0 {
-		t.Log(v.String(), "not parsed correctly", v.GetBuildVersion())
-		t.Fail()
-	}
-
-	str = "test"
-	data = toBytes(str)
+	str := "test"
+	data := toBytes(str)
 	if err = yaml.Unmarshal(data, &v); err == nil {
 		t.Log(str, "is not a valid version but parsed successfully")
 		t.Fail()
@@ -686,7 +669,7 @@ func TestEvaluateRelationship(t *testing.T) {
 	}
 
 	v := pa.Evaluate(&s, "tosca.relationships.HostedOn")
-	if vstr, ok := v.(string); ok {
+	if vstr, isString := v.(string); isString {
 		if vstr != "1" {
 			t.Log(fname, "property evaluation failed to get value for `test`", vstr)
 			t.Fail()
@@ -760,7 +743,7 @@ func TestEvaluatePropertyHostGetAttributeFunc(t *testing.T) {
 	}
 
 	v := pa.Evaluate(&s, "dbms")
-	if vstr, ok := v.(string); ok {
+	if vstr, isString := v.(string); isString {
 		if vstr != "127.0.0.1" {
 			t.Log(fname, "property evaluation failed to get value for `ip_address`", vstr)
 			t.Fail()

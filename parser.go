@@ -137,7 +137,7 @@ func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver, hooks 
 		data := MustAsset(normType)
 
 		var tt ServiceTemplateDefinition
-		err := yaml.Unmarshal(data, &tt)
+		err = yaml.Unmarshal(data, &tt)
 		if err != nil {
 			return err
 		}
