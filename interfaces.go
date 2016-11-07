@@ -16,8 +16,6 @@ limitations under the License.
 
 package toscalib
 
-import "github.com/kenjones-cisco/mergo"
-
 // InterfaceType as described in Appendix A 6.4
 // An Interface Type is a reusable entity that describes a set of operations that can be used to interact with or manage a node or relationship in a TOSCA topology.
 type InterfaceType struct {
@@ -66,10 +64,6 @@ type InterfaceDefinition struct {
 
 func (i *InterfaceDefinition) extendFrom(intfType InterfaceType) {
 
-	base := intfType.Operations
-	_ = mergo.MergeWithOverwrite(&base, i.Operations)
-	i.Operations = base
-
 	for k, v := range intfType.Inputs {
 		if len(i.Inputs) == 0 {
 			i.Inputs = make(map[string]PropertyAssignment)
@@ -77,6 +71,32 @@ func (i *InterfaceDefinition) extendFrom(intfType InterfaceType) {
 		if _, ok := i.Inputs[k]; !ok {
 			tmp := newPA(v)
 			i.Inputs[k] = *tmp
+		}
+	}
+
+	for k, v := range intfType.Operations {
+		if len(i.Operations) == 0 {
+			i.Operations = make(map[string]OperationDefinition)
+		}
+		if op, ok := i.Operations[k]; ok {
+			if op.Description == "" {
+				op.Description = v.Description
+			}
+			if op.Implementation == "" {
+				op.Implementation = v.Implementation
+			}
+			if len(op.Inputs) == 0 {
+				op.Inputs = v.Inputs
+			} else {
+				for pn, pv := range v.Inputs {
+					if _, ok := op.Inputs[pn]; !ok {
+						op.Inputs[pn] = pv
+					}
+				}
+			}
+			i.Operations[k] = op
+		} else {
+			i.Operations[k] = v
 		}
 	}
 }

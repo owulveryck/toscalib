@@ -104,10 +104,12 @@ func parseImports(impDefs []ImportDefinition, resolver Resolver, hooks ParserHoo
 		}
 
 		if len(tt.Imports) != 0 {
-			tt, err = parseImports(tt.Imports, resolver, hooks)
+			var imptt ServiceTemplateDefinition
+			imptt, err = parseImports(tt.Imports, resolver, hooks)
 			if err != nil {
 				return std, err
 			}
+			tt = tt.Merge(imptt)
 		}
 
 		std = std.Merge(tt)

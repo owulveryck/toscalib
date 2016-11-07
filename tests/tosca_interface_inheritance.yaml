@@ -1,0 +1,90 @@
+tosca_definitions_version: tosca_simple_yaml_1_0_0
+description: Validate interface operations inheritance
+
+metadata:
+  template_name: testapp
+  template_version: 0.1.0
+  template_author: dev
+
+imports:
+  - tests/custom_types/tosca_non_normative.yaml
+
+topology_template:
+  node_templates:
+    mygslb:
+      type: my.nodes.GSLB
+      properties:
+        domain_name: test
+        policy: round_robin
+      requirements:
+        - application:
+            node: myui
+      interfaces:
+        Standard:
+          create:
+            inputs:
+              domain_name: { get_property: [SELF, domain_name] }
+          configure:
+            inputs:
+              targets: { get_attribute: [SELF, destination, private_address] }
+              policy: { get_property: [SELF, policy] }
+
+    myui:
+      type: my.nodes.ScalableContainer
+      properties:
+        appname: reference-web
+        appinstance: dev
+        avail_zone: east
+        image_name: example/ui
+      requirements:
+        - endpoint:
+            node: myapi
+      capabilities:
+        scalable:
+          properties:
+            min_instances: 1
+            max_instances: 1
+            default_instances: 1
+      interfaces:
+        Standard:
+          create:
+            inputs:
+              avail_zone: { get_property: [ SELF, avail_zone ] }
+              appname: { get_property: [ SELF, appname ] }
+              appinstance: { get_property: [ SELF, appinstance ] }
+
+    myapi:
+      type: my.nodes.ScalableContainer
+      properties:
+        appname: reference-api
+        appinstance: dev
+        avail_zone: east
+        image_name: example/api
+      requirements:
+        - database_endpoint:
+            node: mydb
+            capability: tosca.capabilities.Endpoint.Database
+            relationship: tosca.relationships.ConnectsTo
+      capabilities:
+        scalable:
+          properties:
+            min_instances: 1
+            max_instances: 1
+            default_instances: 1
+      interfaces:
+        Standard:
+          create:
+            inputs:
+              avail_zone: { get_property: [ SELF, avail_zone ] }
+              appname: { get_property: [ SELF, appname ] }
+              appinstance: { get_property: [ SELF, appinstance ] }
+
+    mydb:
+      type: my.nodes.HostedMongo
+      capabilities:
+        database_endpoint:
+          properties:
+            protocol: tcp
+            initiator: source
+            network_name: PRIVATE
+            secure: false

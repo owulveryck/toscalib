@@ -1,0 +1,155 @@
+tosca_definitions_version: tosca_simple_yaml_1_0_0_wd03
+
+node_types:
+  tosca.nodes.Container.Application.Docker:
+    derived_from: tosca.nodes.Container.Application
+    requirements:
+      - host:
+        capability: tosca.capabilities.Container.Docker
+
+  my.nodes.Container.Application.Docker:
+    derived_from: tosca.nodes.Container.Application.Docker
+    description: represents a containerized application.
+    capabilities:
+      endpoint: tosca.capabilities.Endpoint
+    attributes:
+      uuid:
+        type: string
+    properties:
+      env_vars:
+        type: map
+        required: false
+        entry_schema:
+          description: Environment variables for the Docker container.
+          type: string
+    artifacts:
+      my_image:
+        type: tosca.artifacts.Deployment.Image.Container.Docker
+
+  my.nodes.ScalableContainer:
+    derived_from: my.nodes.Container.Application.Docker
+    description: represents scalable containerized application.
+    capabilities:
+      scalable: tosca.capabilities.Scalable
+    requirements:
+      - endpoint: tosca.capabilities.Endpoint
+        type: tosca.relationships.ConnectsTo
+        lower_bound: 0
+        upper_bound: UNBOUNDED
+    properties:
+      appname:
+        description: Application name
+        type: string
+        required: true
+      appinstance:
+        description: Lifecycle
+        type: string
+        required: true
+      image_name:
+        description: Docker image name
+        type: string
+        required: true
+      image_tag:
+        description: Docker image tag
+        type: string
+        required: true
+      avail_zone:
+        description: DC Region
+        type: string
+        required: true
+    interfaces:
+      Standard:
+        create:
+          implementation: scripts/kube-create.sh
+          inputs:
+            image_name:
+              type: string
+        configure: scripts/kube-configure.sh
+        start: scripts/kube-start.sh
+        stop: scripts/kube-stop.sh
+        delete: scripts/kube-delete.sh
+
+  my.nodes.GSLB:
+    derived_from: tosca.nodes.LoadBalancer
+    description: represents a Global Server Load Balancer.
+    properties:
+      domain_name:
+        description: Resolved domain name
+        type: string
+        required: true
+      policy:
+        description: Balancing policy
+        type: string
+        required: true
+        constraints:
+          - valid_values: [ oredered_list, static_dns, round_robin, weighted_round_robin, least_loaded, geo_database ]
+    interfaces:
+      Standard:
+        configure:
+          implementation: scripts/gslb-configure.sh
+          inputs:
+            policy:
+              type: string
+            targets:
+              type: string
+        create:
+          implementation: scripts/gslb-create.sh
+          inputs:
+            domain_name:
+              type: string
+
+  my.nodes.HostedMongo:
+    derived_from: tosca.nodes.Database
+    attributes:
+      uuid:
+        type: string
+    properties:
+      port:
+        default: 27017
+    interfaces:
+      Standard:
+        create: scripts/mongo-create.sh
+        configure:
+          inputs:
+            port:
+              type: integer
+          implementation: scripts/mongo-configure.sh
+        start: scripts/mongo-start.sh
+        stop: scripts/mongo-stop.sh
+
+capability_types:
+  tosca.capabilities.Container.Docker:
+    derived_from: tosca.capabilities.Container
+    properties:
+      version:
+        type: list
+        required: false
+        entry_schema:
+          type: version
+      publish_all:
+        type: boolean
+        default: false
+        required: false
+      publish_ports:
+        type: list
+        entry_schema:
+          type: PortSpec
+        required: false
+      expose_ports:
+        type: list
+        entry_schema:
+          type: PortSpec
+        required: false
+      volumes:
+        type: list
+        entry_schema:
+          type: string
+        required: false
+
+  tosca.capabilities.Endpoint.Messaging:
+    derived_from: tosca.capabilities.Endpoint
+
+artifact_types:
+  tosca.artifacts.Deployment.Image.Container.Docker:
+    derived_from: tosca.artifacts.Deployment.Image
+    description: Docker Container Image
