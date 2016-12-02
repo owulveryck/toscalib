@@ -1,8 +1,4 @@
-FROM golang:1.6
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        zip \
-    && rm -rf /var/lib/apt/lists/*
+FROM golang:1.7
 
 ENV GLIDE_VERSION v0.12.3
 
@@ -16,7 +12,4 @@ RUN go get -u github.com/jteeuwen/go-bindata/... \
     && rm /tmp/glide.tgz
 
 ENV CGO_ENABLED 0
-ENV GO15VENDOREXPERIMENT 1
-ENV GOEXPERIMENT framepointer
 ENV GOPATH /go:/toscalib
-

@@ -2,6 +2,9 @@ tosca_definitions_version: tosca_simple_yaml_1_0
 
 description: Template for deploying a two-tier application on two servers.
 
+imports:
+  - tests/custom_types/custom_rel_types.yaml
+
 topology_template:
   inputs:
     # omitted here for brevity
@@ -26,7 +29,16 @@ topology_template:
 
   relationship_templates:
     my_custom_database_connection:
-      type: ConnectsTo
+      type: tosca.relationships.ConnectsTo
       interfaces:
         Configure:
           pre_configure_source: scripts/wp_db_configure.sh
+    my_custom_glsb_connection:
+      type: my.relationships.ConnectsToWebUI
+      properties:
+        target_ip: { get_attribute: [TARGET, private_address] }
+      interfaces:
+        Configure:
+          post_configure_source:
+            inputs:
+              target_ip: { get_property: [SELF, target_ip] }

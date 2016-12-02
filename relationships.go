@@ -76,7 +76,10 @@ func (r *RelationshipTemplate) extendFrom(relType RelationshipType) {
 		if len(r.Interfaces) == 0 {
 			r.Interfaces = make(map[string]InterfaceDefinition)
 		}
-		if _, ok := r.Interfaces[k]; !ok {
+		if intf, ok := r.Interfaces[k]; ok {
+			intf.merge(v)
+			r.Interfaces[k] = intf
+		} else {
 			r.Interfaces[k] = v
 		}
 	}

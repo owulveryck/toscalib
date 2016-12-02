@@ -11,24 +11,27 @@ type flatTypes struct {
 	Policies      map[string]PolicyType
 }
 
-// TODO(kenjones): Switch to reflect if possible in the future (if simple)
-
 func flattenCapType(name string, s ServiceTemplateDefinition) CapabilityType {
 	if ct, ok := s.CapabilityTypes[name]; ok {
 		if ct.DerivedFrom != "" {
 			parent := flattenCapType(ct.DerivedFrom, s)
+
+			// clone the parent first before applying any changes
+			tmp := clone(parent)
+			ctm, _ := tmp.(CapabilityType)
+
 			// mergo does not handle merging Slices so the rt items
 			// will wipe away, capture the values here.
-			sources := parent.ValidSources
+			sources := ctm.ValidSources
 
-			_ = mergo.MergeWithOverwrite(&parent, ct)
+			_ = mergo.MergeWithOverwrite(&ctm, ct)
 
 			// now copy them back in using append, if the child type had
 			// any previously, otherwise it will duplicate the parents.
 			if len(ct.ValidSources) > 0 {
-				parent.ValidSources = append(parent.ValidSources, sources...)
+				ctm.ValidSources = append(ctm.ValidSources, sources...)
 			}
-			return parent
+			return ctm
 		}
 		return ct
 	}
@@ -39,8 +42,13 @@ func flattenIntfType(name string, s ServiceTemplateDefinition) InterfaceType {
 	if it, ok := s.InterfaceTypes[name]; ok {
 		if it.DerivedFrom != "" {
 			parent := flattenIntfType(it.DerivedFrom, s)
-			_ = mergo.MergeWithOverwrite(&parent, it)
-			return parent
+
+			// clone the parent first before applying any changes
+			tmp := clone(parent)
+			itm, _ := tmp.(InterfaceType)
+
+			_ = mergo.MergeWithOverwrite(&itm, it)
+			return itm
 		}
 		return it
 	}
@@ -51,18 +59,23 @@ func flattenRelType(name string, s ServiceTemplateDefinition) RelationshipType {
 	if rt, ok := s.RelationshipTypes[name]; ok {
 		if rt.DerivedFrom != "" {
 			parent := flattenRelType(rt.DerivedFrom, s)
+
+			// clone the parent first before applying any changes
+			tmp := clone(parent)
+			rtm, _ := tmp.(RelationshipType)
+
 			// mergo does not handle merging Slices so the rt items
 			// will wipe away, capture the values here.
-			targets := parent.ValidTarget
+			targets := rtm.ValidTarget
 
-			_ = mergo.MergeWithOverwrite(&parent, rt)
+			_ = mergo.MergeWithOverwrite(&rtm, rt)
 
 			// now copy them back in using append, if the child type had
 			// any previously, otherwise it will duplicate the parents.
 			if len(rt.ValidTarget) > 0 {
-				parent.ValidTarget = append(parent.ValidTarget, targets...)
+				rtm.ValidTarget = append(rtm.ValidTarget, targets...)
 			}
-			return parent
+			return rtm
 		}
 		return rt
 	}
@@ -73,18 +86,23 @@ func flattenNodeType(name string, s ServiceTemplateDefinition) NodeType {
 	if nt, ok := s.NodeTypes[name]; ok {
 		if nt.DerivedFrom != "" {
 			parent := flattenNodeType(nt.DerivedFrom, s)
+
+			// clone the parent first before applying any changes
+			tmp := clone(parent)
+			ntm, _ := tmp.(NodeType)
+
 			// mergo does not handle merging Slices so the nt items
 			// will wipe away, capture the values here.
-			reqs := parent.Requirements
+			reqs := ntm.Requirements
 
-			_ = mergo.MergeWithOverwrite(&parent, nt)
+			_ = mergo.MergeWithOverwrite(&ntm, nt)
 
 			// now copy them back in using append, if the child node type had
 			// any previously, otherwise it will duplicate the parents.
 			if len(nt.Requirements) > 0 {
-				parent.Requirements = append(parent.Requirements, reqs...)
+				ntm.Requirements = append(ntm.Requirements, reqs...)
 			}
-			return parent
+			return ntm
 		}
 		return nt
 	}
@@ -95,22 +113,27 @@ func flattenGroupType(name string, s ServiceTemplateDefinition) GroupType {
 	if gt, ok := s.GroupTypes[name]; ok {
 		if gt.DerivedFrom != "" {
 			parent := flattenGroupType(gt.DerivedFrom, s)
+
+			// clone the parent first before applying any changes
+			tmp := clone(parent)
+			gtm, _ := tmp.(GroupType)
+
 			// mergo does not handle merging Slices so the nt items
 			// will wipe away, capture the values here.
-			reqs := parent.Requirements
-			members := parent.Members
+			reqs := gtm.Requirements
+			members := gtm.Members
 
-			_ = mergo.MergeWithOverwrite(&parent, gt)
+			_ = mergo.MergeWithOverwrite(&gtm, gt)
 
 			// now copy them back in using append, if the child type had
 			// any previously, otherwise it will duplicate the parents.
 			if len(gt.Requirements) > 0 {
-				parent.Requirements = append(parent.Requirements, reqs...)
+				gtm.Requirements = append(gtm.Requirements, reqs...)
 			}
 			if len(gt.Members) > 0 {
-				parent.Members = append(parent.Members, members...)
+				gtm.Members = append(gtm.Members, members...)
 			}
-			return parent
+			return gtm
 		}
 		return gt
 	}
@@ -121,18 +144,23 @@ func flattenPolicyType(name string, s ServiceTemplateDefinition) PolicyType {
 	if pt, ok := s.PolicyTypes[name]; ok {
 		if pt.DerivedFrom != "" {
 			parent := flattenPolicyType(pt.DerivedFrom, s)
+
+			// clone the parent first before applying any changes
+			tmp := clone(parent)
+			ptm, _ := tmp.(PolicyType)
+
 			// mergo does not handle merging Slices so the items
 			// will wipe away, capture the values here.
-			targets := parent.Targets
+			targets := ptm.Targets
 
-			_ = mergo.MergeWithOverwrite(&parent, pt)
+			_ = mergo.MergeWithOverwrite(&ptm, pt)
 
 			// now copy them back in using append, if the child type had
 			// any previously, otherwise it will duplicate the parents.
 			if len(pt.Targets) > 0 {
-				parent.Targets = append(parent.Targets, targets...)
+				ptm.Targets = append(ptm.Targets, targets...)
 			}
-			return parent
+			return ptm
 		}
 		return pt
 	}
@@ -155,6 +183,19 @@ func flattenHierarchy(s ServiceTemplateDefinition) flatTypes {
 	flats.Relationships = make(map[string]RelationshipType)
 	for name := range s.RelationshipTypes {
 		flats.Relationships[name] = flattenRelType(name, s)
+	}
+
+	for k, v := range flats.Relationships {
+		for name, iDef := range v.Interfaces {
+			// during merge the Type is not always properly inherited, so set it
+			// from the parent.
+			if iDef.Type == "" {
+				iDef.Type = flats.Relationships[v.DerivedFrom].Interfaces[name].Type
+			}
+			iDef.extendFrom(flats.Interfaces[iDef.Type])
+			v.Interfaces[name] = iDef
+		}
+		flats.Relationships[k] = v
 	}
 
 	flats.Nodes = make(map[string]NodeType)

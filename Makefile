@@ -5,7 +5,7 @@ SHELL := /bin/bash
 
 .PHONY: clean test cover lint format
 
-PROJECT = toscalib
+export PROJECT = toscalib
 
 IMPORT_PATH := github.com/CiscoCloud/${PROJECT}
 
@@ -25,14 +25,17 @@ DOCKERNOVENDOR := docker run --rm -i \
 	${DEV_IMAGE}
 
 clean:
-	@rm -rf cover *.txt
+	@rm -rf cover
+
+veryclean: clean
+	@rm -rf .glide vendor
 
 # ----------------------------------------------
-# docker build
+# build
 
 # builds the builder container
 build/image_build:
-	docker build -t ${DEV_IMAGE} -f Dockerfile.dev .
+	@docker build --quiet -t ${DEV_IMAGE} -f Dockerfile.dev .
 
 # top-level target for vendoring our packages: glide install requires
 # being in the package directory so we have to run this for each package
@@ -41,9 +44,12 @@ vendor: build/image_build
 
 # fetch a dependency via go get, vendor it, and then save into the parent
 # package's glide.yml
-# usage DEP=github.com/owner/package make add-dep
+# usage: DEP=github.com/owner/package make add-dep
 add-dep: build/image_build
-	${DOCKERNOVENDOR} bash -c "DEP=$(DEP) ./scripts/add_dep.sh"
+ifeq ($(strip $(DEP)),)
+	$(error "No dependency provided. Expected: DEP=<go import path>")
+endif
+	${DOCKERNOVENDOR} glide get ${DEP}
 
 # ----------------------------------------------
 # develop and test
@@ -67,3 +73,8 @@ cover: check
 # ------ Generator
 generate: build/image_build NormativeTypes/*
 	${DOCKERRUN} go-bindata -pkg=toscalib -prefix=NormativeTypes/ -o normative_definitions.go NormativeTypes/
+
+# ------ Minishift / Docker Machine Helpers
+.PHONY: setup
+setup:
+	@bash ./scripts/setup.sh

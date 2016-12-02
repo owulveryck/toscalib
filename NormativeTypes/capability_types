@@ -119,6 +119,9 @@ capability_types:
   tosca.capabilities.network.Bindable:
     derived_from: tosca.capabilities.Node
 
+  tosca.capabilities.network.Linkable:
+    derived_from: tosca.capabilities.Node
+
   tosca.capabilities.Node:
     derived_from: tosca.capabilities.Root
 

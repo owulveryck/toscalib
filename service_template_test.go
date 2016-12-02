@@ -306,6 +306,72 @@ func TestParseVerifyNTInterfaces(t *testing.T) {
 	}
 }
 
+func TestParseVerifyRTInterfaces(t *testing.T) {
+	fname := "./tests/tosca_custom_relationship.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	want := map[string]map[string]string{
+		"my_custom_database_connection": map[string]string{
+			"pre_configure_source":  "scripts/wp_db_configure.sh",
+			"pre_configure_target":  "",
+			"post_configure_source": "",
+			"post_configure_target": "",
+			"add_target":            "",
+			"add_source":            "",
+			"target_changed":        "",
+			"remove_target":         "",
+		},
+		"my_custom_glsb_connection": map[string]string{
+			"pre_configure_source":  "",
+			"pre_configure_target":  "",
+			"post_configure_source": "scripts/my_script.sh",
+			"post_configure_target": "",
+			"add_target":            "",
+			"add_source":            "",
+			"target_changed":        "",
+			"remove_target":         "",
+		},
+	}
+
+	for k, v := range want {
+		tmpl, found := s.TopologyTemplate.RelationshipTemplates[k]
+		if !found {
+			t.Log(k, "RelationshipTemplate not found in TopologyTemplate")
+			t.Fail()
+			continue
+		}
+
+		cfgIntf, ok := tmpl.Interfaces["Configure"]
+		if !ok {
+			t.Log(k, "template missing Configure interface")
+			t.Fail()
+			continue
+		}
+
+		for opname, impl := range v {
+			op, ok := cfgIntf.Operations[opname]
+			if !ok {
+				t.Log(k, "--", opname, "operation missing from Configure interface")
+				t.Fail()
+				continue
+			}
+			if op.Implementation != impl {
+				t.Log(k, "--", opname, "operation has the wrong implementation: got", op.Implementation, "wanted:", impl)
+				t.Fail()
+			}
+		}
+	}
+}
+
 func TestParseBadImportsSimple(t *testing.T) {
 	fname := "./tests/invalids/test_bad_import_format.yaml"
 	var s ServiceTemplateDefinition
@@ -452,6 +518,8 @@ func TestMerge(t *testing.T) {
 		"tosca.nodes.Database":              1,
 		"tosca.nodes.DBMS":                  0,
 		"tosca.nodes.LoadBalancer":          1,
+		"tosca.nodes.network.Network":       0,
+		"tosca.nodes.network.Port":          2,
 		"tosca.nodes.Storage.ObjectStorage": 0,
 		"tosca.nodes.Root":                  1,
 		"tosca.nodes.SoftwareComponent":     1,

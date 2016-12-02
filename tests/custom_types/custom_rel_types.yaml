@@ -1,0 +1,17 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: GSLB to Web relationship type definition
+
+relationship_types:
+  my.relationships.ConnectsToWebUI:
+    derived_from: tosca.relationships.ConnectsTo
+    properties:
+      target_ip:
+        type: string
+    interfaces:
+      Configure:
+        post_configure_source:
+          inputs:
+            target_ip:
+              type: string
+          implementation: scripts/my_script.sh
