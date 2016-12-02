@@ -3,10 +3,6 @@
 (line 225) (kenjones): Add support for the evaluation of ConstraintClause
 
 
-### ``flattener.go``
-(line 14) (kenjones): Switch to reflect if possible in the future (if simple)
-
-
 ### ``parser.go``
 (line 84) (kenjones): Add hooks as method parameter
 
