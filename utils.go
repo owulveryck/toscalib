@@ -99,3 +99,10 @@ func get(k int, list []interface{}) string {
 	}
 	return ""
 }
+
+func remainder(k int, list []interface{}) []interface{} {
+	if len(list) <= k {
+		return make([]interface{}, 0)
+	}
+	return list[k+1:]
+}

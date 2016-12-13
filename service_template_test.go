@@ -234,6 +234,33 @@ func TestParseVerifyPropertyExpression(t *testing.T) {
 	}
 }
 
+func TestParseVerifyMapProperty(t *testing.T) {
+	fname := "./tests/tosca_nested_property_names_indexes.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	prop, ok := s.TopologyTemplate.NodeTemplates["mysql_database"].Properties["map_prop"]
+	if !ok {
+		t.Log(fname, "missing NodeTemplate `mysql_database` Property `map_prop`")
+		t.Fail()
+	}
+
+	data := map[string]string{"test": "dev", "other": "task"}
+
+	if ok := reflect.DeepEqual(prop.Value, data); !ok {
+		t.Log(fname, "missing or invalid value found for Property `map_prop`", prop.Value, "wanted:", data)
+		t.Fail()
+	}
+}
+
 func TestParseVerifyNTInterfaces(t *testing.T) {
 	fname := "./tests/tosca_interface_inheritance.yaml"
 	var s ServiceTemplateDefinition

@@ -411,6 +411,56 @@ func TestEvaluateGetAttributeFuncWithIndex(t *testing.T) {
 	}
 }
 
+func TestEvaluateGetAttributeFuncWithNamedIndex(t *testing.T) {
+	fname := "./tests/tosca_nested_property_names_indexes.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	nt := s.GetNodeTemplate("wordpress")
+	if nt == nil {
+		t.Log(fname, "missing NodeTemplate `wordpress`")
+		t.Fail()
+	}
+
+	intf, ok := nt.Interfaces["Standard"]
+	if !ok {
+		t.Log(fname, "missing Interface `Standard`")
+		t.Fail()
+	}
+
+	op, ok := intf.Operations["configure"]
+	if !ok {
+		t.Log(fname, "missing Operation `configure`")
+		t.Fail()
+	}
+
+	pa, ok := op.Inputs["wp_endpoint_protocol"]
+	if !ok {
+		t.Log(fname, "missing Operation Input `wp_endpoint_protocol`")
+		t.Fail()
+	}
+
+	v := pa.Evaluate(&s, "wordpress")
+	if vstr, ok := v.(string); ok {
+		if vstr != "tcp" {
+			t.Log(fname, "property evaluation failed to get value for `wp_endpoint_protocol`", vstr)
+			t.Fail()
+		}
+	} else {
+		t.Log("property value returned not the correct type", v)
+		t.Fail()
+	}
+
+}
+
 func TestEvaluateGetPropertyFuncWithCapInherit(t *testing.T) {
 	fname := "./tests/get_property_capabilties_inheritance.yaml"
 	var s ServiceTemplateDefinition

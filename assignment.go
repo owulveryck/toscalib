@@ -24,24 +24,32 @@ func (p *Assignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 
 	var m map[string]string
 	if err := unmarshal(&m); err == nil {
+		processed := false
 		for k, v := range m {
 			if isFunction(k) {
+				processed = true
 				p.Function = k
 				args := make([]interface{}, 1)
 				args[0] = v
 				p.Args = args
 			}
 			if isOperator(k) {
+				processed = true
 				p.Expression = ConstraintClause{Operator: k, Values: v}
 			}
+		}
+		if !processed {
+			p.Value = m
 		}
 		return nil
 	}
 
 	var mm map[string][]string
 	if err := unmarshal(&mm); err == nil {
+		processed := false
 		for k, v := range mm {
 			if isFunction(k) {
+				processed = true
 				p.Function = k
 				args := make([]interface{}, len(v))
 				for i, a := range v {
@@ -50,8 +58,12 @@ func (p *Assignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 				p.Args = args
 			}
 			if isOperator(k) {
+				processed = true
 				p.Expression = ConstraintClause{Operator: k, Values: v}
 			}
+		}
+		if !processed {
+			p.Value = mm
 		}
 		return nil
 	}
@@ -59,11 +71,16 @@ func (p *Assignment) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	// ex. concat function with another function embedded inside
 	var mmm map[string][]interface{}
 	if err := unmarshal(&mmm); err == nil {
+		processed := false
 		for k, v := range mmm {
 			if isFunction(k) {
+				processed = true
 				p.Function = k
 				p.Args = v
 			}
+		}
+		if !processed {
+			p.Value = mmm
 		}
 		return nil
 	}
@@ -130,6 +147,14 @@ func (p *Assignment) evaluate(std *ServiceTemplateDefinition, ctx, arg string) i
 		if pa := newAssignmentFunc(val); pa != nil {
 			return pa.Evaluate(std, ctx)
 		}
+
+		if len(p.Args) != 0 {
+			tmp := clone(*p)
+			pa, _ := tmp.(Assignment)
+			pa.Value = val
+			return pa.lookupValueArg(p.Args[0].(string))
+		}
+
 		return val
 	}
 	return p.Evaluate(std, ctx)
@@ -180,13 +205,16 @@ func (p *Assignment) evalProperty(std *ServiceTemplateDefinition, ctx string) in
 	if len(p.Args) >= 3 {
 		if rnt != nil {
 			if prop := rnt.findProperty(p.Args[2].(string), p.Args[1].(string)); prop != nil {
+				prop.Args = remainder(3, p.Args)
 				return prop.evaluate(std, rnt.Name, get(3, p.Args))
 			}
 		}
 		if prop := nt.findProperty(p.Args[2].(string), p.Args[1].(string)); prop != nil {
+			prop.Args = remainder(3, p.Args)
 			return prop.evaluate(std, nt.Name, get(3, p.Args))
 		}
 		if prop := nt.findProperty(p.Args[1].(string), ""); prop != nil {
+			prop.Args = remainder(2, p.Args)
 			return prop.evaluate(std, nt.Name, get(2, p.Args))
 		}
 	}
@@ -207,13 +235,16 @@ func (p *Assignment) evalAttribute(std *ServiceTemplateDefinition, ctx string) i
 	if len(p.Args) >= 3 {
 		if rnt != nil {
 			if attr := rnt.findAttribute(p.Args[2].(string), p.Args[1].(string)); attr != nil {
+				attr.Args = remainder(3, p.Args)
 				return attr.evaluate(std, rnt.Name, get(3, p.Args))
 			}
 		}
 		if attr := nt.findAttribute(p.Args[2].(string), p.Args[1].(string)); attr != nil {
+			attr.Args = remainder(3, p.Args)
 			return attr.evaluate(std, nt.Name, get(3, p.Args))
 		}
 		if attr := nt.findAttribute(p.Args[1].(string), ""); attr != nil {
+			attr.Args = remainder(2, p.Args)
 			return attr.evaluate(std, nt.Name, get(2, p.Args))
 		}
 	}
