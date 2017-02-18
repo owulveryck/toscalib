@@ -27,7 +27,7 @@ import "github.com/kenjones-cisco/mergo"
 type NodeTemplate struct {
 	Name         string
 	Type         string                             `yaml:"type" json:"type"`                                   // The required name of the Node Type the Node Template is based upon.
-	Decription   string                             `yaml:"description,omitempty" json:"description,omitempty"` // An optional description for the Node Template.
+	Description  string                             `yaml:"description,omitempty" json:"description,omitempty"` // An optional description for the Node Template.
 	Metadata     Metadata                           `yaml:"metadata,omitempty" json:"metadata"`
 	Directives   []string                           `yaml:"directives,omitempty" json:"-" json:"directives,omitempty"`     // An optional list of directive values to provide processing instructions to orchestrators and tooling.
 	Properties   map[string]PropertyAssignment      `yaml:"properties,omitempty" json:"-" json:"properties,omitempty"`     // An optional list of property value assignments for the Node Template.
@@ -39,8 +39,8 @@ type NodeTemplate struct {
 	NodeFilter   map[string]NodeFilter              `yaml:"node_filter,omitempty" json:"-" json:"node_filter,omitempty"`   // The optional filter definition that TOSCA orchestrators would use to select the correct target node.  This keyname is only valid if the directive has the value of “selectable” set.
 	Copy         string                             `yaml:"copy,omitempty" json:"copy,omitempty"`                          // The optional (symbolic) name of another node template to copy into (all keynames and values) and use as a basis for this node template.
 	Refs         struct {
-		Type NodeType `yaml:"-",json:"-"`
-	} `yaml:"-",json:"-"`
+		Type NodeType `yaml:"-" json:"-"`
+	} `yaml:"-" json:"-"`
 }
 
 // GetRequirement returns the Requirement with the specified name.

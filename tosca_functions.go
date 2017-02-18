@@ -16,6 +16,11 @@ const (
 	// Host is a ref a TOSCA orchestrator will interpret this keyword to refer to the all nodes
 	// that “host” the node using this reference (i.e., as identified by its HostedOn relationship).
 	Host = "HOST"
+
+	// LocalFile will indicate the orchestrator is responsible for providing a path as the result of the
+	// get_artifact call where the artifact file can be accessed. The orchestrator will also remove (by default)
+	// the artifact from this location at the end of the operation.
+	LocalFile = "LOCAL_FILE"
 )
 
 // Defines Tosca Function Names

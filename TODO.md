@@ -1,6 +1,7 @@
 ## To Do
+
 ### ``assignment.go``
-(line 225) (kenjones): Add support for the evaluation of ConstraintClause
+(line 319) (kenjones): Add support for the evaluation of ConstraintClause
 
 
 ### ``parser.go``
@@ -16,9 +17,5 @@
 
 
 ### ``tosca_reusable_modeling_definitions.go``
-(line 21) : Implement ArtifactDefinition struct
-
-(line 26) : Implement ArtifactType struct
-
-(line 29) : Implement NodeFilter struct
+(line 70) : Implement NodeFilter struct
 

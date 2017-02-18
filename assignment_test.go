@@ -509,3 +509,118 @@ func TestEvaluateGetPropertyFuncWithCapInherit(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestEvaluateTokenSuccess(t *testing.T) {
+	fname := "./tests/test_token.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	// make sure to set the attribute so a value can be returned
+	s.SetAttribute("server", "public_address", "127.0.0.1")
+	attr := s.GetAttribute("server", "public_address")
+	if attr.Value != "127.0.0.1" {
+		t.Log("failed to properly set the attribute to a value")
+		t.Fail()
+	}
+
+	pa := s.TopologyTemplate.Outputs["url"].Value
+	v := pa.Evaluate(&s, "")
+	if v.(string) != "127" {
+		t.Log(fname, "token evaluation failed to get value for `url`", v.(string))
+		t.Fail()
+	}
+
+}
+
+func TestEvaluateTokenFail(t *testing.T) {
+	fname := "./tests/test_token_invalid.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	pa := s.TopologyTemplate.Outputs["invalid_token_syntax_1"].Value
+	v := pa.Evaluate(&s, "")
+	if v != nil {
+		t.Log(fname, "token evaluation should return nil value for `invalid_token_syntax_1`", v)
+		t.Fail()
+	}
+
+	pa = s.TopologyTemplate.Outputs["invalid_token_syntax_2"].Value
+	v = pa.Evaluate(&s, "")
+	if v != nil {
+		t.Log(fname, "token evaluation should return nil value for `invalid_token_syntax_2`", v)
+		t.Fail()
+	}
+
+	pa = s.TopologyTemplate.Outputs["invalid_token_syntax_3"].Value
+	v = pa.Evaluate(&s, "")
+	if v != nil {
+		t.Log(fname, "token evaluation should return nil value for `invalid_token_syntax_3`", v)
+		t.Fail()
+	}
+}
+
+func TestEvaluateGetArtifact(t *testing.T) {
+	fname := "./tests/test_get_artifact.yaml"
+	var s ServiceTemplateDefinition
+	o, err := os.Open(fname)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = s.Parse(o)
+	if err != nil {
+		t.Log("Error in processing", fname)
+		t.Fatal(err)
+	}
+
+	nt := s.GetNodeTemplate("my_db")
+	if nt == nil {
+		t.Log(fname, "missing NodeTemplate `my_db`")
+		t.Fail()
+	}
+
+	intf, ok := nt.Interfaces["Standard"]
+	if !ok {
+		t.Log(fname, "missing Interface `Standard`")
+		t.Fail()
+	}
+
+	op, ok := intf.Operations["create"]
+	if !ok {
+		t.Log(fname, "missing Operation `create`")
+		t.Fail()
+	}
+
+	pa, ok := op.Inputs["db_data"]
+	if !ok {
+		t.Log(fname, "missing Operation Input `db_data`")
+		t.Fail()
+	}
+
+	v := pa.Evaluate(&s, "my_db")
+	if vstr, isString := v.(string); isString {
+		if vstr != "/tmp/my_db_content.txt" {
+			t.Log(fname, "artifact evaluation failed to get value for `db_data`", vstr)
+			t.Fail()
+		}
+	} else {
+		t.Log("property value returned not the correct type", v)
+		t.Fail()
+	}
+
+}

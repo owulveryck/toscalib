@@ -1,6 +1,10 @@
 package toscalib
 
-import "reflect"
+import (
+	"io/ioutil"
+	"path/filepath"
+	"reflect"
+)
 
 // Original source:
 // https://gist.github.com/hvoecking/10772475
@@ -105,4 +109,29 @@ func remainder(k int, list []interface{}) []interface{} {
 		return make([]interface{}, 0)
 	}
 	return list[k+1:]
+}
+
+func copyFile(src, destDir string) (string, error) {
+	absSrc, err := filepath.Abs(src)
+	if err != nil {
+		return "", err
+	}
+	srcFilename := filepath.Base(absSrc)
+
+	dest, err := filepath.Abs(filepath.Join(destDir, srcFilename))
+	if err != nil {
+		return "", err
+	}
+
+	data, err := ioutil.ReadFile(absSrc)
+	if err != nil {
+		return "", err
+	}
+	// Write data to dst
+	err = ioutil.WriteFile(dest, data, 0644)
+	if err != nil {
+		return "", err
+	}
+
+	return dest, nil
 }

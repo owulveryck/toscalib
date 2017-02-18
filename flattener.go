@@ -3,12 +3,40 @@ package toscalib
 import "github.com/kenjones-cisco/mergo"
 
 type flatTypes struct {
+	ArtifactTypes map[string]ArtifactType
 	Capabilities  map[string]CapabilityType
 	Interfaces    map[string]InterfaceType
 	Relationships map[string]RelationshipType
 	Nodes         map[string]NodeType
 	Groups        map[string]GroupType
 	Policies      map[string]PolicyType
+}
+
+func flattenArtType(name string, s ServiceTemplateDefinition) ArtifactType {
+	if at, ok := s.ArtifactTypes[name]; ok {
+		if at.DerivedFrom != "" {
+			parent := flattenArtType(at.DerivedFrom, s)
+
+			// clone the parent first before applying any changes
+			tmp := clone(parent)
+			atm, _ := tmp.(ArtifactType)
+
+			// mergo does not handle merging Slices so the items
+			// will wipe away, capture the values here.
+			exts := atm.FileExt
+
+			_ = mergo.MergeWithOverwrite(&atm, at)
+
+			// now copy them back in using append, if the child type had
+			// any previously, otherwise it will duplicate the parents.
+			if len(at.FileExt) > 0 {
+				atm.FileExt = append(atm.FileExt, exts...)
+			}
+			return atm
+		}
+		return at
+	}
+	return ArtifactType{}
 }
 
 func flattenCapType(name string, s ServiceTemplateDefinition) CapabilityType {
@@ -169,6 +197,11 @@ func flattenPolicyType(name string, s ServiceTemplateDefinition) PolicyType {
 
 func flattenHierarchy(s ServiceTemplateDefinition) flatTypes {
 	var flats flatTypes
+
+	flats.ArtifactTypes = make(map[string]ArtifactType)
+	for name := range s.ArtifactTypes {
+		flats.ArtifactTypes[name] = flattenArtType(name, s)
+	}
 
 	flats.Capabilities = make(map[string]CapabilityType)
 	for name := range s.CapabilityTypes {

@@ -2,8 +2,10 @@ package toscalib
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 // Assignment supports Value evaluation
@@ -191,6 +193,67 @@ func (p *Assignment) evalConcat(std *ServiceTemplateDefinition, ctx string) inte
 	return output
 }
 
+func (p *Assignment) evalToken(std *ServiceTemplateDefinition, ctx string) interface{} {
+	var output string
+	var value string
+	var token string
+	for idx, val := range p.Args {
+		switch reflect.TypeOf(val).Kind() {
+		case reflect.String:
+			// the first and second arg must result be of type string or resolve
+			// to be a string.
+			if idx == 0 {
+				value = val.(string)
+			} else if idx == 1 {
+				token = val.(string)
+			}
+		case reflect.Map:
+			// the first input could actually be a lookup for the value
+			if idx == 0 {
+				if pa := newAssignmentFunc(val); pa != nil {
+					if o := pa.Evaluate(std, ctx); o != nil {
+						value = fmt.Sprintf("%s", o)
+					}
+				}
+			}
+		case reflect.Int:
+			// the 3rd arg must be an int
+			if idx == 2 && value != "" && token != "" {
+				output = strings.Split(value, token)[val.(int)]
+			}
+		}
+	}
+	if output == "" {
+		return nil
+	}
+	return output
+}
+
+func (p *Assignment) evalArtifact(std *ServiceTemplateDefinition, ctx string) interface{} {
+	nt, _ := getNTByArgs(std, ctx, p.Args)
+	if nt == nil {
+		return nil
+	}
+
+	if at, ok := nt.Artifacts[p.Args[1].(string)]; ok {
+		// set default location to the 'temp|tmp' directory to handle 'LOCAL_FILE' being specified
+		// or no location or deploy_path is specified.
+		location := os.TempDir()
+		if loc := get(2, p.Args); loc != "" && loc != LocalFile {
+			location = loc
+		} else if at.DeployPath != "" {
+			location = at.DeployPath
+		}
+
+		destFile, err := copyFile(at.File, location)
+		if err != nil {
+			return nil
+		}
+		return destFile
+	}
+	return nil
+}
+
 func (p *Assignment) evalProperty(std *ServiceTemplateDefinition, ctx string) interface{} {
 	nt, rnt := getNTByArgs(std, ctx, p.Args)
 	if nt == nil {
@@ -261,6 +324,17 @@ func (p *Assignment) Evaluate(std *ServiceTemplateDefinition, ctx string) interf
 	switch p.Function {
 	case ConcatFunc:
 		return p.evalConcat(std, ctx)
+
+	case TokenFunc:
+		// there are 3 required args
+		if len(p.Args) == 3 {
+			return p.evalToken(std, ctx)
+		}
+
+	case GetArtifactFunc:
+		if len(p.Args) > 1 {
+			return p.evalArtifact(std, ctx)
+		}
 
 	case GetInputFunc:
 		if len(p.Args) == 1 {

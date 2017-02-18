@@ -18,13 +18,54 @@ package toscalib
 
 import "fmt"
 
-// ArtifactDefinition Appendix 5.5 TODO: Implement ArtifactDefinition struct
-type ArtifactDefinition map[string]interface{}
+// ArtifactDefinition defines a named, typed file that can be associated with Node Type or
+// Node Template and used by orchestration engine to facilitate deployment and implementation
+// of interface operations.
+type ArtifactDefinition struct {
+	Type        string `yaml:"type" json:"type"`                                   // the required artifact type the artifact definition is based upon
+	File        string `yaml:"file" json:"file"`                                   // equired URI string (relative or absolute) which can be used to locate the artifact’s file
+	Repository  string `yaml:"repository" json:"repository"`                       // optional name of the repository definition to use to retrieve the associated artifact (file) from
+	Description string `yaml:"description,omitempty" json:"description,omitempty"` // optional description for the artifact
+	DeployPath  string `yaml:"deploy_path,omitempty" json:"deploy_path,omitempty"` // optional path the artifact_file_URI would be copied into within the target node’s container
+}
 
-// ArtifactType as described in appendix 6.3
-// An Artifact Type is a reusable entity that defines the type of one or more files which Node Types or Node Templates can have dependent relationships and used during operations such as during installation or deployment.
-// TODO: Implement ArtifactType struct
-type ArtifactType interface{}
+// UnmarshalYAML converts YAML text to a type
+func (d *ArtifactDefinition) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	var s string
+	if err := unmarshal(&s); err == nil {
+		d.File = s
+		return nil
+	}
+	var str struct {
+		Type        string `yaml:"type" json:"type"`
+		File        string `yaml:"file" json:"file"`
+		Repository  string `yaml:"repository" json:"repository"`
+		Description string `yaml:"description,omitempty" json:"description,omitempty"`
+		DeployPath  string `yaml:"deploy_path,omitempty" json:"deploy_path,omitempty"`
+	}
+	if err := unmarshal(&str); err != nil {
+		return err
+	}
+	d.Type = str.Type
+	d.File = str.File
+	d.Repository = str.Repository
+	d.Description = str.Description
+	d.DeployPath = str.DeployPath
+	return nil
+}
+
+// ArtifactType is a reusable entity that defines the type of one or more files that are used to
+// define implementation or deployment artifacts that are referenced by nodes or relationships on
+// their operations.
+type ArtifactType struct {
+	DerivedFrom string                        `yaml:"derived_from,omitempty" json:"derived_from"` // optional name of the Artifact Type this Artifact Type definition derives from
+	Version     Version                       `yaml:"version,omitempty" json:"version"`
+	Description string                        `yaml:"description,omitempty" json:"description"`
+	Metadata    Metadata                      `yaml:"metadata,omitempty" json:"metadata"`
+	MimeType    string                        `yaml:"mime_type,omitempty" json:"mime_type"`             // optional Multipurpose Internet Mail Extensions (MIME) standard string value that describes the file contents for this type of Artifact Type
+	FileExt     []string                      `yaml:"file_ext,omitempty" json:"file_ext"`               // optional list of one or more recognized file extensions for this type of artifact type
+	Properties  map[string]PropertyDefinition `yaml:"properties,omitempty" json:"properties,omitempty"` // optional list of property definitions for the artifact type
+}
 
 // NodeFilter Appendix 5.4 TODO: Implement NodeFilter struct
 // A node filter definition defines criteria for selection of a TOSCA Node Template based upon the template’s property values, capabilities and capability properties.

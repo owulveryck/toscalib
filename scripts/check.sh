@@ -10,6 +10,7 @@ set -o pipefail
 gometalinter \
     --exclude='normative_definitions\.go:.*$' \
     --exclude='error return value not checked.*(Close|Log|Print).*\(errcheck\)$' \
+    --exclude='^tosca_functions\.go.*warning: Potential hardcoded credentials,HIGH,LOW \(gas\)$' \
     --disable=aligncheck \
     --disable=dupl \
     --disable=gotype \

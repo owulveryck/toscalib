@@ -1,0 +1,42 @@
+tosca_definitions_version: tosca_simple_yaml_1_0
+
+description: Template for deploying MySQL and database content.
+
+topology_template:
+  inputs:
+    # omitted here for brevity
+
+  node_templates:
+    my_db:
+      type: tosca.nodes.Database.MySQL
+      properties:
+        name: { get_input: database_name }
+        user: { get_input: database_user }
+        password: { get_input: database_password }
+        port: { get_input: database_port }
+      artifacts:
+        db_content:
+          file: tests/files/my_db_content.txt
+          type: tosca.artifacts.File
+      requirements:
+        - host: mysql
+      interfaces:
+        Standard:
+          create:
+            implementation: db_create.sh
+            inputs:
+              # Copy DB file artifact to server’s staging area
+              db_data: { get_artifact: [ SELF, db_content ] }
+
+    mysql:
+      type: tosca.nodes.DBMS.MySQL
+      properties:
+        root_password: { get_input: mysql_rootpw }
+        port: { get_input: mysql_port }
+      requirements:
+        - host: db_server
+
+    db_server:
+      type: tosca.nodes.Compute
+      capabilities:
+        # omitted here for brevity
