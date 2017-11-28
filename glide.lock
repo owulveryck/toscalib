@@ -1,19 +1,19 @@
 hash: b38aa1a8a50f4097b8acba76b8f5004895a6d8c8174bbb4aaebd7556056d4870
-updated: 2016-10-28T21:14:53.071030672Z
+updated: 2017-11-28T14:24:29.063049585+05:30
 imports:
 - name: github.com/blang/semver
-  version: 60ec3488bfea7cca02b021d106d9911120d25fe9
+  version: 2ee87856327ba09384cabd113bc6b5d174e9ec0f
 - name: github.com/kenjones-cisco/mergo
   version: 0149f50ea824b391564215914d0e54ac298dd216
 - name: golang.org/x/tools
-  version: c6efba04dd0d931bb11cd7f556285fa3c9305398
+  version: 6d70fb2e85323e81c89374331d3d2b93304faa36
   subpackages:
   - godoc/vfs
   - godoc/vfs/zipfs
 - name: gopkg.in/yaml.v2
-  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
+  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
 testImports:
 - name: github.com/davecgh/go-spew
-  version: 6cf5744a041a0022271cefed95ba843f6d87fd51
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
   subpackages:
   - spew

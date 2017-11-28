@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"golang.org/x/tools/godoc/vfs"
@@ -77,10 +78,7 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 			return r, err
 		}
 		r, err = ioutil.ReadAll(rsc)
-		if err != nil {
-			return r, err
-		}
-		return r, nil
+		return r, err
 	}, ParserHooks{ParsedSTD: noop}) // TODO(kenjones): Add hooks as method parameter
 }
 
@@ -181,6 +179,14 @@ func (t *ServiceTemplateDefinition) ParseReader(r io.Reader, resolver Resolver, 
 // ParseSource retrieves and parses a TOSCA document and loads into the structure using
 // specified Resolver function to retrieve remote source or imports.
 func (t *ServiceTemplateDefinition) ParseSource(source string, resolver Resolver, hooks ParserHooks) error {
+	if isLocalPath(source) {
+		prevDir := setWorkingDir(source)
+		if prevDir != "" {
+			defer func() {
+				_ = os.Chdir(prevDir)
+			}()
+		}
+	}
 	data, err := resolver(source)
 	if err != nil {
 		return err
