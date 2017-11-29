@@ -138,28 +138,6 @@ func copyFile(src, destDir string) (string, error) {
 }
 
 func isLocalPath(location string) bool {
-	if _, err := os.Stat(location); err != nil {
-		return false
-	}
-	return true
-}
-
-// setWorkingDir will set current working directory as base of filename.
-// returns previous working directory
-func setWorkingDir(fileName string) string {
-	prevDir := ""
-	if filepath.IsAbs(fileName) {
-		var err error
-		baseDir, _ := filepath.Split(fileName)
-		prevDir, err = os.Getwd()
-		if err != nil {
-			return ""
-		}
-		if baseDir != "" {
-			if err = os.Chdir(baseDir); err != nil {
-				return ""
-			}
-		}
-	}
-	return prevDir
+	_, err := os.Stat(location)
+	return err == nil
 }
