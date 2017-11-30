@@ -2,6 +2,6 @@
 
 vendor/
 .glide/
-
+tmp/
 cover/
 *.txt

@@ -39,39 +39,60 @@ DOCKERRUN := docker run --rm \
 	${DEV_IMAGE}
 
 DOCKERNOVENDOR := docker run --rm -i \
-	-e LDFLAGS="${LDFLAGS}" \
 	-v ${ROOT}:/${PROJECT}/src/${IMPORT_PATH} \
 	-w /${PROJECT}/src/${IMPORT_PATH} \
 	${DEV_IMAGE}
 
 clean:
-	@rm -rf cover
+	@${DOCKERRUN} bash -c 'rm -rf cover'
 
+## Same as clean but also removes cached dependencies.
 veryclean: clean
-	@rm -rf .glide vendor
+	@${DOCKERRUN} bash -c 'rm -rf tmp .glide vendor'
+
+## prefix before other make targets to run in your local dev environment
+local: | quiet
+	@$(eval DOCKERRUN= )
+	@$(eval DOCKERNOVENDOR= )
+	@mkdir -p tmp
+	@touch tmp/dev_image_id
+quiet: # this is silly but shuts up 'Nothing to be done for `local`'
+	@:
+
+## builds the dev container
+prepare: tmp/dev_image_id
+tmp/dev_image_id: Dockerfile.dev
+	@mkdir -p tmp
+	@docker rmi -f ${DEV_IMAGE} > /dev/null 2>&1 || true
+	@echo "## Building dev container"
+	@docker build --quiet -t ${DEV_IMAGE} -f Dockerfile.dev .
+	@docker inspect -f "{{ .ID }}" ${DEV_IMAGE} > tmp/dev_image_id
 
 # ----------------------------------------------
-# build
+# dependencies
+# NOTE: glide will be replaced with `dep` when its production-ready
+# ref https://github.com/golang/dep
 
-# builds the builder container
-.PHONY: build/image_build
-build/image_build:
-	@echo "Building dev container"
-	@docker build --quiet -t ${DEV_IMAGE} -f Dockerfile.dev .
+## Install dependencies using glide if glide.yaml changed.
+vendor: tmp/glide-installed
+tmp/glide-installed: tmp/dev_image_id glide.yaml
+	@mkdir -p vendor
+	${DOCKERRUN} glide install
+	@date > tmp/glide-installed
 
-# top-level target for vendoring our packages: glide install requires
-# being in the package directory so we have to run this for each package
-.PHONY: vendor
-vendor: build/image_build
-ifeq ($(INSTALL_VENDOR),1)
-	${DOCKERRUN} glide install --skip-test
-endif
+## Install all dependencies using glide.
+dep-install: prepare
+	@mkdir -p vendor
+	${DOCKERRUN} glide install
+	@date > tmp/glide-installed
 
-# fetch a dependency via go get, vendor it, and then save into the parent
-# package's glide.yml
-# usage: DEP=github.com/owner/package make add-dep
-.PHONY: add-dep
-add-dep: build/image_build
+## Update dependencies using glide.
+dep-update: prepare
+	${DOCKERRUN} glide up
+
+# usage DEP=github.com/owner/package make dep-add
+## Add new dependencies to glide and install.
+dep-add: prepare
 ifeq ($(strip $(DEP)),)
 	$(error "No dependency provided. Expected: DEP=<go import path>")
 endif
@@ -81,8 +102,15 @@ endif
 # develop and test
 
 .PHONY: format
-format: vendor
+format: tmp/glide-installed
+	git status
 	${DOCKERNOVENDOR} bash ./scripts/fmt.sh
+	git status
+ifeq ($(CI),true)
+	@if ! git diff-index --quiet HEAD; then echo "goimports modified code; requires attention!"; exit 1; fi
+else
+	@if ! git diff-index --quiet HEAD; then echo "goimports modified code; requires attention!"; fi
+endif
 
 .PHONY: check
 check: format
@@ -102,7 +130,7 @@ cover: check
 
 # ------ Generator
 .PHONY: generate
-generate: build/image_build NormativeTypes/*
+generate: prepare NormativeTypes/*
 	${DOCKERRUN} go-bindata -pkg=toscalib -prefix=NormativeTypes/ -o normative_definitions.go NormativeTypes/
 
 # ------ Minishift / Docker Machine Helpers
