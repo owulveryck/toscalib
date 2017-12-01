@@ -137,7 +137,10 @@ func copyFile(src, destDir string) (string, error) {
 	return dest, nil
 }
 
-func isLocalPath(location string) bool {
-	_, err := os.Stat(location)
-	return err == nil
+func isAbsLocalPath(location string) bool {
+	if filepath.IsAbs(location) {
+		_, err := os.Stat(location)
+		return !os.IsNotExist(err)
+	}
+	return false
 }

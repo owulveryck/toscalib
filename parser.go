@@ -76,8 +76,7 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 		if err != nil {
 			return r, err
 		}
-		r, err = ioutil.ReadAll(rsc)
-		return r, err
+		return ioutil.ReadAll(rsc)
 	}, ParserHooks{ParsedSTD: noop}) // TODO(kenjones): Add hooks as method parameter
 }
 
@@ -86,9 +85,10 @@ func parseImports(baseDir string, impDefs []ImportDefinition, resolver Resolver,
 
 	for _, im := range impDefs {
 		imFilePath := im.File
-		temp := filepath.Join(baseDir, imFilePath)
-		if baseDir != "" && isLocalPath(temp) {
-			imFilePath = temp
+		if baseDir != "" {
+			if temp := filepath.Join(baseDir, imFilePath); isAbsLocalPath(temp) {
+				imFilePath = temp
+			}
 		}
 
 		r, err := resolver(imFilePath)
@@ -107,9 +107,6 @@ func parseImports(baseDir string, impDefs []ImportDefinition, resolver Resolver,
 		}
 
 		if len(tt.Imports) != 0 {
-			if isLocalPath(imFilePath) && filepath.IsAbs(imFilePath) {
-				baseDir, _ = filepath.Split(imFilePath)
-			}
 			var imptt ServiceTemplateDefinition
 			imptt, err = parseImports(baseDir, tt.Imports, resolver, hooks)
 			if err != nil {
@@ -188,7 +185,7 @@ func (t *ServiceTemplateDefinition) ParseReader(r io.Reader, resolver Resolver, 
 // specified Resolver function to retrieve remote source or imports.
 func (t *ServiceTemplateDefinition) ParseSource(source string, resolver Resolver, hooks ParserHooks) error {
 	baseDir := ""
-	if isLocalPath(source) && filepath.IsAbs(source) {
+	if isAbsLocalPath(source) {
 		baseDir, _ = filepath.Split(source)
 	}
 	data, err := resolver(source)
