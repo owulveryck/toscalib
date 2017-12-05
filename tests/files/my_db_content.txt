@@ -1,0 +1,3 @@
+username: abc123
+password: fake
+schema: wp

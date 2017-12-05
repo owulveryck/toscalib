@@ -76,11 +76,7 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 		if err != nil {
 			return r, err
 		}
-		r, err = ioutil.ReadAll(rsc)
-		if err != nil {
-			return r, err
-		}
-		return r, nil
+		return ioutil.ReadAll(rsc)
 	}, ParserHooks{ParsedSTD: noop}) // TODO(kenjones): Add hooks as method parameter
 }
 

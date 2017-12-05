@@ -5,3 +5,4 @@ vendor/
 tmp/
 cover/
 *.txt
+!tests/files/my_db_content.txt

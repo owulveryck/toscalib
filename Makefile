@@ -103,9 +103,7 @@ endif
 
 .PHONY: format
 format: tmp/glide-installed
-	git status
 	${DOCKERNOVENDOR} bash ./scripts/fmt.sh
-	git status
 ifeq ($(CI),true)
 	@if ! git diff-index --quiet HEAD; then echo "goimports modified code; requires attention!"; exit 1; fi
 else
