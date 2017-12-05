@@ -105,7 +105,7 @@ endif
 format: tmp/glide-installed
 ifeq ($(CI),true)
 	${DOCKERNOVENDOR} bash ./scripts/fmt.sh
-	@if ! git diff-index --quiet HEAD; then echo "goimports modified code; requires attention!"; exit 1; fi
+	@if ! git diff-index --quiet HEAD; then echo "goimports modified code; requires attention!"; git status ; exit 1; fi
 else
 	${DOCKERNOVENDOR} bash ./scripts/fmt.sh
 	@if ! git diff-index --quiet HEAD; then echo "goimports modified code; requires attention!"; fi
