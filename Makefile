@@ -30,6 +30,8 @@ ifneq ($(strip $(FORCE_VENDOR_INSTALL)),)
 	INSTALL_VENDOR := 1
 endif
 
+CI ?= false
+
 DEV_IMAGE := ${PROJECT}_dev
 
 DOCKERRUN := docker run --rm \
@@ -39,6 +41,7 @@ DOCKERRUN := docker run --rm \
 	${DEV_IMAGE}
 
 DOCKERNOVENDOR := docker run --rm -i \
+	-e CI="${CI}" \
 	-v ${ROOT}:/${PROJECT}/src/${IMPORT_PATH} \
 	-w /${PROJECT}/src/${IMPORT_PATH} \
 	${DEV_IMAGE}
@@ -103,13 +106,7 @@ endif
 
 .PHONY: format
 format: tmp/glide-installed
-ifeq ($(CI),true)
 	${DOCKERNOVENDOR} bash ./scripts/fmt.sh
-	@if ! git diff-index --quiet HEAD; then echo "goimports modified code; requires attention!"; git status ; exit 1; fi
-else
-	${DOCKERNOVENDOR} bash ./scripts/fmt.sh
-	@if ! git diff-index --quiet HEAD; then echo "goimports modified code; requires attention!"; fi
-endif
 
 .PHONY: check
 check: format
