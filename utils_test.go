@@ -1,6 +1,8 @@
 package toscalib
 
 import (
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -128,5 +130,29 @@ func TestCloneStructWithPointerToStructWrappedWithInterface(t *testing.T) {
 	translated := clone(original)
 	if ok := reflect.DeepEqual(original, translated); !ok {
 		t.Fatal(spew.Sdump(original), "!=", spew.Sdump(translated))
+	}
+}
+
+func TestIsAbsLocalPath(t *testing.T) {
+	type localStruct struct {
+		fileName string
+		expected bool
+	}
+	testFiles := []localStruct{{"tests/example1.yaml", true},
+		{"tests/tosca_helloworld.yaml", true},
+		{"does_not_exist.yaml", false},
+	}
+
+	dir, _ := os.Getwd()
+	for _, testFile := range testFiles {
+		result := isAbsLocalPath(filepath.Join(dir, testFile.fileName))
+		if result != testFile.expected {
+			t.Errorf("checking profile %v, expected %v, actual %v", testFile.fileName, testFile.expected, result)
+		}
+	}
+
+	//test case relative path
+	if isAbsLocalPath("tests/tosca_helloworld.yaml") {
+		t.Errorf("relative path test case: expected false but got true")
 	}
 }

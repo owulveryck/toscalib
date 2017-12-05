@@ -2,6 +2,7 @@ package toscalib
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"reflect"
 )
@@ -134,4 +135,12 @@ func copyFile(src, destDir string) (string, error) {
 	}
 
 	return dest, nil
+}
+
+func isAbsLocalPath(location string) bool {
+	if filepath.IsAbs(location) {
+		_, err := os.Stat(location)
+		return !os.IsNotExist(err)
+	}
+	return false
 }

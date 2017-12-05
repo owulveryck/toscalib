@@ -80,11 +80,18 @@ func (t *ServiceTemplateDefinition) ParseCsar(zipfile string) error {
 	}, ParserHooks{ParsedSTD: noop}) // TODO(kenjones): Add hooks as method parameter
 }
 
-func parseImports(impDefs []ImportDefinition, resolver Resolver, hooks ParserHooks) (ServiceTemplateDefinition, error) {
+func parseImports(baseDir string, impDefs []ImportDefinition, resolver Resolver, hooks ParserHooks) (ServiceTemplateDefinition, error) {
 	var std ServiceTemplateDefinition
 
 	for _, im := range impDefs {
-		r, err := resolver(im.File)
+		imFilePath := im.File
+		if baseDir != "" {
+			if temp := filepath.Join(baseDir, imFilePath); isAbsLocalPath(temp) {
+				imFilePath = temp
+			}
+		}
+
+		r, err := resolver(imFilePath)
 		if err != nil {
 			return std, err
 		}
@@ -94,14 +101,14 @@ func parseImports(impDefs []ImportDefinition, resolver Resolver, hooks ParserHoo
 		if err != nil {
 			return std, err
 		}
-		err = hooks.ParsedSTD(im.File, &tt)
+		err = hooks.ParsedSTD(imFilePath, &tt)
 		if err != nil {
 			return std, err
 		}
 
 		if len(tt.Imports) != 0 {
 			var imptt ServiceTemplateDefinition
-			imptt, err = parseImports(tt.Imports, resolver, hooks)
+			imptt, err = parseImports(baseDir, tt.Imports, resolver, hooks)
 			if err != nil {
 				return std, err
 			}
@@ -114,7 +121,7 @@ func parseImports(impDefs []ImportDefinition, resolver Resolver, hooks ParserHoo
 	return std, nil
 }
 
-func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver, hooks ParserHooks) error {
+func (t *ServiceTemplateDefinition) parse(baseDir string, data []byte, resolver Resolver, hooks ParserHooks) error {
 	var std ServiceTemplateDefinition
 	// Unmarshal the data in an interface
 	err := yaml.Unmarshal(data, &std)
@@ -149,7 +156,7 @@ func (t *ServiceTemplateDefinition) parse(data []byte, resolver Resolver, hooks 
 
 	// Load all referenced Imports (recursively)
 	var tt ServiceTemplateDefinition
-	tt, err = parseImports(std.Imports, resolver, hooks)
+	tt, err = parseImports(baseDir, std.Imports, resolver, hooks)
 	if err != nil {
 		return err
 	}
@@ -171,17 +178,21 @@ func (t *ServiceTemplateDefinition) ParseReader(r io.Reader, resolver Resolver, 
 	if err != nil {
 		return err
 	}
-	return t.parse(data, resolver, hooks)
+	return t.parse("", data, resolver, hooks)
 }
 
 // ParseSource retrieves and parses a TOSCA document and loads into the structure using
 // specified Resolver function to retrieve remote source or imports.
 func (t *ServiceTemplateDefinition) ParseSource(source string, resolver Resolver, hooks ParserHooks) error {
+	baseDir := ""
+	if isAbsLocalPath(source) {
+		baseDir, _ = filepath.Split(source)
+	}
 	data, err := resolver(source)
 	if err != nil {
 		return err
 	}
-	return t.parse(data, resolver, hooks)
+	return t.parse(baseDir, data, resolver, hooks)
 }
 
 // Parse a TOSCA document and fill in the structure
