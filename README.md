@@ -8,6 +8,7 @@ This library is an implementation of the TOSCA definition as described in the do
 [![GoDoc][1]][2]
 [![GoCard][3]][4]
 [![coverage][5]][6]
+[![Build Status][7]][8]
 
 [1]: https://godoc.org/github.com/CiscoCloud/toscalib?status.svg
 [2]: https://godoc.org/github.com/CiscoCloud/toscalib
@@ -15,6 +16,8 @@ This library is an implementation of the TOSCA definition as described in the do
 [4]: https://goreportcard.com/report/github.com/CiscoCloud/toscalib
 [5]: http://gocover.io/_badge/github.com/CiscoCloud/toscalib
 [6]: http://gocover.io/github.com/CiscoCloud/toscalib
+[7]: https://travis-ci.org/CiscoCloud/toscalib.svg?branch=master
+[8]: https://travis-ci.org/CiscoCloud/toscalib
 
 ## Plans
 
