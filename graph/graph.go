@@ -9,6 +9,17 @@ import (
 	"github.com/owulveryck/toscalib"
 )
 
+var (
+	// StopOp is the starting point of the workflow
+	StopOp = &Operation{
+		OperationName: "STOP",
+	}
+	// StartOp is the starting point of the workflow
+	StartOp = &Operation{
+		OperationName: "START",
+	}
+)
+
 // NodeInstance is a structure that represents a TOSCA's Node Template
 // A Node Template specifies the occurrence of a software component node
 // as part of a Topology Template.
@@ -22,6 +33,11 @@ type NodeInstance struct {
 // See https://godoc.org/github.com/gonum/graph#Node
 func (n *NodeInstance) ID() int {
 	return n.id
+}
+
+// DOTID to fulfil the dot encoding node interface
+func (n *NodeInstance) DOTID() string {
+	return n.template.Name
 }
 
 // GetGraphs from a service template definition; the first graph is a graph of the node templates relationships
@@ -112,27 +128,21 @@ func GetGraphs(t toscalib.ServiceTemplateDefinition) (graph.Graph, graph.Graph) 
 		}
 	}
 	// Add a start and an end node
-	startOp := &Operation{
-		OperationName: "START",
-		id:            workflow.NewNodeID(),
-	}
-	workflow.AddNode(startOp)
-	stopOp := &Operation{
-		OperationName: "STOP",
-		id:            workflow.NewNodeID(),
-	}
-	workflow.AddNode(stopOp)
+	StartOp.id = workflow.NewNodeID()
+	workflow.AddNode(StartOp)
+	StopOp.id = workflow.NewNodeID()
+	workflow.AddNode(StopOp)
 	for _, node := range workflow.Nodes() {
-		if len(workflow.To(node)) == 0 && node != startOp && node != stopOp {
+		if len(workflow.To(node)) == 0 && node != StartOp && node != StopOp {
 			workflow.SetEdge(simple.Edge{
 				T: node,
-				F: startOp,
+				F: StartOp,
 			})
 		}
-		if len(workflow.From(node)) == 0 && node != startOp && node != stopOp {
+		if len(workflow.From(node)) == 0 && node != StartOp && node != StopOp {
 			workflow.SetEdge(simple.Edge{
 				F: node,
-				T: stopOp,
+				T: StopOp,
 			})
 		}
 	}
